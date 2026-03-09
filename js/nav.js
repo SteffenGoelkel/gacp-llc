@@ -65,7 +65,7 @@ function getFooterHTML() {
           </div>
           <div>
             <h4 class="footer__col-heading">Contact</h4>
-            <a href="/register.html" class="footer__link">Get in Touch</a>
+            <a href="/contact.html" class="footer__link">Get in Touch</a>
           </div>
         </div>
         <div class="footer__bottom">
