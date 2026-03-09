@@ -81,20 +81,20 @@
 /* Zone labels */
 .hero__zone-label {
   position: absolute;
-  bottom: 120px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   z-index: 4;
   text-align: center;
   opacity: 0;
   transition: opacity var(--dur-slow) var(--ease-out),
               transform var(--dur-slow) var(--ease-out);
-  transform: translateX(-50%) translateY(10px);
+  transform: translate(-50%, -40%);
 }
 
 .hero__zone:hover .hero__zone-label {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translate(-50%, -50%);
 }
 
 .hero__zone-label span {
@@ -226,7 +226,6 @@
 /* --- Responsive -------------------------------------------- */
 @media (max-width: 1024px) {
   .hero__title { font-size: var(--fs-4xl); }
-  .hero__zone-label { bottom: 140px; }
 }
 
 @media (max-width: 768px) {
