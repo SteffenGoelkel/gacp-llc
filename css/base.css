@@ -220,13 +220,18 @@ small, .text-sm { font-size: var(--fs-sm); }
 }
 
 .fade-in {
-  opacity: 0;
-  transform: translateY(20px);
+  opacity: 1;
+  transform: translateY(0);
   transition: opacity var(--dur-slower) var(--ease-out),
               transform var(--dur-slower) var(--ease-out);
 }
 
-.fade-in.visible {
+.js-ready .fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.js-ready .fade-in.visible {
   opacity: 1;
   transform: translateY(0);
 }
