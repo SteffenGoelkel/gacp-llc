@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — GACP LLC</title>
+  <meta name="description" content="Get in touch with GACP LLC for enquiries about botanical extracts, trade accounts, and custom formulations.">
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+
+    <main class="page-main">
+
+      <section class="page-header" style="padding:var(--sp-5xl) 0 var(--sp-3xl);background:linear-gradient(to bottom, var(--ink-light), var(--ink))">
+        <div class="container">
+          <p class="label text-accent fade-in" style="margin-bottom:var(--sp-md)">Get in Touch</p>
+          <h1 class="fade-in">Contact Us</h1>
+          <p class="fade-in" style="margin-top:var(--sp-lg);font-size:var(--fs-md)">Questions about our products, trade accounts, or custom formulations? We'd love to hear from you.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="grid grid-2 gap-2xl" style="align-items:start">
+
+            <!-- Form -->
+            <div class="fade-in">
+              <form id="contact-form" style="max-width:480px">
+                <div class="form-group">
+                  <label class="form-label form-label--required" for="contact-name">Name</label>
+                  <input type="text" name="name" id="contact-name" class="form-input" placeholder="Your full name" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label form-label--required" for="contact-email">Email</label>
+                  <input type="email" name="email" id="contact-email" class="form-input" placeholder="you@company.com" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="contact-company">Company</label>
+                  <input type="text" name="company" id="contact-company" class="form-input" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label form-label--required" for="contact-subject">Subject</label>
+                  <select name="subject" id="contact-subject" class="form-select" required>
+                    <option value="">Select a topic…</option>
+                    <option value="General Enquiry">General Enquiry</option>
+                    <option value="Trade Account">Trade Account</option>
+                    <option value="Product Information">Product Information</option>
+                    <option value="Custom Formulation">Custom Formulation</option>
+                    <option value="Bulk Pricing">Bulk Pricing</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label form-label--required" for="contact-message">Message</label>
+                  <textarea name="message" id="contact-message" class="form-textarea" placeholder="Tell us how we can help…" rows="5" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn--primary btn--lg btn--full">Send Message</button>
+              </form>
+            </div>
+
+            <!-- Info -->
+            <div class="fade-in" style="padding-top:var(--sp-md)">
+              <div style="margin-bottom:var(--sp-2xl)">
+                <h3 style="margin-bottom:var(--sp-md)">What to Expect</h3>
+                <p style="line-height:1.8;color:var(--text-dim)">We aim to respond to all enquiries within 24 hours during business days. For trade account applications, please use our <a href="/register.html" style="color:var(--green)">registration form</a> instead.</p>
+              </div>
+
+              <div style="margin-bottom:var(--sp-2xl)">
+                <h3 style="margin-bottom:var(--sp-md)">Common Enquiries</h3>
+                <div style="display:flex;flex-direction:column;gap:var(--sp-md)">
+                  <div class="card" style="padding:var(--sp-md)">
+                    <strong style="display:block;margin-bottom:4px;font-size:var(--fs-sm)">Product Availability</strong>
+                    <p class="text-xs text-dim">Minimum order quantities, lead times, and stock levels.</p>
+                  </div>
+                  <div class="card" style="padding:var(--sp-md)">
+                    <strong style="display:block;margin-bottom:4px;font-size:var(--fs-sm)">Custom Formulations</strong>
+                    <p class="text-xs text-dim">Bespoke blends, white-label, and private-label manufacturing.</p>
+                  </div>
+                  <div class="card" style="padding:var(--sp-md)">
+                    <strong style="display:block;margin-bottom:4px;font-size:var(--fs-sm)">Documentation & Compliance</strong>
+                    <p class="text-xs text-dim">CoA requests, regulatory documentation, and safety data sheets.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <div id="footer-slot"></div>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/contact.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavigation('contact', true);
+    });
+  </script>
+</body>
+</html>
