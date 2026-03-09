@@ -65,8 +65,7 @@ function getFooterHTML() {
           </div>
           <div>
             <h4 class="footer__col-heading">Contact</h4>
-            <a href="mailto:info@gacp.llc" class="footer__link">info@gacp.llc</a>
-            <span class="footer__link">United States</span>
+            <a href="/register.html" class="footer__link">Get in Touch</a>
           </div>
         </div>
         <div class="footer__bottom">
