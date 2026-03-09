@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+
+    <main class="page-main">
+      <div class="container-sm" style="padding-top:var(--sp-3xl);padding-bottom:var(--sp-4xl)">
+
+        <div style="text-align:center;margin-bottom:var(--sp-2xl)">
+          <h1 style="font-size:var(--fs-2xl)">Apply for an Account</h1>
+          <p style="color:var(--text-dim);font-size:var(--fs-sm);margin-top:var(--sp-sm)">Complete the form below. Your application will be reviewed within 24 hours.</p>
+        </div>
+
+        <form id="register-form" style="max-width:520px;margin:0 auto">
+
+          <!-- Account Type -->
+          <fieldset style="border:none;padding:0;margin:0 0 var(--sp-xl)">
+            <legend class="form-label" style="margin-bottom:var(--sp-md);font-size:var(--fs-md);font-weight:600">Account Type</legend>
+            <div style="display:flex;gap:var(--sp-md)">
+              <label class="account-type-btn" style="flex:1">
+                <input type="radio" name="account_type" value="individual" checked style="display:none">
+                <div class="account-type-card">
+                  <strong>Individual</strong>
+                  <span class="text-xs text-dim">Personal use, branded products</span>
+                </div>
+              </label>
+              <label class="account-type-btn" style="flex:1">
+                <input type="radio" name="account_type" value="business" style="display:none">
+                <div class="account-type-card">
+                  <strong>Business / Trade</strong>
+                  <span class="text-xs text-dim">Bulk, technical specs, volume pricing</span>
+                </div>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Business fields (shown when business selected) -->
+          <div id="biz-fields" class="hidden">
+            <div class="form-group">
+              <label class="form-label" for="biz_category">Business Category</label>
+              <select name="biz_category" id="biz_category" class="form-select">
+                <option value="">Select category…</option>
+                <option value="manufacturer">Manufacturer / Formulator</option>
+                <option value="distributor">Distributor / Wholesaler</option>
+                <option value="retailer">Retailer</option>
+                <option value="research">Research / Academic</option>
+                <option value="brand">Brand Owner</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="company">Company Name</label>
+              <input type="text" name="company" id="company" class="form-input">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="corp_num">Corporate / EIN Number</label>
+                <input type="text" name="corp_num" id="corp_num" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="vat">VAT / Tax ID</label>
+                <input type="text" name="vat" id="vat" class="form-input">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="website">Website</label>
+              <input type="url" name="website" id="website" class="form-input" placeholder="https://">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="intended_use">Intended Use</label>
+            <textarea name="intended_use" id="intended_use" class="form-textarea" placeholder="Briefly describe how you intend to use our products…" rows="2"></textarea>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:var(--sp-xl) 0">
+
+          <!-- Personal Details -->
+          <h3 style="font-size:var(--fs-md);margin-bottom:var(--sp-lg)">Personal Details</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label--required" for="first_name">First Name</label>
+              <input type="text" name="first_name" id="first_name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label--required" for="last_name">Last Name</label>
+              <input type="text" name="last_name" id="last_name" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label form-label--required" for="reg_email">Email</label>
+            <input type="email" name="email" id="reg_email" class="form-input" placeholder="you@company.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone</label>
+            <input type="tel" name="phone" id="phone" class="form-input" placeholder="+1 (555) 000-0000">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label--required" for="reg_password">Password</label>
+              <input type="password" name="password" id="reg_password" class="form-input" required minlength="8" autocomplete="new-password">
+              <span class="form-hint">Minimum 8 characters</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label--required" for="password_confirm">Confirm</label>
+              <input type="password" name="password_confirm" id="password_confirm" class="form-input" required autocomplete="new-password">
+            </div>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:var(--sp-xl) 0">
+
+          <!-- Address -->
+          <h3 style="font-size:var(--fs-md);margin-bottom:var(--sp-lg)">Address</h3>
+
+          <div class="form-group">
+            <label class="form-label form-label--required" for="addr1">Address Line 1</label>
+            <input type="text" name="addr1" id="addr1" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="addr2">Address Line 2</label>
+            <input type="text" name="addr2" id="addr2" class="form-input">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label--required" for="city">City</label>
+              <input type="text" name="city" id="city" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label--required" for="state">State / Region</label>
+              <input type="text" name="state" id="state" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label--required" for="zip">ZIP / Postal Code</label>
+              <input type="text" name="zip" id="zip" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label--required" for="country">Country</label>
+              <select name="country" id="country" class="form-select" required>
+                <option value="US" selected>United States</option>
+                <option value="CA">Canada</option>
+                <option value="GB">United Kingdom</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="NL">Netherlands</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:var(--sp-xl) 0">
+
+          <!-- Terms & Submit -->
+          <div class="form-check" style="margin-bottom:var(--sp-xl)">
+            <input type="checkbox" id="terms" required>
+            <label for="terms">I confirm the information provided is accurate and I agree to GACP LLC's terms of service.</label>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full btn--lg" id="register-submit">Submit Application</button>
+
+          <p style="font-size:var(--fs-sm);color:var(--text-dim);text-align:center;margin-top:var(--sp-lg)">
+            Already have an account?
+            <a href="/login.html" style="color:var(--green);font-weight:500">Sign in</a>
+          </p>
+        </form>
+
+      </div>
+    </main>
+
+    <div id="footer-slot"></div>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/geo.js"></script>
+  <script src="/js/nav.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavigation('register', true);
+      initRegisterPage();
+    });
+  </script>
+</body>
+</html>

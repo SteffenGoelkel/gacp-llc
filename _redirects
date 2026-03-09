@@ -1,0 +1,3 @@
+# Redirects
+# Redirect www to apex
+# https://www.gacp.llc/* https://gacp.llc/:splat 301

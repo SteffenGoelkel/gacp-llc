@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Formulation — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+    <main class="page-main">
+      <div class="portal-layout">
+        <div id="portal-sidebar-slot"></div>
+        <div class="portal-content">
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-xs)">Custom Formulation Request</h2>
+          <p class="text-sm text-dim" style="margin-bottom:var(--sp-2xl)">Tell us about your formulation needs. Our team will respond within 48 hours.</p>
+
+          <form class="formulation-form" id="formulation-form">
+            <div class="form-group">
+              <label class="form-label form-label--required">Product Type</label>
+              <select name="product_type" class="form-select" required>
+                <option value="">Select type…</option>
+                <option value="extract">Standardised Extract</option>
+                <option value="isolate">Isolate</option>
+                <option value="blend">Custom Blend</option>
+                <option value="oil">Oil / Distillate</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label form-label--required">Target Application</label>
+              <select name="application" class="form-select" required>
+                <option value="">Select application…</option>
+                <option value="supplement">Dietary Supplement</option>
+                <option value="cosmetic">Cosmetic / Skincare</option>
+                <option value="food">Food & Beverage</option>
+                <option value="pharma">Pharmaceutical</option>
+                <option value="research">Research</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label form-label--required">Key Compounds / Botanicals</label>
+              <textarea name="compounds" class="form-textarea" placeholder="List the specific compounds, botanical species, or active ingredients you require…" rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Target Potency / Specification</label>
+              <input type="text" name="potency" class="form-input" placeholder="e.g., ≥95% curcuminoids, 200:1 extract ratio">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Volume (initial order)</label>
+                <input type="text" name="volume_initial" class="form-input" placeholder="e.g., 5 kg">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Volume (monthly projected)</label>
+                <input type="text" name="volume_monthly" class="form-input" placeholder="e.g., 25 kg/month">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Delivery Form</label>
+              <select name="form" class="form-select">
+                <option value="">Select form…</option>
+                <option value="powder">Powder</option>
+                <option value="liquid">Liquid / Oil</option>
+                <option value="capsule">Encapsulated</option>
+                <option value="tablet">Tableted</option>
+                <option value="flexible">Flexible</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Regulatory Requirements</label>
+              <div class="flex flex-col gap-sm">
+                <div class="form-check">
+                  <input type="checkbox" name="reg_gmp" id="reg_gmp">
+                  <label for="reg_gmp">GMP certification required</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" name="reg_organic" id="reg_organic">
+                  <label for="reg_organic">Organic certification required</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" name="reg_kosher" id="reg_kosher">
+                  <label for="reg_kosher">Kosher / Halal certification</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" name="reg_novel" id="reg_novel">
+                  <label for="reg_novel">Novel food dossier needed</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Additional Notes</label>
+              <textarea name="notes" class="form-textarea" placeholder="Any other details, timelines, or special requirements…" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--lg">Submit Request</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/portal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      initNavigation('formulation', true);
+      initPortalLayout('formulation');
+
+      const auth = await requireAuth();
+      if (!auth) return;
+
+      const form = document.getElementById('formulation-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = 'Submitting…';
+
+        try {
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData);
+          payload.user_id = auth.profile.id;
+          payload.email = auth.profile.email;
+
+          await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...payload, subject: 'Custom Formulation Request' }),
+          });
+
+          showToast('Formulation request submitted!', 'success');
+          form.reset();
+        } catch (err) {
+          showToast('Submission failed. Please email info@gacp.llc', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Submit Request';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

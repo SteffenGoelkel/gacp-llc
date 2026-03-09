@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+    <main class="page-main">
+      <div class="container" style="padding-top:var(--sp-2xl);padding-bottom:var(--sp-4xl)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-2xl)">
+          <div>
+            <h1 style="font-size:var(--fs-2xl)">Application Review</h1>
+            <p class="text-sm text-dim">Pending account applications</p>
+          </div>
+          <a href="/portal/dashboard.html" class="btn btn--secondary btn--sm">← Back to Portal</a>
+        </div>
+
+        <div id="admin-container">
+          <div class="loading-screen">
+            <div class="spinner"></div>
+            <span>Loading applications…</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Detail overlay -->
+    <div class="overlay" id="admin-overlay">
+      <div class="overlay__panel"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavigation('admin', true);
+      initAdmin();
+    });
+
+    // Close overlay on backdrop click
+    document.addEventListener('click', (e) => {
+      const overlay = document.getElementById('admin-overlay');
+      if (e.target === overlay) closeOverlay();
+    });
+
+    function closeOverlay() {
+      const overlays = document.querySelectorAll('.overlay');
+      overlays.forEach(o => {
+        o.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    }
+  </script>
+</body>
+</html>

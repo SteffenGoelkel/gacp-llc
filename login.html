@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .login-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+    .login-image {
+      position: relative;
+      background: url('/images/login-bg.jpg') center/cover no-repeat;
+      display: flex;
+      align-items: flex-end;
+      padding: var(--sp-3xl);
+    }
+    .login-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,15,13,0.85), rgba(10,15,13,0.2));
+    }
+    .login-image__content {
+      position: relative;
+      z-index: 2;
+    }
+    .login-form-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-3xl);
+      background: var(--ink);
+    }
+    .login-form-inner {
+      width: 100%;
+      max-width: 380px;
+    }
+    @media (max-width: 768px) {
+      .login-layout { grid-template-columns: 1fr; }
+      .login-image { display: none; }
+      .login-form-wrap { min-height: 100vh; padding: var(--sp-xl); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-layout">
+
+    <!-- Left: Image -->
+    <div class="login-image">
+      <div class="login-image__content">
+        <img src="/images/logo.png" alt="GACP" style="height:40px;margin-bottom:var(--sp-lg)">
+        <h2 style="font-size:var(--fs-2xl);max-width:16ch">Precision Botanicals, Full Traceability</h2>
+        <p style="color:var(--cream-dim);margin-top:var(--sp-sm);font-size:var(--fs-sm)">Access your portal to view products, pricing, and documentation.</p>
+      </div>
+    </div>
+
+    <!-- Right: Form -->
+    <div class="login-form-wrap">
+      <div class="login-form-inner">
+        <a href="/" style="display:inline-block;margin-bottom:var(--sp-2xl)">
+          <img src="/images/logo.png" alt="GACP" style="height:36px">
+        </a>
+
+        <h1 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-xs)">Sign In</h1>
+        <p style="color:var(--text-dim);font-size:var(--fs-sm);margin-bottom:var(--sp-2xl)">Enter your credentials to access the portal.</p>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input type="email" name="email" id="email" class="form-input" placeholder="you@company.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" name="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+
+          <div id="login-error" class="form-error" style="margin-bottom:var(--sp-md)"></div>
+
+          <button type="submit" class="btn btn--primary btn--full btn--lg" style="margin-bottom:var(--sp-lg)">Sign In</button>
+        </form>
+
+        <p style="font-size:var(--fs-sm);color:var(--text-dim);text-align:center">
+          Don't have an account?
+          <a href="/register.html" style="color:var(--green);font-weight:500">Apply here</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const already = await redirectIfAuth();
+      if (!already) initLoginPage();
+    });
+  </script>
+</body>
+</html>

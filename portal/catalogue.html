@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogue — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+    <main class="page-main">
+      <div class="portal-layout">
+        <div id="portal-sidebar-slot"></div>
+        <div class="portal-content">
+          <div id="location-banner-slot"></div>
+          <div class="catalogue-header">
+            <div>
+              <h2 style="font-size:var(--fs-2xl)">Product Catalogue</h2>
+              <span class="text-sm text-dim" id="catalogue-count">18 products</span>
+            </div>
+            <div class="flex items-center gap-lg">
+              <div id="view-toggle" class="view-toggle hidden">
+                <button class="view-toggle__btn view-toggle__btn--active" data-view="auto">Trade</button>
+                <button class="view-toggle__btn" data-view="consumer">Consumer</button>
+              </div>
+              <div class="catalogue-search">
+                <svg class="catalogue-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="catalogue-search__input" id="catalogue-search" placeholder="Search products…">
+              </div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <button class="filter-btn filter-btn--active" data-cat="all">All</button>
+            <button class="filter-btn" data-cat="tropical">Tropical</button>
+            <button class="filter-btn" data-cat="ethno">Ethno-Pharma</button>
+            <button class="filter-btn" data-cat="extract">Extracts</button>
+            <button class="filter-btn" data-cat="isolate">Isolates</button>
+            <button class="filter-btn" data-cat="oil">Oils</button>
+          </div>
+          <div class="catalogue-grid" id="catalogue-grid">
+            <div class="loading-screen"><div class="spinner"></div><span>Loading catalogue…</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div class="overlay" id="product-overlay"><div class="overlay__panel"></div></div>
+  </div>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/geo.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/portal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavigation('catalogue', true);
+      initPortalLayout('catalogue');
+      initCatalogue();
+    });
+  </script>
+</body>
+</html>
