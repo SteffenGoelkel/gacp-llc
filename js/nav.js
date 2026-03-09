@@ -10,7 +10,7 @@ function getNavHTML(activePage = '') {
     <nav class="nav nav--transparent" id="main-nav">
       <div class="nav__inner">
         <a href="/" class="nav__logo">
-          <img src="/images/logo.png" alt="GACP" width="36" height="36">
+          <img src="/images/logo.png" alt="GACP" width="72" height="72">
           <span>GACP</span>
         </a>
 
