@@ -99,6 +99,8 @@ function debounce(fn, ms = 250) {
 
 /** Intersection Observer for fade-in animations */
 function initFadeObserver() {
+  document.body.classList.add('js-ready');
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach(entry => {
