@@ -5,9 +5,9 @@
 
 // Supabase
 const SUPABASE_URL = 'https://dbpgofivflbzjupwpegr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRicGdvZml2Zmxiemp1cHdwZWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5ODc4MzEsImV4cCI6MjA4ODU2MzgzMX0.jh1a1JLGE4jf9LsWdVHqHIwzbGYTDGcmtMdXV8e8kW0';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRicGdvZml2Zmxiemp1cHdwZWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5ODc4MzEsImV4cCI6MjA4ODU2MzgzMX0.jh1a1JLGE4jf9LsWdVHqHIwzbGYTDGcmtMdXV8e8kW0'; // Replace with actual anon key
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Roles
 const ROLES = {

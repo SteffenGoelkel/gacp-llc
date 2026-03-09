@@ -9,7 +9,7 @@ async function initAdmin() {
 
   // For demo: load all pending profiles
   // In production: this would require admin role check + service role key
-  const { data: profiles, error } = await supabase
+  const { data: profiles, error } = await _sb
     .from('profiles')
     .select('*')
     .eq('role', 'pending')
@@ -108,7 +108,7 @@ async function initAdmin() {
 }
 
 async function setApplicationRole(userId, role) {
-  const { error } = await supabase
+  const { error } = await _sb
     .from('profiles')
     .update({
       role,

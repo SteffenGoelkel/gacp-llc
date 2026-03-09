@@ -6,13 +6,13 @@
 // --- Session management ------------------------------------
 
 async function getSession() {
-  const { data: { session }, error } = await supabase.auth.getSession();
+  const { data: { session }, error } = await _sb.auth.getSession();
   if (error) { console.error('Session error:', error); return null; }
   return session;
 }
 
 async function getProfile(userId) {
-  const { data, error } = await supabase
+  const { data, error } = await _sb
     .from('profiles')
     .select('*')
     .eq('id', userId)
@@ -37,7 +37,7 @@ function clearCachedProfile() {
 // --- Login -------------------------------------------------
 
 async function login(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await _sb.auth.signInWithPassword({
     email: email.trim(),
     password,
   });
@@ -48,7 +48,7 @@ async function login(email, password) {
 // --- Registration ------------------------------------------
 
 async function register(email, password) {
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error } = await _sb.auth.signUp({
     email: email.trim(),
     password,
   });
@@ -57,7 +57,7 @@ async function register(email, password) {
 }
 
 async function updateProfile(userId, fields) {
-  const { data, error } = await supabase
+  const { data, error } = await _sb
     .from('profiles')
     .update(fields)
     .eq('id', userId)
@@ -71,7 +71,7 @@ async function updateProfile(userId, fields) {
 
 async function logout() {
   clearCachedProfile();
-  const { error } = await supabase.auth.signOut();
+  const { error } = await _sb.auth.signOut();
   if (error) console.error('Logout error:', error);
   window.location.href = PATHS.LOGIN;
 }
@@ -121,7 +121,7 @@ function canToggleView(profile) {
 
 // --- Auth State Listener -----------------------------------
 
-supabase.auth.onAuthStateChange((event, session) => {
+_sb.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_OUT') {
     clearCachedProfile();
   }
