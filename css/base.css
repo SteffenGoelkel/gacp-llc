@@ -103,7 +103,7 @@ button { cursor: pointer; border: none; background: none; }
   --dur-slower: 600ms;
 
   /* Layout */
-  --nav-h:     72px;
+  --nav-h:     100px;
   --max-w:     1280px;
   --max-w-sm:  960px;
   --radius-sm: 4px;
@@ -271,7 +271,7 @@ small, .text-sm { font-size: var(--fs-sm); }
     --fs-3xl: 2rem;
     --fs-4xl: 2.25rem;
     --fs-5xl: 2.5rem;
-    --nav-h: 64px;
+    --nav-h: 80px;
   }
   .container, .container-sm { padding: 0 var(--sp-md); }
   .section { padding: var(--sp-3xl) 0; }

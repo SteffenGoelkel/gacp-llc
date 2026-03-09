@@ -53,16 +53,22 @@
 .nav__logo {
   display: flex;
   align-items: center;
-  gap: var(--sp-sm);
+  gap: var(--sp-md);
   font-family: var(--font-display);
-  font-size: var(--fs-lg);
+  font-size: var(--fs-xl);
   font-weight: 600;
   color: var(--cream);
   letter-spacing: 0.02em;
+  background: rgba(10, 15, 13, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px 20px 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 240, 232, 0.08);
 }
 
 .nav__logo img {
-  height: 36px;
+  height: 72px;
   width: auto;
 }
 
