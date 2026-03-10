@@ -12,59 +12,254 @@
   <link rel="stylesheet" href="/css/layout.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/portal.css">
+  <style>
+    .admin-tabs { display:flex; gap:var(--sp-sm); margin-bottom:var(--sp-xl); border-bottom:1px solid var(--border); padding-bottom:var(--sp-sm); }
+    .admin-tab { padding:var(--sp-sm) var(--sp-lg); border-radius:var(--radius-md) var(--radius-md) 0 0; cursor:pointer; font-size:var(--fs-sm); font-weight:500; color:var(--text-dim); background:transparent; border:none; }
+    .admin-tab--active { color:var(--cream); background:var(--ink-light); border-bottom:2px solid var(--green); }
+    .admin-panel { display:none; }
+    .admin-panel--active { display:block; }
+    .product-list-item { display:grid; grid-template-columns:1fr 120px 80px 100px 120px; align-items:center; padding:var(--sp-md); border-bottom:1px solid var(--border); font-size:var(--fs-sm); gap:var(--sp-md); }
+    .product-list-item:hover { background:var(--ink-light); }
+    .product-list-header { font-weight:600; color:var(--text-dim); text-transform:uppercase; font-size:var(--fs-xs); letter-spacing:0.06em; }
+    .product-list-header:hover { background:transparent; }
+    .form-section { margin-bottom:var(--sp-2xl); padding-bottom:var(--sp-xl); border-bottom:1px solid var(--border); }
+    .form-section:last-child { border-bottom:none; }
+    .form-section h3 { font-size:var(--fs-md); margin-bottom:var(--sp-lg); color:var(--cream); }
+    .compound-row { display:grid; grid-template-columns:1fr 100px 40px; gap:var(--sp-sm); align-items:end; margin-bottom:var(--sp-sm); }
+    .compound-row .btn { padding:var(--sp-xs) var(--sp-sm); }
+    #product-form { max-width:640px; }
+  </style>
 </head>
 <body>
   <div class="page">
     <div id="nav-slot"></div>
     <main class="page-main">
-      <div class="container" style="padding-top:var(--sp-2xl);padding-bottom:var(--sp-4xl)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-2xl)">
-          <div>
-            <h1 style="font-size:var(--fs-2xl)">Application Review</h1>
-            <p class="text-sm text-dim">Pending account applications</p>
-          </div>
-          <a href="/portal/dashboard.html" class="btn btn--secondary btn--sm">← Back to Portal</a>
-        </div>
+      <div class="portal-layout">
+        <div id="portal-sidebar-slot"></div>
+        <div class="portal-content">
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-xs)">Admin Panel</h2>
+          <p class="text-sm text-dim" style="margin-bottom:var(--sp-xl)">Manage products and review applications.</p>
 
-        <div id="admin-container">
-          <div class="loading-screen">
-            <div class="spinner"></div>
-            <span>Loading applications…</span>
+          <div class="admin-tabs">
+            <button class="admin-tab admin-tab--active" data-tab="products">Products</button>
+            <button class="admin-tab" data-tab="applications">Applications</button>
           </div>
+
+          <!-- Products Panel -->
+          <div class="admin-panel admin-panel--active" id="panel-products">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-lg)">
+              <span class="text-sm text-dim" id="product-count"></span>
+              <button class="btn btn--primary btn--sm" id="btn-add-product">+ Add Product</button>
+            </div>
+            <div id="product-list">
+              <div class="loading-screen"><div class="spinner"></div><span>Loading…</span></div>
+            </div>
+          </div>
+
+          <!-- Applications Panel -->
+          <div class="admin-panel" id="panel-applications">
+            <div id="admin-container">
+              <div class="loading-screen"><div class="spinner"></div><span>Loading…</span></div>
+            </div>
+          </div>
+
+          <!-- Product Form (hidden by default) -->
+          <div id="product-form-wrap" class="hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-xl)">
+              <h3 style="font-size:var(--fs-xl)" id="form-title">Add Product</h3>
+              <button class="btn btn--ghost btn--sm" id="btn-cancel-form">Cancel</button>
+            </div>
+
+            <form id="product-form">
+              <input type="hidden" name="id" id="pf-id">
+
+              <div class="form-section">
+                <h3>Basic Info</h3>
+                <div class="form-group">
+                  <label class="form-label form-label--required" for="pf-name">Product Name</label>
+                  <input type="text" name="name" id="pf-name" class="form-input" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label form-label--required" for="pf-cat">Category</label>
+                    <input type="text" name="cat" id="pf-cat" class="form-input" required placeholder="e.g. extract, superfood, isolate">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-brand">Brand</label>
+                    <input type="text" name="brand" id="pf-brand" class="form-input" placeholder="GACP">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="pf-tagline">Tagline</label>
+                  <input type="text" name="tagline" id="pf-tagline" class="form-input">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="pf-description">Description</label>
+                  <textarea name="description" id="pf-description" class="form-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="pf-price">Price (cents)</label>
+                    <input type="number" name="price" id="pf-price" class="form-input" placeholder="0 = Price on request">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-unit">Unit</label>
+                    <input type="text" name="unit" id="pf-unit" class="form-input" value="100g">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-moq">MOQ</label>
+                    <input type="number" name="moq" id="pf-moq" class="form-input" value="1">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="pf-form">Form</label>
+                    <input type="text" name="form" id="pf-form" class="form-input" placeholder="Fine powder">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-purity">Purity / Spec</label>
+                    <input type="text" name="purity" id="pf-purity" class="form-input" placeholder="≥95%">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="pf-shelf">Shelf Life</label>
+                    <input type="text" name="shelf" id="pf-shelf" class="form-input" placeholder="24 months">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-sol">Solubility</label>
+                    <input type="text" name="sol" id="pf-sol" class="form-input">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-color">Color</label>
+                    <input type="text" name="color" id="pf-color" class="form-input">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="pf-img">Image URL</label>
+                    <input type="text" name="img" id="pf-img" class="form-input" placeholder="/images/products/gacp-019.jpg">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-restriction">Restriction</label>
+                    <select name="restriction" id="pf-restriction" class="form-select">
+                      <option value="">None</option>
+                      <option value="kratom">Kratom</option>
+                      <option value="cannabinoid">Cannabinoid</option>
+                      <option value="kanna">Kanna</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="pf-sort">Sort Order</label>
+                    <input type="number" name="sort_order" id="pf-sort" class="form-input" value="0">
+                  </div>
+                  <div class="form-group" style="display:flex;align-items:center;gap:var(--sp-sm);padding-top:24px">
+                    <input type="checkbox" name="active" id="pf-active" checked>
+                    <label for="pf-active" class="form-label" style="margin:0">Active</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dual Layer Toggle -->
+              <div class="form-section">
+                <div style="display:flex;align-items:center;gap:var(--sp-md);margin-bottom:var(--sp-lg)">
+                  <input type="checkbox" name="is_dual_layer" id="pf-dual" onchange="document.getElementById('dual-fields').classList.toggle('hidden', !this.checked)">
+                  <label for="pf-dual" class="form-label" style="margin:0;font-size:var(--fs-md)">Enable Dual-Layer (Consumer + Trade)</label>
+                </div>
+
+                <div id="dual-fields" class="hidden">
+                  <h3>Consumer Layer</h3>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="pf-cname">Consumer Name</label>
+                      <input type="text" name="consumer_name" id="pf-cname" class="form-input">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="pf-cbrand">Consumer Brand</label>
+                      <input type="text" name="consumer_brand" id="pf-cbrand" class="form-input">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-ctagline">Consumer Tagline</label>
+                    <input type="text" name="consumer_tagline" id="pf-ctagline" class="form-input">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-cdesc">Consumer Description</label>
+                    <textarea name="consumer_desc" id="pf-cdesc" class="form-textarea" rows="2"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-cingredients">Consumer Ingredients</label>
+                    <input type="text" name="consumer_ingredients" id="pf-cingredients" class="form-input">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-cbenefits">Consumer Benefits (comma-separated)</label>
+                    <input type="text" name="consumer_benefits_str" id="pf-cbenefits" class="form-input" placeholder="Energy, Focus, Natural">
+                  </div>
+
+                  <h3 style="margin-top:var(--sp-xl)">Trade Layer</h3>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="pf-tname">Trade Name</label>
+                      <input type="text" name="trade_name" id="pf-tname" class="form-input">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="pf-tspec">Trade Spec Code</label>
+                      <input type="text" name="trade_spec" id="pf-tspec" class="form-input" placeholder="GACP-XXX-XX">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-tpotency">Trade Potency</label>
+                    <input type="text" name="trade_potency" id="pf-tpotency" class="form-input">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pf-tdesc">Trade Description</label>
+                    <textarea name="trade_desc" id="pf-tdesc" class="form-textarea" rows="2"></textarea>
+                  </div>
+
+                  <!-- Compounds -->
+                  <h3 style="margin-top:var(--sp-xl)">Compounds</h3>
+                  <div id="compounds-list"></div>
+                  <button type="button" class="btn btn--secondary btn--sm" id="btn-add-compound" style="margin-top:var(--sp-sm)">+ Add Compound</button>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:var(--sp-md)">
+                <button type="submit" class="btn btn--primary btn--lg" id="btn-save-product">Save Product</button>
+                <button type="button" class="btn btn--ghost btn--lg" id="btn-cancel-form-bottom" onclick="hideProductForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+
         </div>
       </div>
     </main>
-
-    <!-- Detail overlay -->
-    <div class="overlay" id="admin-overlay">
-      <div class="overlay__panel"></div>
-    </div>
   </div>
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="/js/config.js"></script>
   <script src="/js/auth.js"></script>
+  <script src="/js/geo.js"></script>
   <script src="/js/nav.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/portal.js"></script>
   <script src="/js/admin.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       initNavigation('admin', true);
-      initAdmin();
+      initPortalLayout('admin');
+      initAdminPanel();
     });
-
-    // Close overlay on backdrop click
-    document.addEventListener('click', (e) => {
-      const overlay = document.getElementById('admin-overlay');
-      if (e.target === overlay) closeOverlay();
-    });
-
-    function closeOverlay() {
-      const overlays = document.querySelectorAll('.overlay');
-      overlays.forEach(o => {
-        o.classList.remove('open');
-        document.body.style.overflow = '';
-      });
-    }
   </script>
 </body>
 </html>
