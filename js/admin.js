@@ -588,11 +588,11 @@ async function searchOpenCorporates(btn) {
       'NL': 'nl', 'FR': 'fr', 'IE': 'ie', 'NZ': 'nz', 'ZA': 'za',
     };
 
-    var url = 'https://api.opencorporates.com/v0.4/companies/search?q=' + encodeURIComponent(company) + '&per_page=5';
+    var url = '/api/corp-search?q=' + encodeURIComponent(company);
 
     var jurisdiction = jurisdictionMap[country];
-    if (jurisdiction) url += '&jurisdiction_code=' + jurisdiction;
-    if (corpNum) url += '&company_number=' + encodeURIComponent(corpNum);
+    if (jurisdiction) url += '&jurisdiction=' + jurisdiction;
+    if (corpNum) url += '&number=' + encodeURIComponent(corpNum);
 
     var res = await fetch(url);
     var data = await res.json();
