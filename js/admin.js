@@ -7,6 +7,11 @@
 let editingProduct = null;
 let appProfiles = [];
 
+const jurisdictionMap = {
+  'US': 'us', 'GB': 'gb', 'CA': 'ca', 'AU': 'au', 'DE': 'de',
+  'NL': 'nl', 'FR': 'fr', 'IE': 'ie', 'NZ': 'nz', 'ZA': 'za',
+};
+
 async function initAdminPanel() {
   const auth = await requireAuth();
   if (!auth) return;
@@ -492,11 +497,12 @@ function showAppDetail(profile) {
   var corpSection = '';
   if (profile.company) {
     corpSection =
-      '<button class="btn btn--secondary btn--sm" id="btn-verify-corp" ' +
-        'data-company="' + escapeHtml(profile.company) + '" ' +
-        'data-corp-num="' + escapeHtml(profile.corp_num || '') + '" ' +
-        'data-country="' + escapeHtml(profile.country || '') + '">Search OpenCorporates</button>' +
-      '<div id="corp-verify-results" style="margin-top:var(--sp-md)"></div>' +
+      '<a class="btn btn--secondary btn--sm" id="btn-verify-corp" ' +
+        'href="https://opencorporates.com/companies?q=' + encodeURIComponent(profile.company) + (jurisdictionMap[profile.country] ? '&jurisdiction_code=' + jurisdictionMap[profile.country] : '') + '" ' +
+        'target="_blank" rel="noopener">Search OpenCorporates ↗</a>' +
+      '<a class="btn btn--secondary btn--sm" style="margin-left:var(--sp-sm)" ' +
+        'href="https://www.google.com/search?q=' + encodeURIComponent('"' + profile.company + '" ' + (profile.corp_num || '') + ' company registry') + '" ' +
+        'target="_blank" rel="noopener">Google Registry Search ↗</a>' +
       '<div style="margin-top:var(--sp-md);display:flex;gap:var(--sp-sm)">' +
         '<button class="btn btn--sm btn--primary" onclick="markCorpVerified(\'' + profile.id + '\', true)">Mark Verified</button>' +
         '<button class="btn btn--sm btn--ghost" style="color:var(--terra)" onclick="markCorpVerified(\'' + profile.id + '\', false)">Mark Unverified</button>' +
@@ -547,11 +553,6 @@ function showAppDetail(profile) {
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  var verifyBtn = document.getElementById('btn-verify-corp');
-  if (verifyBtn) {
-    verifyBtn.addEventListener('click', function() { searchOpenCorporates(verifyBtn); });
-  }
-
   overlay.addEventListener('click', function(e) {
     if (e.target === overlay) closeAppDetail();
   });
@@ -562,83 +563,6 @@ function closeAppDetail() {
   if (overlay) {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
-  }
-}
-
-// --- OpenCorporates Search ---------------------------------
-
-async function searchOpenCorporates(btn) {
-  var company = btn.dataset.company;
-  var corpNum = btn.dataset.corpNum;
-  var country = btn.dataset.country;
-  var results = document.getElementById('corp-verify-results');
-
-  if (!company) {
-    results.innerHTML = '<p class="text-xs text-dim">No company name to search.</p>';
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Searching…';
-  results.innerHTML = '<div class="spinner" style="margin:var(--sp-sm) 0"></div>';
-
-  try {
-    var jurisdictionMap = {
-      'US': 'us', 'GB': 'gb', 'CA': 'ca', 'AU': 'au', 'DE': 'de',
-      'NL': 'nl', 'FR': 'fr', 'IE': 'ie', 'NZ': 'nz', 'ZA': 'za',
-    };
-
-    var url = '/api/corp-search?q=' + encodeURIComponent(company);
-
-    var jurisdiction = jurisdictionMap[country];
-    if (jurisdiction) url += '&jurisdiction=' + jurisdiction;
-    if (corpNum) url += '&number=' + encodeURIComponent(corpNum);
-
-    var res = await fetch(url);
-    var data = await res.json();
-    var companies = (data && data.results && data.results.companies) || [];
-
-    if (!companies.length) {
-      results.innerHTML =
-        '<div style="padding:var(--sp-md);background:rgba(196,106,58,0.08);border-radius:var(--radius-md);border:1px solid rgba(196,106,58,0.2)">' +
-          '<p class="text-sm" style="color:var(--terra)">No matching companies found in registry.</p>' +
-          '<p class="text-xs text-dim" style="margin-top:4px">Searched: "' + escapeHtml(company) + '"' + (jurisdiction ? ' in ' + jurisdiction.toUpperCase() : '') + '</p>' +
-        '</div>';
-      return;
-    }
-
-    results.innerHTML =
-      '<p class="text-xs text-dim" style="margin-bottom:var(--sp-sm)">Found ' + companies.length + ' result' + (companies.length !== 1 ? 's' : '') + ':</p>' +
-      companies.map(function(item) {
-        var c = item.company;
-        var isActive = c.current_status && c.current_status.toLowerCase().indexOf('active') >= 0;
-        var statusBadge = isActive
-          ? '<span class="badge badge--green">Active</span>'
-          : '<span class="badge badge--terra">' + escapeHtml(c.current_status || 'Unknown') + '</span>';
-
-        var nameMatch = c.name.toLowerCase().indexOf(company.toLowerCase()) >= 0 || company.toLowerCase().indexOf(c.name.toLowerCase()) >= 0;
-        var numMatch = corpNum && c.company_number === corpNum;
-
-        return '<div class="card" style="padding:var(--sp-md);margin-bottom:var(--sp-sm)">' +
-          '<div style="display:flex;justify-content:space-between;align-items:start">' +
-            '<div><strong style="color:var(--cream)">' + escapeHtml(c.name) + '</strong>' +
-              (nameMatch ? ' <span class="badge badge--green" style="font-size:10px">Name match</span>' : '') +
-              (numMatch ? ' <span class="badge badge--green" style="font-size:10px">Number match</span>' : '') +
-              '<div class="text-xs text-dim" style="margin-top:4px">' +
-                (c.company_number ? 'Reg: ' + escapeHtml(c.company_number) + ' · ' : '') +
-                (c.jurisdiction_code ? escapeHtml(c.jurisdiction_code.toUpperCase()) + ' · ' : '') +
-                (c.incorporation_date || '') +
-              '</div>' +
-            '</div>' + statusBadge +
-          '</div>' +
-          (c.registered_address_in_full ? '<div class="text-xs text-dim" style="margin-top:4px">' + escapeHtml(c.registered_address_in_full) + '</div>' : '') +
-        '</div>';
-      }).join('');
-  } catch (err) {
-    results.innerHTML = '<p class="text-sm" style="color:var(--terra)">Search failed: ' + escapeHtml(err.message) + '</p>';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Search OpenCorporates';
   }
 }
 
