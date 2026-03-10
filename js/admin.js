@@ -26,21 +26,13 @@ async function initAdminPanel() {
     });
   });
 
-  // Load products
   await loadProducts();
   renderProductList();
-
-  // Load applications
   loadApplications();
 
-  // Add product button
   document.getElementById('btn-add-product').addEventListener('click', () => showProductForm(null));
   document.getElementById('btn-cancel-form').addEventListener('click', hideProductForm);
-
-  // Add compound button
   document.getElementById('btn-add-compound').addEventListener('click', addCompoundRow);
-
-  // Form submit
   document.getElementById('product-form').addEventListener('submit', handleProductSave);
 }
 
@@ -58,12 +50,19 @@ function renderProductList() {
 
   if (countEl) countEl.textContent = `${PRODUCTS.length} products`;
 
+  const visLabel = (p) => {
+    const parts = [];
+    if (p.visible_consumer) parts.push('C');
+    if (p.visible_trade) parts.push('T');
+    return parts.join('/') || '—';
+  };
+
   list.innerHTML = `
     <div class="product-list-item product-list-header">
       <span>Product</span>
       <span>Category</span>
       <span>Price</span>
-      <span>Status</span>
+      <span>Visibility</span>
       <span>Actions</span>
     </div>
     ${PRODUCTS.map(p => `
@@ -75,7 +74,7 @@ function renderProductList() {
         </div>
         <span class="badge badge--neutral">${escapeHtml(p.cat)}</span>
         <span>${p.price ? formatPrice(p.price) : '—'}</span>
-        <span class="badge badge--${p.active ? 'green' : 'neutral'}">${p.active ? 'Active' : 'Inactive'}</span>
+        <span class="text-xs">${p.active ? visLabel(p) : '<span style="color:var(--terra)">Inactive</span>'}</span>
         <div style="display:flex;gap:var(--sp-xs)">
           <button class="btn btn--sm btn--secondary" onclick="editProduct('${p.id}')">Edit</button>
           <button class="btn btn--sm btn--ghost" style="color:var(--terra)" onclick="deleteProduct('${p.id}')">Del</button>
@@ -83,6 +82,25 @@ function renderProductList() {
       </div>
     `).join('')}
   `;
+}
+
+// --- Image Upload ------------------------------------------
+
+async function uploadProductImage(file, productId) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `products/${productId}.${ext}`;
+
+  const { data, error } = await _sb.storage
+    .from('product-images')
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if (error) throw error;
+
+  const { data: urlData } = _sb.storage
+    .from('product-images')
+    .getPublicUrl(path);
+
+  return urlData.publicUrl;
 }
 
 // --- Product Form ------------------------------------------
@@ -102,12 +120,15 @@ function showProductForm(product) {
   // Reset form
   form.reset();
   document.getElementById('pf-active').checked = true;
+  document.getElementById('pf-vis-consumer').checked = true;
+  document.getElementById('pf-vis-trade').checked = true;
   document.getElementById('dual-fields').classList.add('hidden');
   document.getElementById('pf-dual').checked = false;
   document.getElementById('compounds-list').innerHTML = '';
+  document.getElementById('pf-img').value = '';
+  document.getElementById('pf-img-status').textContent = '';
 
   if (product) {
-    // Populate form
     document.getElementById('pf-id').value = product.id;
     document.getElementById('pf-name').value = product.name || '';
     document.getElementById('pf-cat').value = product.cat || '';
@@ -126,6 +147,12 @@ function showProductForm(product) {
     document.getElementById('pf-restriction').value = product.restriction || '';
     document.getElementById('pf-sort').value = product.sort_order || 0;
     document.getElementById('pf-active').checked = product.active !== false;
+    document.getElementById('pf-vis-consumer').checked = product.visible_consumer !== false;
+    document.getElementById('pf-vis-trade').checked = product.visible_trade !== false;
+
+    if (product.img) {
+      document.getElementById('pf-img-status').textContent = 'Current: ' + product.img;
+    }
 
     if (product.is_dual_layer) {
       document.getElementById('pf-dual').checked = true;
@@ -141,7 +168,6 @@ function showProductForm(product) {
       document.getElementById('pf-tpotency').value = product.trade_potency || '';
       document.getElementById('pf-tdesc').value = product.trade_desc || '';
 
-      // Load compounds
       const compounds = getProductCompounds(product.id);
       compounds.forEach(c => addCompoundRow(null, c.compound, c.pct));
     }
@@ -155,11 +181,8 @@ function hideProductForm() {
   wrap.classList.add('hidden');
 
   const panels = document.querySelectorAll('.admin-panel, .admin-tabs, #product-list, #btn-add-product, #product-count');
-  panels.forEach(el => {
-    if (el) el.style.display = '';
-  });
+  panels.forEach(el => { if (el) el.style.display = ''; });
 
-  // Re-show active tab
   const activeTab = document.querySelector('.admin-tab--active');
   if (activeTab) activeTab.click();
 
@@ -192,12 +215,34 @@ async function handleProductSave(e) {
   btn.textContent = 'Saving…';
 
   try {
-    const form = document.getElementById('product-form');
     const isEdit = !!document.getElementById('pf-id').value;
     const isDual = document.getElementById('pf-dual').checked;
 
     const benefitsStr = document.getElementById('pf-cbenefits').value;
     const benefits = benefitsStr ? benefitsStr.split(',').map(b => b.trim()).filter(Boolean) : null;
+
+    // Generate or use existing ID
+    let productId;
+    if (isEdit) {
+      productId = document.getElementById('pf-id').value;
+    } else {
+      productId = 'GACP-' + String(Date.now()).slice(-6);
+    }
+
+    // Handle image upload
+    const imgFile = document.getElementById('pf-img-file').files[0];
+    let imgUrl = document.getElementById('pf-img').value;
+
+    if (imgFile) {
+      document.getElementById('pf-img-status').textContent = 'Uploading image…';
+      try {
+        imgUrl = await uploadProductImage(imgFile, productId);
+        document.getElementById('pf-img-status').textContent = 'Image uploaded';
+      } catch (imgErr) {
+        console.error('Image upload error:', imgErr);
+        document.getElementById('pf-img-status').textContent = 'Image upload failed — saving without image';
+      }
+    }
 
     const productData = {
       name: document.getElementById('pf-name').value,
@@ -213,10 +258,12 @@ async function handleProductSave(e) {
       shelf: document.getElementById('pf-shelf').value || null,
       sol: document.getElementById('pf-sol').value || null,
       color: document.getElementById('pf-color').value || null,
-      img: document.getElementById('pf-img').value || null,
+      img: imgUrl || null,
       restriction: document.getElementById('pf-restriction').value || null,
       sort_order: parseInt(document.getElementById('pf-sort').value) || 0,
       active: document.getElementById('pf-active').checked,
+      visible_consumer: document.getElementById('pf-vis-consumer').checked,
+      visible_trade: document.getElementById('pf-vis-trade').checked,
       is_dual_layer: isDual,
     };
 
@@ -231,17 +278,24 @@ async function handleProductSave(e) {
       productData.trade_spec = document.getElementById('pf-tspec').value || null;
       productData.trade_potency = document.getElementById('pf-tpotency').value || null;
       productData.trade_desc = document.getElementById('pf-tdesc').value || null;
+    } else {
+      // Clear dual-layer fields
+      productData.consumer_name = null;
+      productData.consumer_brand = null;
+      productData.consumer_tagline = null;
+      productData.consumer_desc = null;
+      productData.consumer_ingredients = null;
+      productData.consumer_benefits = null;
+      productData.trade_name = null;
+      productData.trade_spec = null;
+      productData.trade_potency = null;
+      productData.trade_desc = null;
     }
 
-    let productId;
-
     if (isEdit) {
-      productId = document.getElementById('pf-id').value;
       const { error } = await _sb.from('products').update(productData).eq('id', productId);
       if (error) throw error;
     } else {
-      // Generate ID
-      productId = 'GACP-' + String(Date.now()).slice(-6);
       productData.id = productId;
       const { error } = await _sb.from('products').insert(productData);
       if (error) throw error;
@@ -249,10 +303,8 @@ async function handleProductSave(e) {
 
     // Save compounds if dual layer
     if (isDual) {
-      // Delete existing compounds
       await _sb.from('product_compounds').delete().eq('product_id', productId);
 
-      // Insert new
       const rows = document.querySelectorAll('.compound-row');
       const compounds = [];
       rows.forEach(row => {
@@ -271,7 +323,6 @@ async function handleProductSave(e) {
 
     showToast(isEdit ? 'Product updated' : 'Product created', 'success');
 
-    // Refresh
     PRODUCTS = [];
     COMPOUNDS_MAP = {};
     await loadProducts();

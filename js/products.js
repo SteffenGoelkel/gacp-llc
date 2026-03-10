@@ -288,11 +288,18 @@ async function initCatalogue() {
   grid.innerHTML = '<div class="loading-screen"><div class="spinner"></div><span>Loading catalogue…</span></div>';
   await loadProducts();
 
+  // Filter products by visibility based on user role
+  const isTrade = canViewTrade(profile);
+  const visibleProducts = PRODUCTS.filter(p => {
+    if (isTrade) return p.visible_trade !== false;
+    return p.visible_consumer !== false;
+  });
+
   const geo = await detectLocation();
   renderLocationBanner('location-banner-slot');
 
   // Build dynamic category filters
-  const cats = [...new Set(PRODUCTS.map(p => p.cat))].sort();
+  const cats = [...new Set(visibleProducts.map(p => p.cat))].sort();
   const filterBar = document.querySelector('.filter-bar');
   if (filterBar) {
     filterBar.innerHTML = `<button class="filter-btn filter-btn--active" data-cat="all">All</button>` +
@@ -304,7 +311,7 @@ async function initCatalogue() {
   let searchQuery = '';
 
   function render() {
-    let filtered = PRODUCTS;
+    let filtered = visibleProducts;
 
     if (activeCategory !== 'all') {
       filtered = filtered.filter(p => p.cat === activeCategory);
