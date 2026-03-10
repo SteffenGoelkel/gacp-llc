@@ -422,3 +422,16 @@
   color: var(--text-dim);
   font-size: var(--fs-md);
 }
+
+/* --- Nav Logout Link --------------------------------------- */
+.nav__logout {
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  opacity: 0.7;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.nav__logout:hover {
+  opacity: 1;
+  color: var(--terra);
+}
