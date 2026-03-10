@@ -1,9 +1,11 @@
 /* ============================================================
    GACP LLC — admin.js
    Admin panel: product management + application review
+   with corporate verification via OpenCorporates
    ============================================================ */
 
 let editingProduct = null;
+let appProfiles = [];
 
 async function initAdminPanel() {
   const auth = await requireAuth();
@@ -16,7 +18,6 @@ async function initAdminPanel() {
     return;
   }
 
-  // Tab switching
   document.querySelectorAll('.admin-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('admin-tab--active'));
@@ -48,7 +49,7 @@ function renderProductList() {
     return;
   }
 
-  if (countEl) countEl.textContent = `${PRODUCTS.length} products`;
+  if (countEl) countEl.textContent = PRODUCTS.length + ' products';
 
   const visLabel = (p) => {
     const parts = [];
@@ -57,38 +58,27 @@ function renderProductList() {
     return parts.join('/') || '—';
   };
 
-  list.innerHTML = `
-    <div class="product-list-item product-list-header">
-      <span>Product</span>
-      <span>Category</span>
-      <span>Price</span>
-      <span>Visibility</span>
-      <span>Actions</span>
-    </div>
-    ${PRODUCTS.map(p => `
-      <div class="product-list-item" data-id="${p.id}">
-        <div>
-          <strong style="color:var(--cream)">${escapeHtml(p.name)}</strong>
-          ${p.is_dual_layer ? '<span class="badge badge--green" style="margin-left:var(--sp-xs);font-size:10px">Dual</span>' : ''}
-          <br><span class="text-xs text-dim">${escapeHtml(p.id)}</span>
-        </div>
-        <span class="badge badge--neutral">${escapeHtml(p.cat)}</span>
-        <span>${p.price ? formatPrice(p.price) : '—'}</span>
-        <span class="text-xs">${p.active ? visLabel(p) : '<span style="color:var(--terra)">Inactive</span>'}</span>
-        <div style="display:flex;gap:var(--sp-xs)">
-          <button class="btn btn--sm btn--secondary" onclick="editProduct('${p.id}')">Edit</button>
-          <button class="btn btn--sm btn--ghost" style="color:var(--terra)" onclick="deleteProduct('${p.id}')">Del</button>
-        </div>
-      </div>
-    `).join('')}
-  `;
+  list.innerHTML =
+    '<div class="product-list-item product-list-header"><span>Product</span><span>Category</span><span>Price</span><span>Visibility</span><span>Actions</span></div>' +
+    PRODUCTS.map(p => '<div class="product-list-item" data-id="' + p.id + '">' +
+      '<div><strong style="color:var(--cream)">' + escapeHtml(p.name) + '</strong>' +
+      (p.is_dual_layer ? ' <span class="badge badge--green" style="font-size:10px">Dual</span>' : '') +
+      '<br><span class="text-xs text-dim">' + escapeHtml(p.id) + '</span></div>' +
+      '<span class="badge badge--neutral">' + escapeHtml(p.cat) + '</span>' +
+      '<span>' + (p.price ? formatPrice(p.price) : '—') + '</span>' +
+      '<span class="text-xs">' + (p.active ? visLabel(p) : '<span style="color:var(--terra)">Inactive</span>') + '</span>' +
+      '<div style="display:flex;gap:var(--sp-xs)">' +
+        '<button class="btn btn--sm btn--secondary" onclick="editProduct(\'' + p.id + '\')">Edit</button>' +
+        '<button class="btn btn--sm btn--ghost" style="color:var(--terra)" onclick="deleteProduct(\'' + p.id + '\')">Del</button>' +
+      '</div></div>'
+    ).join('');
 }
 
 // --- Image Upload ------------------------------------------
 
 async function uploadProductImage(file, productId) {
   const ext = file.name.split('.').pop().toLowerCase();
-  const path = `products/${productId}.${ext}`;
+  const path = 'products/' + productId + '.' + ext;
 
   const { data, error } = await _sb.storage
     .from('product-images')
@@ -107,17 +97,16 @@ async function uploadProductImage(file, productId) {
 
 function showProductForm(product) {
   editingProduct = product;
-  const wrap = document.getElementById('product-form-wrap');
-  const form = document.getElementById('product-form');
-  const title = document.getElementById('form-title');
-  const panels = document.querySelectorAll('.admin-panel, .admin-tabs, #product-list, #btn-add-product, #product-count');
+  var wrap = document.getElementById('product-form-wrap');
+  var form = document.getElementById('product-form');
+  var title = document.getElementById('form-title');
+  var panels = document.querySelectorAll('.admin-panel, .admin-tabs, #product-list, #btn-add-product, #product-count');
 
-  panels.forEach(el => { if (el) el.style.display = 'none'; });
+  panels.forEach(function(el) { if (el) el.style.display = 'none'; });
   wrap.classList.remove('hidden');
 
   title.textContent = product ? 'Edit Product' : 'Add Product';
 
-  // Reset form
   form.reset();
   document.getElementById('pf-active').checked = true;
   document.getElementById('pf-vis-consumer').checked = true;
@@ -168,8 +157,8 @@ function showProductForm(product) {
       document.getElementById('pf-tpotency').value = product.trade_potency || '';
       document.getElementById('pf-tdesc').value = product.trade_desc || '';
 
-      const compounds = getProductCompounds(product.id);
-      compounds.forEach(c => addCompoundRow(null, c.compound, c.pct));
+      var compounds = getProductCompounds(product.id);
+      compounds.forEach(function(c) { addCompoundRow(null, c.compound, c.pct); });
     }
   }
 
@@ -177,32 +166,25 @@ function showProductForm(product) {
 }
 
 function hideProductForm() {
-  const wrap = document.getElementById('product-form-wrap');
-  wrap.classList.add('hidden');
-
-  const panels = document.querySelectorAll('.admin-panel, .admin-tabs, #product-list, #btn-add-product, #product-count');
-  panels.forEach(el => { if (el) el.style.display = ''; });
-
-  const activeTab = document.querySelector('.admin-tab--active');
+  document.getElementById('product-form-wrap').classList.add('hidden');
+  document.querySelectorAll('.admin-panel, .admin-tabs, #product-list, #btn-add-product, #product-count')
+    .forEach(function(el) { if (el) el.style.display = ''; });
+  var activeTab = document.querySelector('.admin-tab--active');
   if (activeTab) activeTab.click();
-
   editingProduct = null;
 }
 
-function addCompoundRow(e, name = '', pct = '') {
+function addCompoundRow(e, name, pct) {
   if (e) e.preventDefault();
-  const list = document.getElementById('compounds-list');
-  const row = document.createElement('div');
+  name = name || '';
+  pct = pct || '';
+  var list = document.getElementById('compounds-list');
+  var row = document.createElement('div');
   row.className = 'compound-row';
-  row.innerHTML = `
-    <div class="form-group" style="margin:0">
-      <input type="text" class="form-input compound-name" placeholder="Compound name" value="${escapeHtml(String(name))}">
-    </div>
-    <div class="form-group" style="margin:0">
-      <input type="number" class="form-input compound-pct" placeholder="%" step="0.01" value="${pct}">
-    </div>
-    <button type="button" class="btn btn--ghost" style="color:var(--terra);padding:var(--sp-xs)" onclick="this.closest('.compound-row').remove()">✕</button>
-  `;
+  row.innerHTML =
+    '<div class="form-group" style="margin:0"><input type="text" class="form-input compound-name" placeholder="Compound name" value="' + escapeHtml(String(name)) + '"></div>' +
+    '<div class="form-group" style="margin:0"><input type="number" class="form-input compound-pct" placeholder="%" step="0.01" value="' + pct + '"></div>' +
+    '<button type="button" class="btn btn--ghost" style="color:var(--terra);padding:var(--sp-xs)" onclick="this.closest(\'.compound-row\').remove()">✕</button>';
   list.appendChild(row);
 }
 
@@ -210,28 +192,26 @@ function addCompoundRow(e, name = '', pct = '') {
 
 async function handleProductSave(e) {
   e.preventDefault();
-  const btn = document.getElementById('btn-save-product');
+  var btn = document.getElementById('btn-save-product');
   btn.disabled = true;
   btn.textContent = 'Saving…';
 
   try {
-    const isEdit = !!document.getElementById('pf-id').value;
-    const isDual = document.getElementById('pf-dual').checked;
+    var isEdit = !!document.getElementById('pf-id').value;
+    var isDual = document.getElementById('pf-dual').checked;
 
-    const benefitsStr = document.getElementById('pf-cbenefits').value;
-    const benefits = benefitsStr ? benefitsStr.split(',').map(b => b.trim()).filter(Boolean) : null;
+    var benefitsStr = document.getElementById('pf-cbenefits').value;
+    var benefits = benefitsStr ? benefitsStr.split(',').map(function(b) { return b.trim(); }).filter(Boolean) : null;
 
-    // Generate or use existing ID
-    let productId;
+    var productId;
     if (isEdit) {
       productId = document.getElementById('pf-id').value;
     } else {
       productId = 'GACP-' + String(Date.now()).slice(-6);
     }
 
-    // Handle image upload
-    const imgFile = document.getElementById('pf-img-file').files[0];
-    let imgUrl = document.getElementById('pf-img').value;
+    var imgFile = document.getElementById('pf-img-file').files[0];
+    var imgUrl = document.getElementById('pf-img').value;
 
     if (imgFile) {
       document.getElementById('pf-img-status').textContent = 'Uploading image…';
@@ -240,11 +220,11 @@ async function handleProductSave(e) {
         document.getElementById('pf-img-status').textContent = 'Image uploaded';
       } catch (imgErr) {
         console.error('Image upload error:', imgErr);
-        document.getElementById('pf-img-status').textContent = 'Image upload failed — saving without image';
+        document.getElementById('pf-img-status').textContent = 'Image upload failed';
       }
     }
 
-    const productData = {
+    var productData = {
       name: document.getElementById('pf-name').value,
       cat: document.getElementById('pf-cat').value.toLowerCase().trim(),
       brand: document.getElementById('pf-brand').value || null,
@@ -279,7 +259,6 @@ async function handleProductSave(e) {
       productData.trade_potency = document.getElementById('pf-tpotency').value || null;
       productData.trade_desc = document.getElementById('pf-tdesc').value || null;
     } else {
-      // Clear dual-layer fields
       productData.consumer_name = null;
       productData.consumer_brand = null;
       productData.consumer_tagline = null;
@@ -293,36 +272,30 @@ async function handleProductSave(e) {
     }
 
     if (isEdit) {
-      const { error } = await _sb.from('products').update(productData).eq('id', productId);
-      if (error) throw error;
+      var err1 = (await _sb.from('products').update(productData).eq('id', productId)).error;
+      if (err1) throw err1;
     } else {
       productData.id = productId;
-      const { error } = await _sb.from('products').insert(productData);
-      if (error) throw error;
+      var err2 = (await _sb.from('products').insert(productData)).error;
+      if (err2) throw err2;
     }
 
-    // Save compounds if dual layer
     if (isDual) {
       await _sb.from('product_compounds').delete().eq('product_id', productId);
-
-      const rows = document.querySelectorAll('.compound-row');
-      const compounds = [];
-      rows.forEach(row => {
-        const name = row.querySelector('.compound-name').value.trim();
-        const pct = parseFloat(row.querySelector('.compound-pct').value);
-        if (name && !isNaN(pct)) {
-          compounds.push({ product_id: productId, compound: name, pct });
-        }
+      var rows = document.querySelectorAll('.compound-row');
+      var compounds = [];
+      rows.forEach(function(row) {
+        var nm = row.querySelector('.compound-name').value.trim();
+        var pc = parseFloat(row.querySelector('.compound-pct').value);
+        if (nm && !isNaN(pc)) compounds.push({ product_id: productId, compound: nm, pct: pc });
       });
-
       if (compounds.length) {
-        const { error } = await _sb.from('product_compounds').insert(compounds);
-        if (error) console.error('Compounds save error:', error);
+        var err3 = (await _sb.from('product_compounds').insert(compounds)).error;
+        if (err3) console.error('Compounds save error:', err3);
       }
     }
 
     showToast(isEdit ? 'Product updated' : 'Product created', 'success');
-
     PRODUCTS = [];
     COMPOUNDS_MAP = {};
     await loadProducts();
@@ -337,21 +310,17 @@ async function handleProductSave(e) {
   }
 }
 
-// --- Edit / Delete -----------------------------------------
-
 function editProduct(id) {
-  const product = PRODUCTS.find(p => p.id === id);
+  var product = PRODUCTS.find(function(p) { return p.id === id; });
   if (product) showProductForm(product);
 }
 
 async function deleteProduct(id) {
   if (!confirm('Delete this product? This cannot be undone.')) return;
-
   try {
     await _sb.from('product_compounds').delete().eq('product_id', id);
-    const { error } = await _sb.from('products').delete().eq('id', id);
-    if (error) throw error;
-
+    var err = (await _sb.from('products').delete().eq('id', id)).error;
+    if (err) throw err;
     showToast('Product deleted', 'info');
     PRODUCTS = [];
     COMPOUNDS_MAP = {};
@@ -365,87 +334,329 @@ async function deleteProduct(id) {
 // --- Applications ------------------------------------------
 
 async function loadApplications() {
-  const container = document.getElementById('admin-container');
+  var container = document.getElementById('admin-container');
 
-  const { data: profiles, error } = await _sb
+  var result = await _sb
     .from('profiles')
     .select('*')
-    .eq('role', 'pending')
+    .in('role', ['pending', 'consumer', 'trade-restricted', 'trade-full', 'rejected'])
     .order('created_at', { ascending: false });
 
-  if (error) {
+  if (result.error) {
     container.innerHTML = '<p class="text-dim">Unable to load applications.</p>';
     return;
   }
 
-  if (!profiles.length) {
-    container.innerHTML = '<div class="empty-state"><h3 class="empty-state__title">No pending applications</h3><p class="empty-state__text">All applications have been reviewed.</p></div>';
+  appProfiles = result.data || [];
+  var pending = appProfiles.filter(function(p) { return p.role === 'pending'; });
+
+  if (!appProfiles.length) {
+    container.innerHTML = '<div class="empty-state"><h3 class="empty-state__title">No applications</h3></div>';
     return;
   }
 
-  container.innerHTML = `
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr><th>Date</th><th>Name</th><th>Email</th><th>Type</th><th>Company</th><th>Country</th><th>IP Match</th><th>Actions</th></tr>
-        </thead>
-        <tbody id="admin-tbody"></tbody>
-      </table>
-    </div>
-  `;
+  container.innerHTML =
+    '<div style="display:flex;gap:var(--sp-md);margin-bottom:var(--sp-lg)">' +
+      '<button class="filter-btn filter-btn--active" data-app-filter="pending">Pending (' + pending.length + ')</button>' +
+      '<button class="filter-btn" data-app-filter="all">All (' + appProfiles.length + ')</button>' +
+    '</div>' +
+    '<div class="table-wrap"><table class="table"><thead>' +
+      '<tr><th>Date</th><th>Name</th><th>Email</th><th>Type</th><th>Company</th><th>Corp</th><th>Role</th><th>Actions</th></tr>' +
+    '</thead><tbody id="admin-tbody"></tbody></table></div>' +
+    '<div id="app-detail-overlay" class="overlay"><div class="overlay__panel" id="app-detail-panel"></div></div>';
 
-  const tbody = document.getElementById('admin-tbody');
-  profiles.forEach(p => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${new Date(p.created_at).toLocaleDateString()}</td>
-      <td>${escapeHtml((p.first_name || '') + ' ' + (p.last_name || ''))}</td>
-      <td>${escapeHtml(p.email || '')}</td>
-      <td><span class="badge badge--${p.account_type === 'business' ? 'amber' : 'neutral'}">${p.account_type || '—'}</span></td>
-      <td>${escapeHtml(p.company || '—')}</td>
-      <td>${escapeHtml(p.country || '—')}</td>
-      <td>${p.location_match === true ? '<span class="badge badge--green">Match</span>' :
-            p.location_match === false ? '<span class="badge badge--terra">Mismatch</span>' :
-            '<span class="badge badge--neutral">N/A</span>'}</td>
-      <td>
-        <div style="display:flex;gap:var(--sp-xs)">
-          <button class="btn btn--sm btn--primary" data-approve="${p.id}">Approve</button>
-          <button class="btn btn--sm btn--ghost" style="color:var(--terra)" data-reject="${p.id}">Reject</button>
-        </div>
-      </td>
-    `;
-    tbody.appendChild(row);
+  renderAppTable('pending');
+
+  container.querySelectorAll('[data-app-filter]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      container.querySelectorAll('[data-app-filter]').forEach(function(b) { b.classList.remove('filter-btn--active'); });
+      btn.classList.add('filter-btn--active');
+      renderAppTable(btn.dataset.appFilter);
+    });
   });
 
-  tbody.addEventListener('click', async (e) => {
-    const approveBtn = e.target.closest('[data-approve]');
-    const rejectBtn = e.target.closest('[data-reject]');
+  container.addEventListener('click', async function(e) {
+    var approveBtn = e.target.closest('[data-approve]');
+    var rejectBtn = e.target.closest('[data-reject]');
+    var detailBtn = e.target.closest('[data-detail]');
 
-    if (approveBtn) {
-      const { error } = await _sb.from('profiles').update({
-        role: 'consumer',
-        approved_at: new Date().toISOString(),
-        approved_by: 'admin',
-      }).eq('id', approveBtn.dataset.approve);
-
-      if (!error) {
-        approveBtn.closest('tr').remove();
-        showToast('Application approved', 'success');
-      }
+    if (detailBtn) {
+      var p = appProfiles.find(function(x) { return x.id === detailBtn.dataset.detail; });
+      if (p) showAppDetail(p);
     }
-
+    if (approveBtn) await setAppRole(approveBtn.dataset.approve, 'consumer');
     if (rejectBtn) {
       if (!confirm('Reject this application?')) return;
-      const { error } = await _sb.from('profiles').update({
-        role: 'rejected',
-        approved_at: new Date().toISOString(),
-        approved_by: 'admin',
-      }).eq('id', rejectBtn.dataset.reject);
-
-      if (!error) {
-        rejectBtn.closest('tr').remove();
-        showToast('Application rejected', 'info');
-      }
+      await setAppRole(rejectBtn.dataset.reject, 'rejected');
     }
   });
+}
+
+function renderAppTable(filter) {
+  var tbody = document.getElementById('admin-tbody');
+  if (!tbody) return;
+
+  var list = filter === 'all' ? appProfiles : appProfiles.filter(function(p) { return p.role === filter; });
+
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:var(--sp-xl)"><span class="text-dim">No applications found.</span></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(function(p) {
+    var corpBadge = p.corp_verified === true ? '<span class="badge badge--green">Verified</span>'
+      : p.corp_verified === false ? '<span class="badge badge--terra">Unverified</span>'
+      : '<span class="badge badge--neutral">—</span>';
+
+    var roleMap = {
+      pending: '<span class="badge badge--amber">Pending</span>',
+      consumer: '<span class="badge badge--green">Consumer</span>',
+      'trade-restricted': '<span class="badge badge--green">Trade</span>',
+      'trade-full': '<span class="badge badge--green">Trade Full</span>',
+      rejected: '<span class="badge badge--terra">Rejected</span>',
+    };
+    var roleBadge = roleMap[p.role] || '<span class="badge badge--neutral">' + p.role + '</span>';
+
+    return '<tr>' +
+      '<td>' + new Date(p.created_at).toLocaleDateString() + '</td>' +
+      '<td>' + escapeHtml((p.first_name || '') + ' ' + (p.last_name || '')) + '</td>' +
+      '<td>' + escapeHtml(p.email || '') + '</td>' +
+      '<td><span class="badge badge--' + (p.account_type === 'business' ? 'amber' : 'neutral') + '">' + (p.account_type || '—') + '</span></td>' +
+      '<td>' + escapeHtml(p.company || '—') + '</td>' +
+      '<td>' + corpBadge + '</td>' +
+      '<td>' + roleBadge + '</td>' +
+      '<td><div style="display:flex;gap:var(--sp-xs)">' +
+        '<button class="btn btn--sm btn--secondary" data-detail="' + p.id + '">Detail</button>' +
+        (p.role === 'pending' ?
+          '<button class="btn btn--sm btn--primary" data-approve="' + p.id + '">Approve</button>' +
+          '<button class="btn btn--sm btn--ghost" style="color:var(--terra)" data-reject="' + p.id + '">Reject</button>'
+        : '') +
+      '</div></td></tr>';
+  }).join('');
+}
+
+async function setAppRole(id, role) {
+  var err = (await _sb.from('profiles').update({
+    role: role,
+    approved_at: new Date().toISOString(),
+    approved_by: 'admin',
+  }).eq('id', id)).error;
+
+  if (!err) {
+    var p = appProfiles.find(function(x) { return x.id === id; });
+    if (p) p.role = role;
+    var activeFilter = document.querySelector('[data-app-filter].filter-btn--active');
+    renderAppTable(activeFilter ? activeFilter.dataset.appFilter : 'pending');
+    showToast(role === 'rejected' ? 'Application rejected' : 'Application approved', role === 'rejected' ? 'info' : 'success');
+  }
+}
+
+// --- Application Detail + Corporate Verification -----------
+
+function showAppDetail(profile) {
+  var overlay = document.getElementById('app-detail-overlay');
+  var panel = document.getElementById('app-detail-panel');
+  if (!overlay || !panel) return;
+
+  var address = [profile.addr1, profile.addr2, profile.city, profile.state, profile.zip, profile.country].filter(Boolean).join(', ');
+
+  var corpBadge = profile.corp_verified === true ? '<span class="badge badge--green">Verified</span>'
+    : profile.corp_verified === false ? '<span class="badge badge--terra">Unverified</span>'
+    : '<span class="badge badge--neutral">Not yet checked</span>';
+
+  var fields = [
+    ['Name', (profile.first_name || '') + ' ' + (profile.last_name || '')],
+    ['Email', profile.email],
+    ['Phone', profile.phone],
+    ['Account Type', profile.account_type],
+    ['Company', profile.company],
+    ['Corp / EIN', profile.corp_num],
+    ['VAT / Tax ID', profile.vat],
+    ['Website', profile.website],
+    ['Address', address],
+    ['Business Category', profile.biz_category],
+    ['Intended Use', profile.intended_use],
+    ['IP Address', profile.ip_address],
+    ['IP Location', (profile.ip_city || '') + ', ' + (profile.ip_country || '')],
+    ['IP Org', profile.ip_org],
+    ['Location Match', profile.location_match === true ? 'Yes' : profile.location_match === false ? 'No' : 'N/A'],
+    ['Applied', new Date(profile.created_at).toLocaleString()],
+    ['Role', profile.role],
+  ];
+
+  var fieldsHTML = fields.map(function(f) {
+    return '<div><div class="text-muted text-xs" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">' + f[0] + '</div>' +
+      '<div class="text-cream">' + escapeHtml(f[1] || '—') + '</div></div>';
+  }).join('');
+
+  var corpSection = '';
+  if (profile.company) {
+    corpSection =
+      '<button class="btn btn--secondary btn--sm" id="btn-verify-corp" ' +
+        'data-company="' + escapeHtml(profile.company) + '" ' +
+        'data-corp-num="' + escapeHtml(profile.corp_num || '') + '" ' +
+        'data-country="' + escapeHtml(profile.country || '') + '">Search OpenCorporates</button>' +
+      '<div id="corp-verify-results" style="margin-top:var(--sp-md)"></div>' +
+      '<div style="margin-top:var(--sp-md);display:flex;gap:var(--sp-sm)">' +
+        '<button class="btn btn--sm btn--primary" onclick="markCorpVerified(\'' + profile.id + '\', true)">Mark Verified</button>' +
+        '<button class="btn btn--sm btn--ghost" style="color:var(--terra)" onclick="markCorpVerified(\'' + profile.id + '\', false)">Mark Unverified</button>' +
+      '</div>';
+  } else {
+    corpSection = '<p class="text-xs text-dim">No company name provided.</p>';
+  }
+
+  var roleActions = '';
+  if (profile.role === 'pending') {
+    roleActions =
+      '<div style="display:flex;gap:var(--sp-md);flex-wrap:wrap">' +
+        '<button class="btn btn--primary" onclick="setAppRole(\'' + profile.id + '\',\'consumer\');closeAppDetail()">Approve Consumer</button>' +
+        '<button class="btn btn--secondary" onclick="setAppRole(\'' + profile.id + '\',\'trade-restricted\');closeAppDetail()">Approve Trade</button>' +
+        '<button class="btn btn--secondary" onclick="setAppRole(\'' + profile.id + '\',\'trade-full\');closeAppDetail()">Approve Trade Full</button>' +
+        '<button class="btn btn--ghost" style="color:var(--terra)" onclick="setAppRole(\'' + profile.id + '\',\'rejected\');closeAppDetail()">Reject</button>' +
+      '</div>';
+  } else {
+    roleActions =
+      '<div style="display:flex;gap:var(--sp-md);align-items:center">' +
+        '<label class="form-label" style="margin:0">Change role:</label>' +
+        '<select class="form-select" style="width:auto" onchange="if(this.value){setAppRole(\'' + profile.id + '\',this.value);closeAppDetail();}">' +
+          '<option value="">— Select —</option>' +
+          '<option value="pending">Pending</option>' +
+          '<option value="consumer">Consumer</option>' +
+          '<option value="trade-restricted">Trade Restricted</option>' +
+          '<option value="trade-full">Trade Full</option>' +
+          '<option value="rejected">Rejected</option>' +
+        '</select>' +
+      '</div>';
+  }
+
+  panel.innerHTML =
+    '<div style="max-width:600px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-xl)">' +
+        '<h3>Application Detail</h3>' +
+        '<button class="btn btn--ghost btn--sm" onclick="closeAppDetail()">Close</button>' +
+      '</div>' +
+      '<div class="grid grid-2 gap-lg" style="font-size:var(--fs-sm);margin-bottom:var(--sp-xl)">' + fieldsHTML + '</div>' +
+      '<div class="card" style="margin-bottom:var(--sp-xl)">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-md)">' +
+          '<h4 style="font-size:var(--fs-sm)">Corporate Verification</h4>' + corpBadge +
+        '</div>' + corpSection +
+      '</div>' +
+      roleActions +
+    '</div>';
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  var verifyBtn = document.getElementById('btn-verify-corp');
+  if (verifyBtn) {
+    verifyBtn.addEventListener('click', function() { searchOpenCorporates(verifyBtn); });
+  }
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeAppDetail();
+  });
+}
+
+function closeAppDetail() {
+  var overlay = document.getElementById('app-detail-overlay');
+  if (overlay) {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+// --- OpenCorporates Search ---------------------------------
+
+async function searchOpenCorporates(btn) {
+  var company = btn.dataset.company;
+  var corpNum = btn.dataset.corpNum;
+  var country = btn.dataset.country;
+  var results = document.getElementById('corp-verify-results');
+
+  if (!company) {
+    results.innerHTML = '<p class="text-xs text-dim">No company name to search.</p>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Searching…';
+  results.innerHTML = '<div class="spinner" style="margin:var(--sp-sm) 0"></div>';
+
+  try {
+    var jurisdictionMap = {
+      'US': 'us', 'GB': 'gb', 'CA': 'ca', 'AU': 'au', 'DE': 'de',
+      'NL': 'nl', 'FR': 'fr', 'IE': 'ie', 'NZ': 'nz', 'ZA': 'za',
+    };
+
+    var url = 'https://api.opencorporates.com/v0.4/companies/search?q=' + encodeURIComponent(company) + '&per_page=5';
+
+    var jurisdiction = jurisdictionMap[country];
+    if (jurisdiction) url += '&jurisdiction_code=' + jurisdiction;
+    if (corpNum) url += '&company_number=' + encodeURIComponent(corpNum);
+
+    var res = await fetch(url);
+    var data = await res.json();
+    var companies = (data && data.results && data.results.companies) || [];
+
+    if (!companies.length) {
+      results.innerHTML =
+        '<div style="padding:var(--sp-md);background:rgba(196,106,58,0.08);border-radius:var(--radius-md);border:1px solid rgba(196,106,58,0.2)">' +
+          '<p class="text-sm" style="color:var(--terra)">No matching companies found in registry.</p>' +
+          '<p class="text-xs text-dim" style="margin-top:4px">Searched: "' + escapeHtml(company) + '"' + (jurisdiction ? ' in ' + jurisdiction.toUpperCase() : '') + '</p>' +
+        '</div>';
+      return;
+    }
+
+    results.innerHTML =
+      '<p class="text-xs text-dim" style="margin-bottom:var(--sp-sm)">Found ' + companies.length + ' result' + (companies.length !== 1 ? 's' : '') + ':</p>' +
+      companies.map(function(item) {
+        var c = item.company;
+        var isActive = c.current_status && c.current_status.toLowerCase().indexOf('active') >= 0;
+        var statusBadge = isActive
+          ? '<span class="badge badge--green">Active</span>'
+          : '<span class="badge badge--terra">' + escapeHtml(c.current_status || 'Unknown') + '</span>';
+
+        var nameMatch = c.name.toLowerCase().indexOf(company.toLowerCase()) >= 0 || company.toLowerCase().indexOf(c.name.toLowerCase()) >= 0;
+        var numMatch = corpNum && c.company_number === corpNum;
+
+        return '<div class="card" style="padding:var(--sp-md);margin-bottom:var(--sp-sm)">' +
+          '<div style="display:flex;justify-content:space-between;align-items:start">' +
+            '<div><strong style="color:var(--cream)">' + escapeHtml(c.name) + '</strong>' +
+              (nameMatch ? ' <span class="badge badge--green" style="font-size:10px">Name match</span>' : '') +
+              (numMatch ? ' <span class="badge badge--green" style="font-size:10px">Number match</span>' : '') +
+              '<div class="text-xs text-dim" style="margin-top:4px">' +
+                (c.company_number ? 'Reg: ' + escapeHtml(c.company_number) + ' · ' : '') +
+                (c.jurisdiction_code ? escapeHtml(c.jurisdiction_code.toUpperCase()) + ' · ' : '') +
+                (c.incorporation_date || '') +
+              '</div>' +
+            '</div>' + statusBadge +
+          '</div>' +
+          (c.registered_address_in_full ? '<div class="text-xs text-dim" style="margin-top:4px">' + escapeHtml(c.registered_address_in_full) + '</div>' : '') +
+        '</div>';
+      }).join('');
+  } catch (err) {
+    results.innerHTML = '<p class="text-sm" style="color:var(--terra)">Search failed: ' + escapeHtml(err.message) + '</p>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Search OpenCorporates';
+  }
+}
+
+// --- Mark Corporate Verified/Unverified --------------------
+
+async function markCorpVerified(profileId, verified) {
+  var err = (await _sb.from('profiles')
+    .update({ corp_verified: verified })
+    .eq('id', profileId)).error;
+
+  if (!err) {
+    var p = appProfiles.find(function(x) { return x.id === profileId; });
+    if (p) p.corp_verified = verified;
+    showToast(verified ? 'Marked as verified' : 'Marked as unverified', verified ? 'success' : 'info');
+    var activeFilter = document.querySelector('[data-app-filter].filter-btn--active');
+    renderAppTable(activeFilter ? activeFilter.dataset.appFilter : 'pending');
+    closeAppDetail();
+  } else {
+    showToast('Update failed: ' + err.message, 'error');
+  }
 }
