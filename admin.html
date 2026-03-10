@@ -144,8 +144,10 @@
 
                 <div class="form-row">
                   <div class="form-group">
-                    <label class="form-label" for="pf-img">Image URL</label>
-                    <input type="text" name="img" id="pf-img" class="form-input" placeholder="/images/products/gacp-019.jpg">
+                    <label class="form-label" for="pf-img">Product Image</label>
+                    <input type="file" id="pf-img-file" accept="image/*" class="form-input" style="padding:8px">
+                    <input type="hidden" name="img" id="pf-img">
+                    <span class="form-hint" id="pf-img-status"></span>
                   </div>
                   <div class="form-group">
                     <label class="form-label" for="pf-restriction">Restriction</label>
@@ -163,9 +165,19 @@
                     <label class="form-label" for="pf-sort">Sort Order</label>
                     <input type="number" name="sort_order" id="pf-sort" class="form-input" value="0">
                   </div>
-                  <div class="form-group" style="display:flex;align-items:center;gap:var(--sp-sm);padding-top:24px">
-                    <input type="checkbox" name="active" id="pf-active" checked>
-                    <label for="pf-active" class="form-label" style="margin:0">Active</label>
+                  <div class="form-group" style="display:flex;flex-direction:column;gap:var(--sp-sm);padding-top:24px">
+                    <div style="display:flex;align-items:center;gap:var(--sp-sm)">
+                      <input type="checkbox" name="active" id="pf-active" checked>
+                      <label for="pf-active" class="form-label" style="margin:0">Active</label>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:var(--sp-sm)">
+                      <input type="checkbox" name="visible_consumer" id="pf-vis-consumer" checked>
+                      <label for="pf-vis-consumer" class="form-label" style="margin:0">Visible to Consumers</label>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:var(--sp-sm)">
+                      <input type="checkbox" name="visible_trade" id="pf-vis-trade" checked>
+                      <label for="pf-vis-trade" class="form-label" style="margin:0">Visible to Trade</label>
+                    </div>
                   </div>
                 </div>
               </div>
