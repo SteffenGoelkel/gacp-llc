@@ -19,6 +19,7 @@ function getNavHTML(activePage = '') {
           <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
           <a href="/portal/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Products</a>
           <a href="/login.html" class="nav__cta" id="nav-auth-btn">Sign In</a>
+          <a href="#" class="nav__link nav__logout hidden" id="nav-logout-btn">Sign Out</a>
         </div>
 
         <button class="nav__toggle" id="nav-toggle" aria-label="Toggle menu">
@@ -32,6 +33,7 @@ function getNavHTML(activePage = '') {
       <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
       <a href="/portal/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Products</a>
       <a href="/login.html" class="nav__cta" id="nav-auth-btn-mobile">Sign In</a>
+      <a href="#" class="nav__link nav__logout hidden" id="nav-logout-btn-mobile">Sign Out</a>
     </div>
   `;
 }
@@ -145,6 +147,7 @@ function initMobileMenu() {
 async function updateNavAuthState() {
   const session = await getSession();
   const btns = document.querySelectorAll('#nav-auth-btn, #nav-auth-btn-mobile');
+  const logoutBtns = document.querySelectorAll('#nav-logout-btn, #nav-logout-btn-mobile');
 
   btns.forEach(btn => {
     if (session) {
@@ -153,6 +156,18 @@ async function updateNavAuthState() {
     } else {
       btn.textContent = 'Sign In';
       btn.href = PATHS.LOGIN;
+    }
+  });
+
+  logoutBtns.forEach(btn => {
+    if (session) {
+      btn.classList.remove('hidden');
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        logout();
+      });
+    } else {
+      btn.classList.add('hidden');
     }
   });
 }
