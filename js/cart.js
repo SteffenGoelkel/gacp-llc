@@ -69,6 +69,7 @@ async function initCartPage() {
   if (!auth) return;
   const { profile } = auth;
 
+  await loadProducts();
   renderCart(profile);
 }
 

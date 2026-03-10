@@ -76,6 +76,8 @@ async function initDashboard() {
   if (!auth) return;
   const { profile } = auth;
 
+  await loadProducts();
+
   // Greeting
   const greetingEl = document.getElementById('dash-greeting');
   if (greetingEl) {
@@ -108,10 +110,33 @@ async function initDashboard() {
     roleBadge.textContent = roleLabels[profile.role] || profile.role;
   }
 
-  // Tier badge
-  const tierBadge = document.getElementById('dash-tier');
-  if (tierBadge) {
-    tierBadge.textContent = (profile.tier || 'bronze').charAt(0).toUpperCase() + (profile.tier || 'bronze').slice(1);
+  // Account details grid
+  const accountEl = document.getElementById('account-details');
+  if (accountEl) {
+    const tierLabel = (profile.tier || 'bronze').charAt(0).toUpperCase() + (profile.tier || 'bronze').slice(1);
+    const discount = (getTierDiscount(profile.tier) * 100).toFixed(0) + '%';
+    const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || '—';
+    const address = [profile.addr1, profile.city, profile.state, profile.zip, profile.country].filter(Boolean).join(', ') || '—';
+    const memberSince = profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+
+    const fields = [
+      ['Email', profile.email || '—'],
+      ['Name', fullName],
+      ['Phone', profile.phone || '—'],
+      ['Account Type', (profile.account_type || 'individual').charAt(0).toUpperCase() + (profile.account_type || 'individual').slice(1)],
+      ['Company', profile.company || '—'],
+      ['Address', address],
+      ['Tier', tierLabel],
+      ['Discount', discount],
+      ['Member Since', memberSince],
+    ];
+
+    accountEl.innerHTML = fields.map(([label, value]) => `
+      <div class="account-field">
+        <div class="account-field__label">${label}</div>
+        <div class="account-field__value">${escapeHtml(String(value))}</div>
+      </div>
+    `).join('');
   }
 
   // Stats
