@@ -13,6 +13,7 @@ function getPortalSidebarHTML(activePage = '') {
     { href: PATHS.COA,         label: 'CoA Library',   icon: 'file',    key: 'coa' },
     { href: PATHS.FORMULATION, label: 'Formulation',   icon: 'flask',   key: 'formulation' },
     { href: PATHS.PRICING,     label: 'Bulk Pricing',  icon: 'tag',     key: 'pricing' },
+    { href: PATHS.ADMIN,       label: 'Admin',         icon: 'shield',  key: 'admin' },
   ];
 
   const icons = {
@@ -22,6 +23,7 @@ function getPortalSidebarHTML(activePage = '') {
     file:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>',
     flask:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6.5L4 20h16L14 9.5V3"/></svg>',
     tag:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    shield:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
   };
 
   return `
