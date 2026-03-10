@@ -7,11 +7,6 @@
 let editingProduct = null;
 let appProfiles = [];
 
-const jurisdictionMap = {
-  'US': 'us', 'GB': 'gb', 'CA': 'ca', 'AU': 'au', 'DE': 'de',
-  'NL': 'nl', 'FR': 'fr', 'IE': 'ie', 'NZ': 'nz', 'ZA': 'za',
-};
-
 async function initAdminPanel() {
   const auth = await requireAuth();
   if (!auth) return;
@@ -498,7 +493,7 @@ function showAppDetail(profile) {
   if (profile.company) {
     corpSection =
       '<a class="btn btn--secondary btn--sm" id="btn-verify-corp" ' +
-        'href="https://opencorporates.com/companies?q=' + encodeURIComponent(profile.company) + (jurisdictionMap[profile.country] ? '&jurisdiction_code=' + jurisdictionMap[profile.country] : '') + '" ' +
+        'href="https://opencorporates.com/companies?q=' + encodeURIComponent(profile.company) + '" ' +
         'target="_blank" rel="noopener">Search OpenCorporates ↗</a>' +
       '<a class="btn btn--secondary btn--sm" style="margin-left:var(--sp-sm)" ' +
         'href="https://www.google.com/search?q=' + encodeURIComponent('"' + profile.company + '" ' + (profile.corp_num || '') + ' company registry') + '" ' +
