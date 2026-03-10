@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoA Library — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+    <main class="page-main">
+      <div class="portal-layout">
+        <div id="portal-sidebar-slot"></div>
+        <div class="portal-content">
+          <div class="catalogue-header">
+            <div>
+              <h2 style="font-size:var(--fs-2xl)">Certificate of Analysis Library</h2>
+              <span class="text-sm text-dim">Download verified CoA documents for all products</span>
+            </div>
+            <div class="catalogue-search">
+              <svg class="catalogue-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" class="catalogue-search__input" id="coa-search" placeholder="Search by product or batch…">
+            </div>
+          </div>
+
+          <div class="coa-grid" id="coa-grid"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/portal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      initNavigation('coa', true);
+      initPortalLayout('coa');
+
+      const auth = await requireAuth();
+      if (!auth) return;
+      const { profile } = auth;
+
+      await loadProducts();
+
+      const grid = document.getElementById('coa-grid');
+      const searchInput = document.getElementById('coa-search');
+
+      function renderCoAs(query = '') {
+        let products = PRODUCTS;
+        if (query) {
+          const q = query.toLowerCase();
+          products = products.filter(p => {
+            const layer = getProductLayer(p, profile);
+            return layer.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q);
+          });
+        }
+
+        grid.innerHTML = products.map(p => {
+          const layer = getProductLayer(p, profile);
+          return `
+            <div class="card coa-card">
+              <div class="coa-card__icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                </svg>
+              </div>
+              <div class="coa-card__info">
+                <div class="coa-card__product">${escapeHtml(layer.name)}</div>
+                <div class="coa-card__batch">Batch: ${p.id}-2026-001</div>
+                <a href="#" class="coa-card__download" onclick="event.preventDefault();showToast('CoA downloads coming soon','info')">
+                  Download PDF ↓
+                </a>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      renderCoAs();
+
+      if (searchInput) {
+        searchInput.addEventListener('input', debounce((e) => renderCoAs(e.target.value), 200));
+      }
+    });
+  </script>
+</body>
+</html>
