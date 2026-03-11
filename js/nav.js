@@ -58,6 +58,7 @@ function getFooterHTML() {
             <a href="/about.html" class="footer__link">About Us</a>
             <a href="/portal/catalogue.html" class="footer__link">Products</a>
             <a href="/portal/coa.html" class="footer__link">CoA Library</a>
+            <a href="/contact.html" class="footer__link">Contact</a>
           </div>
           <div>
             <h4 class="footer__col-heading">Trade</h4>
@@ -66,9 +67,15 @@ function getFooterHTML() {
             <a href="/register.html" class="footer__link">Apply for Trade Account</a>
           </div>
           <div>
-            <h4 class="footer__col-heading">Contact</h4>
-            <a href="/contact.html" class="footer__link">Get in Touch</a>
+            <h4 class="footer__col-heading">Legal</h4>
+            <a href="/terms.html" class="footer__link">Terms of Service</a>
+            <a href="/privacy.html" class="footer__link">Privacy Policy</a>
+            <a href="/disclaimer.html" class="footer__link">Disclaimer</a>
+            <a href="/shipping.html" class="footer__link">Shipping & Returns</a>
           </div>
+        </div>
+        <div class="footer__disclaimer">
+          <p>These statements have not been evaluated by the Food and Drug Administration. Products are not intended to diagnose, treat, cure, or prevent any disease. Products are sold as raw botanical materials for use by qualified manufacturers and formulators. All products are restricted to individuals aged 21 years or older. Consult a healthcare professional before use.</p>
         </div>
         <div class="footer__bottom">
           <span class="footer__copy">&copy; ${year} GACP LLC. All rights reserved.</span>
