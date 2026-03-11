@@ -664,3 +664,25 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Sample Request ---------------------------------------- */
+.product-detail__sample {
+  background: rgba(224, 149, 64, 0.04);
+  border: 1px solid rgba(224, 149, 64, 0.15);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-lg);
+}
+
+.product-detail__sample h4 {
+  color: var(--amber);
+}
+
+.btn--amber {
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.btn--amber:hover {
+  background: var(--amber-glow);
+}
