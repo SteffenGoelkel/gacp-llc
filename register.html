@@ -174,10 +174,26 @@
 
           <hr style="border:none;border-top:1px solid var(--border);margin:var(--sp-xl) 0">
 
-          <!-- Terms & Submit -->
+          <!-- Verification & Terms -->
+          <div class="form-group">
+            <label class="form-label form-label--required" for="dob">Date of Birth</label>
+            <input type="date" name="dob" id="dob" class="form-input" required>
+            <span class="form-hint">You must be 21 or older to create an account.</span>
+          </div>
+
+          <div class="form-check" style="margin-bottom:var(--sp-md)">
+            <input type="checkbox" id="age-confirm" required>
+            <label for="age-confirm">I confirm that I am 21 years of age or older.</label>
+          </div>
+
+          <div class="form-check" style="margin-bottom:var(--sp-md)">
+            <input type="checkbox" id="disclaimer-confirm" required>
+            <label for="disclaimer-confirm">I acknowledge that products sold by GACP LLC have not been evaluated by the FDA and are not intended to diagnose, treat, cure, or prevent any disease. I have read the <a href="/disclaimer.html" target="_blank" style="color:var(--green)">Disclaimer</a>.</label>
+          </div>
+
           <div class="form-check" style="margin-bottom:var(--sp-xl)">
             <input type="checkbox" id="terms" required>
-            <label for="terms">I confirm the information provided is accurate and I agree to GACP LLC's terms of service.</label>
+            <label for="terms">I confirm the information provided is accurate and I agree to GACP LLC's <a href="/terms.html" target="_blank" style="color:var(--green)">Terms of Service</a> and <a href="/privacy.html" target="_blank" style="color:var(--green)">Privacy Policy</a>.</label>
           </div>
 
           <button type="submit" class="btn btn--primary btn--full btn--lg" id="register-submit">Submit Application</button>
