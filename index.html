@@ -64,11 +64,11 @@
       <div class="hero__stats">
         <div class="hero__stats-inner">
           <div class="hero__stat">
-            <div class="hero__stat-value" data-count="18" data-suffix="">0</div>
+            <div class="hero__stat-value" id="stat-products" data-count="0" data-suffix="">0</div>
             <div class="hero__stat-label">Products</div>
           </div>
           <div class="hero__stat">
-            <div class="hero__stat-value" data-count="5" data-suffix="">0</div>
+            <div class="hero__stat-value" id="stat-categories" data-count="0" data-suffix="">0</div>
             <div class="hero__stat-label">Categories</div>
           </div>
           <div class="hero__stat">
@@ -163,11 +163,29 @@
   <script src="/js/auth.js"></script>
   <script src="/js/geo.js"></script>
   <script src="/js/nav.js"></script>
+  <script src="/js/products.js"></script>
   <script src="/js/hero.js"></script>
   <script src="/js/contact.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       initNavigation('home', false);
+
+      // Load product counts from database
+      try {
+        const products = await loadProducts();
+        const cats = [...new Set(products.map(p => p.cat))];
+
+        const prodEl = document.getElementById('stat-products');
+        const catEl = document.getElementById('stat-categories');
+
+        if (prodEl) prodEl.dataset.count = products.length;
+        if (catEl) catEl.dataset.count = cats.length;
+      } catch (e) {
+        // Fallback — counters stay at 0
+      }
+
+      // Start counter animations after data is set
+      animateStatCounters();
     });
   </script>
 </body>
