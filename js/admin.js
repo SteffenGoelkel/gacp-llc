@@ -148,6 +148,15 @@ function showProductForm(product) {
       document.getElementById('pf-img-status').textContent = 'Current: ' + product.img;
     }
 
+    // Sourcing fields
+    document.getElementById('pf-src-supplier').value = product.source_supplier || '';
+    document.getElementById('pf-src-country').value = product.source_country || '';
+    document.getElementById('pf-src-region').value = product.source_region || '';
+    document.getElementById('pf-src-facility').value = product.source_facility || '';
+    document.getElementById('pf-src-certs').value = product.source_certifications || '';
+    document.getElementById('pf-src-contact').value = product.source_contact || '';
+    document.getElementById('pf-src-notes').value = product.source_notes || '';
+
     if (product.is_dual_layer) {
       document.getElementById('pf-dual').checked = true;
       document.getElementById('dual-fields').classList.remove('hidden');
@@ -250,6 +259,13 @@ async function handleProductSave(e) {
       visible_consumer: document.getElementById('pf-vis-consumer').checked,
       visible_trade: document.getElementById('pf-vis-trade').checked,
       is_dual_layer: isDual,
+      source_supplier: document.getElementById('pf-src-supplier').value || null,
+      source_country: document.getElementById('pf-src-country').value || null,
+      source_region: document.getElementById('pf-src-region').value || null,
+      source_facility: document.getElementById('pf-src-facility').value || null,
+      source_certifications: document.getElementById('pf-src-certs').value || null,
+      source_contact: document.getElementById('pf-src-contact').value || null,
+      source_notes: document.getElementById('pf-src-notes').value || null,
     };
 
     if (isDual) {
