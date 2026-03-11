@@ -42,6 +42,7 @@
 
           <div class="admin-tabs">
             <button class="admin-tab admin-tab--active" data-tab="products">Products</button>
+            <button class="admin-tab" data-tab="coa">CoA Library</button>
             <button class="admin-tab" data-tab="applications">Applications</button>
           </div>
 
@@ -52,6 +53,54 @@
               <button class="btn btn--primary btn--sm" id="btn-add-product">+ Add Product</button>
             </div>
             <div id="product-list">
+              <div class="loading-screen"><div class="spinner"></div><span>Loading…</span></div>
+            </div>
+          </div>
+
+          <!-- CoA Panel -->
+          <div class="admin-panel" id="panel-coa">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-lg)">
+              <span class="text-sm text-dim" id="coa-count"></span>
+              <button class="btn btn--primary btn--sm" id="btn-upload-coa">+ Upload CoA</button>
+            </div>
+
+            <!-- Upload Form -->
+            <div id="coa-upload-form" class="card hidden" style="margin-bottom:var(--sp-xl);padding:var(--sp-xl)">
+              <h4 style="margin-bottom:var(--sp-lg)">Upload Certificate of Analysis</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label form-label--required" for="coa-product">Product</label>
+                  <select id="coa-product" class="form-select" required>
+                    <option value="">Select product…</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label form-label--required" for="coa-batch">Batch Number</label>
+                  <input type="text" id="coa-batch" class="form-input" placeholder="e.g. GACP-001-2026-003" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="coa-date">Test Date</label>
+                  <input type="date" id="coa-date" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label class="form-label form-label--required" for="coa-file">PDF File</label>
+                  <input type="file" id="coa-file" accept=".pdf" class="form-input" style="padding:8px" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="coa-notes">Notes</label>
+                <input type="text" id="coa-notes" class="form-input" placeholder="e.g. Third-party lab: ACS Laboratory">
+              </div>
+              <div style="display:flex;gap:var(--sp-md);margin-top:var(--sp-lg)">
+                <button class="btn btn--primary btn--sm" id="btn-save-coa">Upload & Save</button>
+                <button class="btn btn--ghost btn--sm" onclick="document.getElementById('coa-upload-form').classList.add('hidden')">Cancel</button>
+              </div>
+            </div>
+
+            <!-- CoA List -->
+            <div id="coa-admin-list">
               <div class="loading-screen"><div class="spinner"></div><span>Loading…</span></div>
             </div>
           </div>
@@ -303,11 +352,15 @@
                     <textarea name="trade_desc" id="pf-tdesc" class="form-textarea" rows="2"></textarea>
                   </div>
 
-                  <!-- Compounds -->
-                  <h3 style="margin-top:var(--sp-xl)">Compounds</h3>
-                  <div id="compounds-list"></div>
-                  <button type="button" class="btn btn--secondary btn--sm" id="btn-add-compound" style="margin-top:var(--sp-sm)">+ Add Compound</button>
                 </div>
+              </div>
+
+              <!-- Compounds (standalone, available for all products) -->
+              <div class="form-section">
+                <h3>Compound Profile</h3>
+                <p class="text-xs text-dim" style="margin-bottom:var(--sp-lg)">Add the chemical/compound breakdown for this product. Available for all product types.</p>
+                <div id="compounds-list-main"></div>
+                <button type="button" class="btn btn--secondary btn--sm" id="btn-add-compound-main" style="margin-top:var(--sp-sm)">+ Add Compound</button>
               </div>
 
               <div style="display:flex;gap:var(--sp-md)">

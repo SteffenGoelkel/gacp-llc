@@ -58,35 +58,67 @@
       const grid = document.getElementById('coa-grid');
       const searchInput = document.getElementById('coa-search');
 
+      // Load CoAs from database
+      const { data: coas, error } = await _sb.from('product_coas').select('*').order('uploaded_at', { ascending: false });
+
+      if (error) {
+        grid.innerHTML = '<p class="text-dim">Unable to load certificates.</p>';
+        return;
+      }
+
       function renderCoAs(query = '') {
-        let products = PRODUCTS;
+        let filtered = coas || [];
+
         if (query) {
           const q = query.toLowerCase();
-          products = products.filter(p => {
-            const layer = getProductLayer(p, profile);
-            return layer.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q);
+          filtered = filtered.filter(coa => {
+            const product = PRODUCTS.find(p => p.id === coa.product_id);
+            const layer = product ? getProductLayer(product, profile) : { name: coa.product_id };
+            return layer.name.toLowerCase().includes(q) ||
+                   coa.batch_number.toLowerCase().includes(q) ||
+                   coa.product_id.toLowerCase().includes(q);
           });
         }
 
-        grid.innerHTML = products.map(p => {
-          const layer = getProductLayer(p, profile);
-          return `
-            <div class="card coa-card">
-              <div class="coa-card__icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                  <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-                </svg>
-              </div>
-              <div class="coa-card__info">
-                <div class="coa-card__product">${escapeHtml(layer.name)}</div>
-                <div class="coa-card__batch">Batch: ${p.id}-2026-001</div>
-                <a href="#" class="coa-card__download" onclick="event.preventDefault();showToast('CoA downloads coming soon','info')">
-                  Download PDF ↓
-                </a>
-              </div>
-            </div>
-          `;
+        if (!filtered.length) {
+          grid.innerHTML = '<div class="empty-state"><div class="empty-state__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>' +
+            '<h3 class="empty-state__title">' + (query ? 'No matching certificates' : 'No certificates available') + '</h3>' +
+            '<p class="empty-state__text">' + (query ? 'Try a different search term.' : 'Certificates of Analysis will appear here once uploaded by our team.') + '</p></div>';
+          return;
+        }
+
+        // Group by product
+        const grouped = {};
+        filtered.forEach(coa => {
+          if (!grouped[coa.product_id]) grouped[coa.product_id] = [];
+          grouped[coa.product_id].push(coa);
+        });
+
+        grid.innerHTML = Object.keys(grouped).map(productId => {
+          const product = PRODUCTS.find(p => p.id === productId);
+          const layer = product ? getProductLayer(product, profile) : { name: productId };
+          const productCoas = grouped[productId];
+
+          return '<div class="card coa-product-group">' +
+            '<div class="coa-product-group__header">' +
+              '<div class="coa-card__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>' +
+              '<div><div class="coa-card__product">' + escapeHtml(layer.name) + '</div>' +
+              '<div class="text-xs text-dim">' + productCoas.length + ' certificate' + (productCoas.length !== 1 ? 's' : '') + '</div></div>' +
+            '</div>' +
+            '<div class="coa-product-group__list">' +
+              productCoas.map(coa => {
+                const testDate = coa.tested_date ? new Date(coa.tested_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+                return '<div class="coa-item">' +
+                  '<div class="coa-item__info">' +
+                    '<span class="coa-item__batch">' + escapeHtml(coa.batch_number) + '</span>' +
+                    (testDate ? '<span class="text-xs text-dim"> · Tested ' + testDate + '</span>' : '') +
+                    (coa.notes ? '<span class="text-xs text-dim"> · ' + escapeHtml(coa.notes) + '</span>' : '') +
+                  '</div>' +
+                  '<a href="' + coa.file_url + '" target="_blank" class="btn btn--sm btn--secondary">Download PDF ↓</a>' +
+                '</div>';
+              }).join('') +
+            '</div>' +
+          '</div>';
         }).join('');
       }
 
