@@ -90,7 +90,8 @@ async function uploadProductImage(file, productId) {
     .from('product-images')
     .getPublicUrl(path);
 
-  return urlData.publicUrl;
+  // Add cache-buster so updated images show immediately
+  return urlData.publicUrl + '?v=' + Date.now();
 }
 
 // --- Product Form ------------------------------------------
