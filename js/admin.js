@@ -30,10 +30,11 @@ async function initAdminPanel() {
   await loadProducts();
   renderProductList();
   loadApplications();
+  initCoaAdmin();
 
   document.getElementById('btn-add-product').addEventListener('click', () => showProductForm(null));
   document.getElementById('btn-cancel-form').addEventListener('click', hideProductForm);
-  document.getElementById('btn-add-compound').addEventListener('click', addCompoundRow);
+  document.getElementById('btn-add-compound-main').addEventListener('click', addCompoundRow);
   document.getElementById('product-form').addEventListener('submit', handleProductSave);
 }
 
@@ -118,7 +119,7 @@ function showProductForm(product) {
   document.getElementById('pf-vis-trade').checked = true;
   document.getElementById('dual-fields').classList.add('hidden');
   document.getElementById('pf-dual').checked = false;
-  document.getElementById('compounds-list').innerHTML = '';
+  document.getElementById('compounds-list-main').innerHTML = '';
   document.getElementById('pf-img').value = '';
   document.getElementById('pf-img-status').textContent = '';
   document.getElementById('pf-sample').checked = false;
@@ -178,10 +179,11 @@ function showProductForm(product) {
       document.getElementById('pf-tspec').value = product.trade_spec || '';
       document.getElementById('pf-tpotency').value = product.trade_potency || '';
       document.getElementById('pf-tdesc').value = product.trade_desc || '';
-
-      var compounds = getProductCompounds(product.id);
-      compounds.forEach(function(c) { addCompoundRow(null, c.compound, c.pct); });
     }
+
+    // Load compounds (available for all products)
+    var compounds = getProductCompounds(product.id);
+    compounds.forEach(function(c) { addCompoundRow(null, c.compound, c.pct); });
   }
 
   wrap.scrollIntoView({ behavior: 'smooth' });
@@ -200,7 +202,7 @@ function addCompoundRow(e, name, pct) {
   if (e) e.preventDefault();
   name = name || '';
   pct = pct || '';
-  var list = document.getElementById('compounds-list');
+  var list = document.getElementById('compounds-list-main');
   var row = document.createElement('div');
   row.className = 'compound-row';
   row.innerHTML =
@@ -312,19 +314,18 @@ async function handleProductSave(e) {
       if (err2) throw err2;
     }
 
-    if (isDual) {
-      await _sb.from('product_compounds').delete().eq('product_id', productId);
-      var rows = document.querySelectorAll('.compound-row');
-      var compounds = [];
-      rows.forEach(function(row) {
-        var nm = row.querySelector('.compound-name').value.trim();
-        var pc = parseFloat(row.querySelector('.compound-pct').value);
-        if (nm && !isNaN(pc)) compounds.push({ product_id: productId, compound: nm, pct: pc });
-      });
-      if (compounds.length) {
-        var err3 = (await _sb.from('product_compounds').insert(compounds)).error;
-        if (err3) console.error('Compounds save error:', err3);
-      }
+    // Save compounds (available for all products)
+    await _sb.from('product_compounds').delete().eq('product_id', productId);
+    var rows = document.querySelectorAll('#compounds-list-main .compound-row');
+    var compounds = [];
+    rows.forEach(function(row) {
+      var nm = row.querySelector('.compound-name').value.trim();
+      var pc = parseFloat(row.querySelector('.compound-pct').value);
+      if (nm && !isNaN(pc)) compounds.push({ product_id: productId, compound: nm, pct: pc });
+    });
+    if (compounds.length) {
+      var err3 = (await _sb.from('product_compounds').insert(compounds)).error;
+      if (err3) console.error('Compounds save error:', err3);
     }
 
     showToast(isEdit ? 'Product updated' : 'Product created', 'success');
@@ -676,5 +677,149 @@ async function markCorpVerified(profileId, verified) {
     closeAppDetail();
   } else {
     showToast('Update failed: ' + err.message, 'error');
+  }
+}
+
+// --- CoA Library Admin -------------------------------------
+
+let allCoas = [];
+
+function initCoaAdmin() {
+  // Show upload form
+  document.getElementById('btn-upload-coa').addEventListener('click', function() {
+    var form = document.getElementById('coa-upload-form');
+    form.classList.toggle('hidden');
+
+    // Populate product dropdown
+    var select = document.getElementById('coa-product');
+    select.innerHTML = '<option value="">Select product…</option>' +
+      PRODUCTS.map(function(p) {
+        return '<option value="' + p.id + '">' + escapeHtml(p.name) + ' (' + p.id + ')</option>';
+      }).join('');
+  });
+
+  // Save CoA
+  document.getElementById('btn-save-coa').addEventListener('click', handleCoaUpload);
+
+  // Load existing CoAs
+  loadCoaList();
+}
+
+async function loadCoaList() {
+  var listEl = document.getElementById('coa-admin-list');
+  var countEl = document.getElementById('coa-count');
+
+  var result = await _sb.from('product_coas').select('*').order('uploaded_at', { ascending: false });
+
+  if (result.error) {
+    listEl.innerHTML = '<p class="text-dim">Unable to load CoAs.</p>';
+    return;
+  }
+
+  allCoas = result.data || [];
+  if (countEl) countEl.textContent = allCoas.length + ' certificates';
+
+  if (!allCoas.length) {
+    listEl.innerHTML = '<div class="empty-state"><p class="text-sm text-dim">No certificates uploaded yet.</p></div>';
+    return;
+  }
+
+  listEl.innerHTML =
+    '<div class="product-list-item product-list-header" style="grid-template-columns:1fr 1fr 120px 100px 100px"><span>Product</span><span>Batch</span><span>Test Date</span><span>Notes</span><span>Actions</span></div>' +
+    allCoas.map(function(coa) {
+      var product = PRODUCTS.find(function(p) { return p.id === coa.product_id; });
+      var productName = product ? product.name : coa.product_id;
+      var testDate = coa.tested_date ? new Date(coa.tested_date).toLocaleDateString() : '—';
+
+      return '<div class="product-list-item" style="grid-template-columns:1fr 1fr 120px 100px 100px">' +
+        '<div><strong style="color:var(--cream)">' + escapeHtml(productName) + '</strong><br><span class="text-xs text-dim">' + escapeHtml(coa.product_id) + '</span></div>' +
+        '<span>' + escapeHtml(coa.batch_number) + '</span>' +
+        '<span class="text-sm">' + testDate + '</span>' +
+        '<span class="text-xs text-dim">' + escapeHtml(coa.notes || '—') + '</span>' +
+        '<div style="display:flex;gap:var(--sp-xs)">' +
+          '<a href="' + coa.file_url + '" target="_blank" class="btn btn--sm btn--secondary">View</a>' +
+          '<button class="btn btn--sm btn--ghost" style="color:var(--terra)" onclick="deleteCoa(' + coa.id + ')">Del</button>' +
+        '</div></div>';
+    }).join('');
+}
+
+async function handleCoaUpload() {
+  var productId = document.getElementById('coa-product').value;
+  var batch = document.getElementById('coa-batch').value.trim();
+  var file = document.getElementById('coa-file').files[0];
+  var testDate = document.getElementById('coa-date').value || null;
+  var notes = document.getElementById('coa-notes').value || null;
+
+  if (!productId || !batch || !file) {
+    showToast('Please fill in product, batch number, and file.', 'error');
+    return;
+  }
+
+  var btn = document.getElementById('btn-save-coa');
+  btn.disabled = true;
+  btn.textContent = 'Uploading…';
+
+  try {
+    // Upload PDF to storage
+    var path = 'coa/' + productId + '/' + batch.replace(/[^a-zA-Z0-9\-_]/g, '_') + '.pdf';
+
+    // Delete existing file if any
+    await _sb.storage.from('coa-documents').remove([path]);
+
+    var uploadResult = await _sb.storage.from('coa-documents').upload(path, file, { contentType: 'application/pdf' });
+    if (uploadResult.error) throw uploadResult.error;
+
+    var urlResult = _sb.storage.from('coa-documents').getPublicUrl(path);
+    var fileUrl = urlResult.data.publicUrl;
+
+    // Save record
+    var insertResult = await _sb.from('product_coas').insert({
+      product_id: productId,
+      batch_number: batch,
+      file_url: fileUrl,
+      file_name: file.name,
+      tested_date: testDate,
+      notes: notes,
+    });
+
+    if (insertResult.error) throw insertResult.error;
+
+    showToast('CoA uploaded successfully', 'success');
+    document.getElementById('coa-upload-form').classList.add('hidden');
+    document.getElementById('coa-product').value = '';
+    document.getElementById('coa-batch').value = '';
+    document.getElementById('coa-file').value = '';
+    document.getElementById('coa-date').value = '';
+    document.getElementById('coa-notes').value = '';
+
+    await loadCoaList();
+  } catch (err) {
+    showToast('Upload failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Upload & Save';
+  }
+}
+
+async function deleteCoa(coaId) {
+  if (!confirm('Delete this certificate? This cannot be undone.')) return;
+
+  try {
+    var coa = allCoas.find(function(c) { return c.id === coaId; });
+
+    // Delete from storage
+    if (coa && coa.file_url) {
+      var path = coa.file_url.split('/coa-documents/')[1];
+      if (path) await _sb.storage.from('coa-documents').remove([path]);
+    }
+
+    // Delete record
+    var err = (await _sb.from('product_coas').delete().eq('id', coaId)).error;
+    if (err) throw err;
+
+    showToast('CoA deleted', 'info');
+    await loadCoaList();
+  } catch (err) {
+    showToast('Delete failed: ' + err.message, 'error');
   }
 }
