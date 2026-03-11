@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+
+    <main class="page-main" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+      <div style="text-align:center;padding:var(--sp-3xl) var(--sp-xl)">
+        <div style="font-family:var(--font-display);font-size:clamp(4rem,10vw,8rem);font-weight:700;color:var(--green);line-height:1;margin-bottom:var(--sp-md)">404</div>
+        <h1 style="font-size:var(--fs-xl);margin-bottom:var(--sp-md)">Page Not Found</h1>
+        <p style="color:var(--text-dim);margin-bottom:var(--sp-2xl);max-width:40ch;margin-left:auto;margin-right:auto">The page you're looking for doesn't exist or has been moved.</p>
+        <div style="display:flex;gap:var(--sp-md);justify-content:center">
+          <a href="/" class="btn btn--primary">Go Home</a>
+          <a href="/contact.html" class="btn btn--secondary">Contact Us</a>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer-slot"></div>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/nav.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavigation('', true);
+    });
+  </script>
+</body>
+</html>
