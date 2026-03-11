@@ -54,27 +54,27 @@
 .hero__zone--tropical::after {
   background: linear-gradient(
     to bottom,
-    rgba(74, 154, 90, 0.15),
-    rgba(10, 15, 13, 0.5) 70%,
-    rgba(10, 15, 13, 0.9)
+    rgba(78, 138, 86, 0.15),
+    rgba(12, 16, 14, 0.5) 70%,
+    rgba(12, 16, 14, 0.9)
   );
 }
 
 .hero__zone--arable::after {
   background: linear-gradient(
     to bottom,
-    rgba(212, 160, 48, 0.1),
-    rgba(10, 15, 13, 0.5) 70%,
-    rgba(10, 15, 13, 0.9)
+    rgba(224, 149, 64, 0.1),
+    rgba(12, 16, 14, 0.5) 70%,
+    rgba(12, 16, 14, 0.9)
   );
 }
 
 .hero__zone--lab::after {
   background: linear-gradient(
     to bottom,
-    rgba(196, 106, 58, 0.1),
-    rgba(10, 15, 13, 0.5) 70%,
-    rgba(10, 15, 13, 0.9)
+    rgba(212, 98, 62, 0.1),
+    rgba(12, 16, 14, 0.5) 70%,
+    rgba(12, 16, 14, 0.9)
   );
 }
 
@@ -90,7 +90,7 @@
   transition: opacity var(--dur-slow) var(--ease-out),
               transform var(--dur-slow) var(--ease-out);
   transform: translateX(-50%) translateY(-10px);
-  background: rgba(10, 15, 13, 0.7);
+  background: rgba(12, 16, 14, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 12px 24px;
@@ -192,7 +192,7 @@
 .hero__stats {
   position: relative;
   z-index: 5;
-  background: rgba(10, 15, 13, 0.8);
+  background: rgba(12, 16, 14, 0.8);
   backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);

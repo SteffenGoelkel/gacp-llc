@@ -34,7 +34,7 @@
 }
 
 .nav--solid {
-  background: rgba(10, 15, 13, 0.95);
+  background: rgba(12, 16, 14, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 1px 0 var(--border);
@@ -59,7 +59,7 @@
   font-weight: 600;
   color: var(--cream);
   letter-spacing: 0.02em;
-  background: rgba(10, 15, 13, 0.6);
+  background: rgba(12, 16, 14, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 8px 20px 8px 10px;
@@ -165,7 +165,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(10, 15, 13, 0.98);
+  background: rgba(12, 16, 14, 0.98);
   backdrop-filter: blur(20px);
   z-index: 999;
   flex-direction: column;
@@ -243,7 +243,7 @@
 }
 
 .portal-sidebar__link--active {
-  background: rgba(74, 154, 90, 0.12);
+  background: rgba(78, 138, 86, 0.12);
   color: var(--green);
 }
 

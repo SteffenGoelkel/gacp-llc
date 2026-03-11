@@ -77,7 +77,7 @@
 .quick-action:hover {
   border-color: var(--green);
   color: var(--cream);
-  background: rgba(74, 154, 90, 0.06);
+  background: rgba(78, 138, 86, 0.06);
 }
 
 .quick-action svg {
@@ -286,10 +286,10 @@
 .benefit-tag {
   padding: 0.3rem 0.7rem;
   font-size: var(--fs-xs);
-  background: rgba(74, 154, 90, 0.1);
+  background: rgba(78, 138, 86, 0.1);
   color: var(--green);
   border-radius: var(--radius-full);
-  border: 1px solid rgba(74, 154, 90, 0.2);
+  border: 1px solid rgba(78, 138, 86, 0.2);
 }
 
 @media (max-width: 640px) {
@@ -403,7 +403,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(74, 154, 90, 0.1);
+  background: rgba(78, 138, 86, 0.1);
   color: var(--green);
   border-radius: var(--radius-md);
   flex-shrink: 0;
@@ -542,8 +542,8 @@
   align-items: center;
   gap: var(--sp-sm);
   padding: var(--sp-sm) var(--sp-md);
-  background: rgba(74,154,90,0.06);
-  border: 1px solid rgba(74,154,90,0.15);
+  background: rgba(78,138,86,0.06);
+  border: 1px solid rgba(78,138,86,0.15);
   border-radius: var(--radius-md);
   margin-bottom: var(--sp-lg);
   font-size: var(--fs-xs);
@@ -566,12 +566,12 @@
 }
 
 .product-card__restriction--kratom {
-  background: rgba(196,106,58,0.12);
+  background: rgba(212,98,62,0.12);
   color: var(--terra);
 }
 
 .product-card__restriction--cannabinoid {
-  background: rgba(212,160,48,0.12);
+  background: rgba(224,149,64,0.12);
   color: var(--amber);
 }
 
@@ -614,14 +614,14 @@
 .product-detail__notice svg { flex-shrink: 0; margin-top: 2px; }
 
 .product-detail__notice--kratom {
-  background: rgba(196,106,58,0.08);
-  border: 1px solid rgba(196,106,58,0.2);
+  background: rgba(212,98,62,0.08);
+  border: 1px solid rgba(212,98,62,0.2);
   color: var(--terra);
 }
 
 .product-detail__notice--cannabinoid {
-  background: rgba(212,160,48,0.08);
-  border: 1px solid rgba(212,160,48,0.2);
+  background: rgba(224,149,64,0.08);
+  border: 1px solid rgba(224,149,64,0.2);
   color: var(--amber);
 }
 
@@ -629,4 +629,38 @@
   background: rgba(107,143,122,0.08);
   border: 1px solid rgba(107,143,122,0.2);
   color: var(--sage-lt);
+}
+
+/* --- Account Details Grid ---------------------------------- */
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-lg) var(--sp-xl);
+}
+
+.account-field__label {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.account-field__value {
+  font-size: var(--fs-sm);
+  color: var(--cream);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .account-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
 }

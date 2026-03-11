@@ -28,24 +28,25 @@ button { cursor: pointer; border: none; background: none; }
 
 /* --- Custom Properties ------------------------------------- */
 :root {
-  /* Core palette (from logo) */
-  --ink:        #0a0f0d;
-  --ink-light:  #141c18;
-  --ink-mid:    #1a2520;
-  --green:      #4a9a5a;
-  --green-dim:  #3a7a48;
-  --green-glow: #5ab96c;
-  --amber:      #d4a030;
-  --amber-dim:  #b08728;
-  --amber-glow: #e8b840;
-  --terra:      #c46a3a;
-  --terra-dim:  #a45830;
-  --terra-glow: #d87c4c;
-  --sage:       #6b8f7a;
-  --sage-dim:   #5a7a68;
-  --cream:      #f4f0e8;
-  --cream-dim:  #d8d4cc;
-  --cream-muted:#b0aca4;
+  /* Core palette (refined from logo extraction) */
+  --ink:        #0c100e;
+  --ink-light:  #151d19;
+  --ink-mid:    #1d2823;
+  --green:      #4e8a56;
+  --green-dim:  #3d6e44;
+  --green-glow: #5ea668;
+  --amber:      #e09540;
+  --amber-dim:  #c07e30;
+  --amber-glow: #eca84e;
+  --terra:      #d4623e;
+  --terra-dim:  #b55232;
+  --terra-glow: #e0764e;
+  --sage:       #7a9a88;
+  --sage-dim:   #607a6c;
+  --sage-lt:    #8aaa96;
+  --cream:      #f5f1ea;
+  --cream-dim:  #dbd6ce;
+  --cream-muted:#b5b0a8;
   --white:      #ffffff;
   --black:      #000000;
 
@@ -57,8 +58,8 @@ button { cursor: pointer; border: none; background: none; }
   --text-dim:   var(--sage);
   --text-muted: var(--cream-muted);
   --accent:     var(--green);
-  --border:     rgba(107, 143, 122, 0.15);
-  --border-strong: rgba(107, 143, 122, 0.3);
+  --border:     rgba(122, 154, 136, 0.15);
+  --border-strong: rgba(122, 154, 136, 0.3);
 
   /* Category accents */
   --cat-tropical: var(--green);
