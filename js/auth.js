@@ -268,12 +268,11 @@ function initRegisterPage() {
           }),
         });
       } catch (notifyErr) {
-        // Don't block registration if notification fails
         console.error('Admin notification failed:', notifyErr);
       }
 
       showToast('Account created! Your application is under review.', 'success');
-      setTimeout(() => { window.location.href = PATHS.LOGIN; }, 2000);
+      setTimeout(() => { window.location.href = PATHS.LOGIN; }, 3000);
     } catch (err) {
       showToast(err.message || 'Registration failed. Please try again.', 'error');
       submitBtn.disabled = false;
