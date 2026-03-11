@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+
+    <main class="page-main">
+      <div class="portal-layout">
+        <div id="portal-sidebar-slot"></div>
+
+        <div class="portal-content">
+
+          <!-- Pending notice -->
+          <div id="pending-notice" class="card hidden" style="border-color:var(--amber);margin-bottom:var(--sp-xl);background:rgba(224,149,64,0.06)">
+            <div class="flex items-center gap-md">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <div>
+                <strong style="color:var(--amber)">Application Under Review</strong>
+                <p class="text-sm text-dim" style="margin-top:2px">Your account is pending approval. You'll receive full access once reviewed.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Welcome -->
+          <div class="dash-welcome">
+            <h2 class="dash-welcome__greeting" id="dash-greeting">Welcome back</h2>
+          </div>
+
+          <!-- My Account Card -->
+          <div class="card" style="margin-bottom:var(--sp-xl);padding:var(--sp-xl)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-lg)">
+              <h3 style="font-size:var(--fs-md)">My Account</h3>
+              <span id="dash-role" class="badge badge--neutral">—</span>
+            </div>
+            <div class="account-grid" id="account-details">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="dash-stats">
+            <div class="card stat-card">
+              <div class="stat-card__value" id="stat-products">—</div>
+              <div class="stat-card__label">Products</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card__value" id="stat-cart">—</div>
+              <div class="stat-card__label">Cart Items</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card__value" id="stat-tier">—</div>
+              <div class="stat-card__label">Your Tier</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card__value" id="stat-discount">—</div>
+              <div class="stat-card__label">Discount</div>
+            </div>
+          </div>
+
+          <!-- Grid -->
+          <div class="dash-grid">
+            <div>
+              <h4 class="dash-grid__section-title">Recent Activity</h4>
+              <div class="card">
+                <div class="empty-state" style="padding:var(--sp-xl)">
+                  <p class="text-sm text-dim">No recent orders yet. Browse the catalogue to get started.</p>
+                  <a href="/portal/catalogue.html" class="btn btn--primary btn--sm" style="margin-top:var(--sp-md)">View Catalogue</a>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h4 class="dash-grid__section-title">Quick Actions</h4>
+              <div class="quick-actions">
+                <a href="/portal/catalogue.html" class="quick-action">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                  Browse Products
+                </a>
+                <a href="/portal/cart.html" class="quick-action">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                  View Cart
+                </a>
+                <a href="/portal/coa.html" class="quick-action">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+                  CoA Library
+                </a>
+                <a href="/portal/formulation.html" class="quick-action">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6.5L4 20h16L14 9.5V3"/></svg>
+                  Custom Formulation
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/portal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavigation('portal', true);
+      initPortalLayout('dashboard');
+      initDashboard();
+    });
+  </script>
+</body>
+</html>
