@@ -80,9 +80,14 @@ async function uploadProductImage(file, productId) {
   const ext = file.name.split('.').pop().toLowerCase();
   const path = 'products/' + productId + '.' + ext;
 
+  // Delete any existing images for this product (handles extension changes)
+  const extensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+  const removePaths = extensions.map(e => 'products/' + productId + '.' + e);
+  await _sb.storage.from('product-images').remove(removePaths);
+
   const { data, error } = await _sb.storage
     .from('product-images')
-    .upload(path, file, { upsert: true, contentType: file.type });
+    .upload(path, file, { contentType: file.type });
 
   if (error) throw error;
 
@@ -90,7 +95,6 @@ async function uploadProductImage(file, productId) {
     .from('product-images')
     .getPublicUrl(path);
 
-  // Add cache-buster so updated images show immediately
   return urlData.publicUrl + '?v=' + Date.now();
 }
 
