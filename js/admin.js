@@ -449,10 +449,64 @@ async function setAppRole(id, role) {
 
   if (!err) {
     var p = appProfiles.find(function(x) { return x.id === id; });
-    if (p) p.role = role;
+    if (p) {
+      p.role = role;
+      // Send notification email
+      sendApplicationNotification(p, role);
+    }
     var activeFilter = document.querySelector('[data-app-filter].filter-btn--active');
     renderAppTable(activeFilter ? activeFilter.dataset.appFilter : 'pending');
     showToast(role === 'rejected' ? 'Application rejected' : 'Application approved', role === 'rejected' ? 'info' : 'success');
+  }
+}
+
+async function sendApplicationNotification(profile, role) {
+  var name = (profile.first_name || '').trim() || 'there';
+  var email = profile.email;
+  if (!email) return;
+
+  var subject, message;
+
+  if (role === 'rejected') {
+    subject = 'GACP LLC — Application Update';
+    message = 'Dear ' + name + ',\n\n' +
+      'Thank you for your interest in GACP LLC.\n\n' +
+      'After reviewing your application, we are unable to approve your account at this time. ' +
+      'If you believe this is in error or would like to provide additional information, ' +
+      'please reply to this email or contact us through our website.\n\n' +
+      'Kind regards,\nGACP LLC';
+  } else {
+    var roleLabel = {
+      consumer: 'Consumer',
+      'trade-restricted': 'Trade',
+      'trade-full': 'Trade (Full Access)',
+    }[role] || role;
+
+    subject = 'GACP LLC — Account Approved';
+    message = 'Dear ' + name + ',\n\n' +
+      'Your GACP LLC account has been approved. You now have ' + roleLabel + ' access.\n\n' +
+      'You can sign in to your portal at:\nhttps://gacp.llc/login.html\n\n' +
+      'From your portal you can browse our product catalogue, view documentation, ' +
+      'and place enquiries.\n\n' +
+      'If you have any questions, please don\'t hesitate to contact us.\n\n' +
+      'Kind regards,\nGACP LLC';
+  }
+
+  try {
+    await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'GACP LLC',
+        email: 'info@gacp.llc',
+        to: email,
+        to_name: name,
+        subject: subject,
+        message: message,
+      }),
+    });
+  } catch (e) {
+    console.error('Notification email failed:', e);
   }
 }
 

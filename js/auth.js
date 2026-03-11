@@ -226,6 +226,37 @@ function initRegisterPage() {
 
       await updateProfile(user.id, profileFields);
 
+      // Notify admin of new application
+      try {
+        const fullName = [data.first_name, data.last_name].filter(Boolean).join(' ') || 'Unknown';
+        await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'GACP Website',
+            email: data.email,
+            subject: 'New Application: ' + fullName,
+            message: [
+              'A new account application has been submitted.',
+              '',
+              'Name: ' + fullName,
+              'Email: ' + data.email,
+              'Account Type: ' + (data.account_type || 'individual'),
+              'Company: ' + (data.company || 'N/A'),
+              'Business Category: ' + (data.biz_category || 'N/A'),
+              'Intended Use: ' + (data.intended_use || 'N/A'),
+              'Country: ' + (data.country || 'N/A'),
+              '',
+              'Review this application at:',
+              'https://gacp.llc/admin.html',
+            ].join('\n'),
+          }),
+        });
+      } catch (notifyErr) {
+        // Don't block registration if notification fails
+        console.error('Admin notification failed:', notifyErr);
+      }
+
       showToast('Account created! Your application is under review.', 'success');
       setTimeout(() => { window.location.href = PATHS.LOGIN; }, 2000);
     } catch (err) {
