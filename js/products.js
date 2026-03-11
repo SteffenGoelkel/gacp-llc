@@ -255,6 +255,29 @@ function openProductDetail(product, profile, viewMode = 'auto') {
       ${benefitsHTML}
       ${compoundsHTML}
 
+      ${product.sample_available ? `
+      <div class="product-detail__section product-detail__sample">
+        <h4>Request a Sample</h4>
+        <div style="display:flex;align-items:center;gap:var(--sp-lg);margin-bottom:var(--sp-md)">
+          <div>
+            <span style="font-size:var(--fs-lg);font-weight:700;color:var(--amber)">${formatPrice(product.sample_price)}</span>
+            <span class="text-sm text-dim"> / ${escapeHtml(product.sample_unit)} sample</span>
+          </div>
+        </div>
+        <div id="sample-form-${product.id}">
+          <div class="form-row" style="margin-bottom:var(--sp-md)">
+            <div class="form-group" style="margin:0;flex:1">
+              <input type="number" class="form-input" id="sample-qty-${product.id}" value="1" min="1" max="10" style="width:80px">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:var(--sp-md)">
+            <textarea class="form-textarea" id="sample-notes-${product.id}" rows="2" placeholder="Any specific requirements (batch preference, testing needs, intended application)..."></textarea>
+          </div>
+          <button class="btn btn--amber btn--sm" onclick="requestSample('${product.id}', '${escapeHtml(layer.name)}', ${product.sample_price}, '${escapeHtml(product.sample_unit)}')">Request Sample</button>
+        </div>
+      </div>
+      ` : ''}
+
       <div style="display:flex;gap:var(--sp-md);margin-top:var(--sp-xl)">
         ${product.price ? `<button class="btn btn--primary" onclick="addToCart('${product.id}')">Add to Cart</button>` : ''}
         <button class="btn btn--secondary" onclick="closeOverlay()">Close</button>
@@ -264,6 +287,78 @@ function openProductDetail(product, profile, viewMode = 'auto') {
 
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+/** Request a sample — sends email notification to admin */
+async function requestSample(productId, productName, samplePrice, sampleUnit) {
+  const qtyEl = document.getElementById('sample-qty-' + productId);
+  const notesEl = document.getElementById('sample-notes-' + productId);
+  const qty = parseInt(qtyEl?.value) || 1;
+  const notes = notesEl?.value || '';
+
+  // Get current user profile
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) {
+    showToast('Please sign in to request a sample.', 'error');
+    return;
+  }
+
+  const { data: profile } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile) {
+    showToast('Profile not found.', 'error');
+    return;
+  }
+
+  const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || session.user.email;
+  const totalPrice = samplePrice * qty;
+
+  try {
+    await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: fullName,
+        email: session.user.email,
+        subject: 'Sample Request: ' + productName,
+        message: [
+          'SAMPLE REQUEST',
+          '━━━━━━━━━━━━━━━━━━━━━━━━━',
+          '',
+          'Product: ' + productName + ' (' + productId + ')',
+          'Sample Size: ' + sampleUnit,
+          'Quantity: ' + qty,
+          'Unit Price: $' + (samplePrice / 100).toFixed(2),
+          'Total: $' + (totalPrice / 100).toFixed(2),
+          '',
+          'Customer: ' + fullName,
+          'Email: ' + session.user.email,
+          'Company: ' + (profile.company || 'N/A'),
+          'Phone: ' + (profile.phone || 'N/A'),
+          'Account Type: ' + (profile.account_type || 'individual'),
+          'Tier: ' + (profile.tier || 'bronze'),
+          '',
+          'Notes:',
+          notes || '(none)',
+          '',
+          'Shipping Address:',
+          [profile.addr1, profile.addr2, profile.city, profile.state, profile.zip, profile.country].filter(Boolean).join(', ') || 'Not provided',
+        ].join('\n'),
+      }),
+    });
+
+    // Replace form with confirmation
+    const formEl = document.getElementById('sample-form-' + productId);
+    if (formEl) {
+      formEl.innerHTML = '<div style="padding:var(--sp-md);background:rgba(78,138,86,0.08);border-radius:var(--radius-md);border:1px solid rgba(78,138,86,0.2)">' +
+        '<p style="color:var(--green);font-weight:600;margin-bottom:var(--sp-xs)">Sample request submitted</p>' +
+        '<p class="text-sm text-dim">We\'ll be in touch at ' + escapeHtml(session.user.email) + ' to confirm your sample order and arrange payment.</p>' +
+      '</div>';
+    }
+
+    showToast('Sample request sent!', 'success');
+  } catch (err) {
+    showToast('Failed to send request. Please try again.', 'error');
+  }
 }
 
 function closeOverlay() {
