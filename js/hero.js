@@ -53,4 +53,5 @@ function animateCount(el, target, prefix, suffix, duration = 1500) {
   requestAnimationFrame(update);
 }
 
-document.addEventListener('DOMContentLoaded', initHero);
+// Called from page script after data is ready
+// document.addEventListener('DOMContentLoaded', initHero);
