@@ -175,4 +175,10 @@ async function initDashboard() {
     const notice = document.getElementById('pending-notice');
     if (notice) notice.classList.remove('hidden');
   }
+
+  // Rejected notice
+  if (profile.role === ROLES.REJECTED) {
+    const notice = document.getElementById('rejected-notice');
+    if (notice) notice.classList.remove('hidden');
+  }
 }

@@ -121,6 +121,8 @@ function showProductForm(product) {
   document.getElementById('compounds-list').innerHTML = '';
   document.getElementById('pf-img').value = '';
   document.getElementById('pf-img-status').textContent = '';
+  document.getElementById('pf-sample').checked = false;
+  document.getElementById('sample-fields').classList.add('hidden');
 
   if (product) {
     document.getElementById('pf-id').value = product.id;
@@ -156,6 +158,12 @@ function showProductForm(product) {
     document.getElementById('pf-src-certs').value = product.source_certifications || '';
     document.getElementById('pf-src-contact').value = product.source_contact || '';
     document.getElementById('pf-src-notes').value = product.source_notes || '';
+
+    // Sample fields
+    document.getElementById('pf-sample').checked = product.sample_available === true;
+    document.getElementById('sample-fields').classList.toggle('hidden', !product.sample_available);
+    document.getElementById('pf-sample-price').value = product.sample_price || '';
+    document.getElementById('pf-sample-unit').value = product.sample_unit || '10g';
 
     if (product.is_dual_layer) {
       document.getElementById('pf-dual').checked = true;
@@ -266,6 +274,9 @@ async function handleProductSave(e) {
       source_certifications: document.getElementById('pf-src-certs').value || null,
       source_contact: document.getElementById('pf-src-contact').value || null,
       source_notes: document.getElementById('pf-src-notes').value || null,
+      sample_available: document.getElementById('pf-sample').checked,
+      sample_price: parseInt(document.getElementById('pf-sample-price').value) || 0,
+      sample_unit: document.getElementById('pf-sample-unit').value || '10g',
     };
 
     if (isDual) {
@@ -370,6 +381,7 @@ async function loadApplications() {
 
   appProfiles = result.data || [];
   var pending = appProfiles.filter(function(p) { return p.role === 'pending'; });
+  var rejected = appProfiles.filter(function(p) { return p.role === 'rejected'; });
 
   if (!appProfiles.length) {
     container.innerHTML = '<div class="empty-state"><h3 class="empty-state__title">No applications</h3></div>';
@@ -379,6 +391,7 @@ async function loadApplications() {
   container.innerHTML =
     '<div style="display:flex;gap:var(--sp-md);margin-bottom:var(--sp-lg)">' +
       '<button class="filter-btn filter-btn--active" data-app-filter="pending">Pending (' + pending.length + ')</button>' +
+      '<button class="filter-btn" data-app-filter="rejected">Rejected (' + rejected.length + ')</button>' +
       '<button class="filter-btn" data-app-filter="all">All (' + appProfiles.length + ')</button>' +
     '</div>' +
     '<div class="table-wrap"><table class="table"><thead>' +
@@ -400,6 +413,7 @@ async function loadApplications() {
     var approveBtn = e.target.closest('[data-approve]');
     var rejectBtn = e.target.closest('[data-reject]');
     var detailBtn = e.target.closest('[data-detail]');
+    var reopenBtn = e.target.closest('[data-reopen]');
 
     if (detailBtn) {
       var p = appProfiles.find(function(x) { return x.id === detailBtn.dataset.detail; });
@@ -409,6 +423,10 @@ async function loadApplications() {
     if (rejectBtn) {
       if (!confirm('Reject this application?')) return;
       await setAppRole(rejectBtn.dataset.reject, 'rejected');
+    }
+    if (reopenBtn) {
+      await setAppRole(reopenBtn.dataset.reopen, 'pending');
+      showToast('Application re-opened for review', 'info');
     }
   });
 }
@@ -452,6 +470,9 @@ function renderAppTable(filter) {
         (p.role === 'pending' ?
           '<button class="btn btn--sm btn--primary" data-approve="' + p.id + '">Approve</button>' +
           '<button class="btn btn--sm btn--ghost" style="color:var(--terra)" data-reject="' + p.id + '">Reject</button>'
+        : '') +
+        (p.role === 'rejected' ?
+          '<button class="btn btn--sm btn--amber" data-reopen="' + p.id + '">Re-open</button>'
         : '') +
       '</div></td></tr>';
   }).join('');
