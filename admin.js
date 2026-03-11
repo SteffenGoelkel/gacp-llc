@@ -12,7 +12,7 @@ async function initAdminPanel() {
   if (!auth) return;
   const { profile } = auth;
 
-  if (profile.role !== 'trade-full') {
+  if (profile.role !== 'trade-full' && profile.role !== 'admin') {
     document.querySelector('.portal-content').innerHTML =
       '<div class="empty-state"><h3 class="empty-state__title">Access Denied</h3><p class="empty-state__text">Admin access required.</p></div>';
     return;
@@ -80,9 +80,14 @@ async function uploadProductImage(file, productId) {
   const ext = file.name.split('.').pop().toLowerCase();
   const path = 'products/' + productId + '.' + ext;
 
+  // Delete any existing images for this product (handles extension changes)
+  const extensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+  const removePaths = extensions.map(e => 'products/' + productId + '.' + e);
+  await _sb.storage.from('product-images').remove(removePaths);
+
   const { data, error } = await _sb.storage
     .from('product-images')
-    .upload(path, file, { upsert: true, contentType: file.type });
+    .upload(path, file, { contentType: file.type });
 
   if (error) throw error;
 
@@ -90,7 +95,7 @@ async function uploadProductImage(file, productId) {
     .from('product-images')
     .getPublicUrl(path);
 
-  return urlData.publicUrl;
+  return urlData.publicUrl + '?v=' + Date.now();
 }
 
 // --- Product Form ------------------------------------------
@@ -116,6 +121,8 @@ function showProductForm(product) {
   document.getElementById('compounds-list').innerHTML = '';
   document.getElementById('pf-img').value = '';
   document.getElementById('pf-img-status').textContent = '';
+  document.getElementById('pf-sample').checked = false;
+  document.getElementById('sample-fields').classList.add('hidden');
 
   if (product) {
     document.getElementById('pf-id').value = product.id;
@@ -142,6 +149,21 @@ function showProductForm(product) {
     if (product.img) {
       document.getElementById('pf-img-status').textContent = 'Current: ' + product.img;
     }
+
+    // Sourcing fields
+    document.getElementById('pf-src-supplier').value = product.source_supplier || '';
+    document.getElementById('pf-src-country').value = product.source_country || '';
+    document.getElementById('pf-src-region').value = product.source_region || '';
+    document.getElementById('pf-src-facility').value = product.source_facility || '';
+    document.getElementById('pf-src-certs').value = product.source_certifications || '';
+    document.getElementById('pf-src-contact').value = product.source_contact || '';
+    document.getElementById('pf-src-notes').value = product.source_notes || '';
+
+    // Sample fields
+    document.getElementById('pf-sample').checked = product.sample_available === true;
+    document.getElementById('sample-fields').classList.toggle('hidden', !product.sample_available);
+    document.getElementById('pf-sample-price').value = product.sample_price || '';
+    document.getElementById('pf-sample-unit').value = product.sample_unit || '10g';
 
     if (product.is_dual_layer) {
       document.getElementById('pf-dual').checked = true;
@@ -245,6 +267,16 @@ async function handleProductSave(e) {
       visible_consumer: document.getElementById('pf-vis-consumer').checked,
       visible_trade: document.getElementById('pf-vis-trade').checked,
       is_dual_layer: isDual,
+      source_supplier: document.getElementById('pf-src-supplier').value || null,
+      source_country: document.getElementById('pf-src-country').value || null,
+      source_region: document.getElementById('pf-src-region').value || null,
+      source_facility: document.getElementById('pf-src-facility').value || null,
+      source_certifications: document.getElementById('pf-src-certs').value || null,
+      source_contact: document.getElementById('pf-src-contact').value || null,
+      source_notes: document.getElementById('pf-src-notes').value || null,
+      sample_available: document.getElementById('pf-sample').checked,
+      sample_price: parseInt(document.getElementById('pf-sample-price').value) || 0,
+      sample_unit: document.getElementById('pf-sample-unit').value || '10g',
     };
 
     if (isDual) {
@@ -339,7 +371,7 @@ async function loadApplications() {
   var result = await _sb
     .from('profiles')
     .select('*')
-    .in('role', ['pending', 'consumer', 'trade-restricted', 'trade-full', 'rejected'])
+    .in('role', ['pending', 'consumer', 'trade-restricted', 'trade-full', 'admin', 'rejected'])
     .order('created_at', { ascending: false });
 
   if (result.error) {
@@ -413,6 +445,7 @@ function renderAppTable(filter) {
       consumer: '<span class="badge badge--green">Consumer</span>',
       'trade-restricted': '<span class="badge badge--green">Trade</span>',
       'trade-full': '<span class="badge badge--green">Trade Full</span>',
+      admin: '<span class="badge badge--green">Admin</span>',
       rejected: '<span class="badge badge--terra">Rejected</span>',
     };
     var roleBadge = roleMap[p.role] || '<span class="badge badge--neutral">' + p.role + '</span>';
@@ -444,10 +477,65 @@ async function setAppRole(id, role) {
 
   if (!err) {
     var p = appProfiles.find(function(x) { return x.id === id; });
-    if (p) p.role = role;
+    if (p) {
+      p.role = role;
+      // Send notification email
+      sendApplicationNotification(p, role);
+    }
     var activeFilter = document.querySelector('[data-app-filter].filter-btn--active');
     renderAppTable(activeFilter ? activeFilter.dataset.appFilter : 'pending');
     showToast(role === 'rejected' ? 'Application rejected' : 'Application approved', role === 'rejected' ? 'info' : 'success');
+  }
+}
+
+async function sendApplicationNotification(profile, role) {
+  var name = (profile.first_name || '').trim() || 'there';
+  var email = profile.email;
+  if (!email) return;
+
+  var subject, message;
+
+  if (role === 'rejected') {
+    subject = 'GACP LLC — Application Update';
+    message = 'Dear ' + name + ',\n\n' +
+      'Thank you for your interest in GACP LLC.\n\n' +
+      'After reviewing your application, we are unable to approve your account at this time. ' +
+      'If you believe this is in error or would like to provide additional information, ' +
+      'please reply to this email or contact us through our website.\n\n' +
+      'Kind regards,\nGACP LLC';
+  } else {
+    var roleLabel = {
+      consumer: 'Consumer',
+      'trade-restricted': 'Trade',
+      'trade-full': 'Trade (Full Access)',
+      admin: 'Admin',
+    }[role] || role;
+
+    subject = 'GACP LLC — Account Approved';
+    message = 'Dear ' + name + ',\n\n' +
+      'Your GACP LLC account has been approved. You now have ' + roleLabel + ' access.\n\n' +
+      'You can sign in to your portal at:\nhttps://gacp.llc/login.html\n\n' +
+      'From your portal you can browse our product catalogue, view documentation, ' +
+      'and place enquiries.\n\n' +
+      'If you have any questions, please don\'t hesitate to contact us.\n\n' +
+      'Kind regards,\nGACP LLC';
+  }
+
+  try {
+    await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'GACP LLC',
+        email: 'info@gacp.llc',
+        to: email,
+        to_name: name,
+        subject: subject,
+        message: message,
+      }),
+    });
+  } catch (e) {
+    console.error('Notification email failed:', e);
   }
 }
 
@@ -492,11 +580,12 @@ function showAppDetail(profile) {
   var corpSection = '';
   if (profile.company) {
     corpSection =
-      '<button class="btn btn--secondary btn--sm" id="btn-verify-corp" ' +
-        'data-company="' + escapeHtml(profile.company) + '" ' +
-        'data-corp-num="' + escapeHtml(profile.corp_num || '') + '" ' +
-        'data-country="' + escapeHtml(profile.country || '') + '">Search OpenCorporates</button>' +
-      '<div id="corp-verify-results" style="margin-top:var(--sp-md)"></div>' +
+      '<a class="btn btn--secondary btn--sm" id="btn-verify-corp" ' +
+        'href="https://opencorporates.com/companies?q=' + encodeURIComponent(profile.company) + '" ' +
+        'target="_blank" rel="noopener">Search OpenCorporates ↗</a>' +
+      '<a class="btn btn--secondary btn--sm" style="margin-left:var(--sp-sm)" ' +
+        'href="https://www.google.com/search?q=' + encodeURIComponent('"' + profile.company + '" ' + (profile.corp_num || '') + ' company registry') + '" ' +
+        'target="_blank" rel="noopener">Google Registry Search ↗</a>' +
       '<div style="margin-top:var(--sp-md);display:flex;gap:var(--sp-sm)">' +
         '<button class="btn btn--sm btn--primary" onclick="markCorpVerified(\'' + profile.id + '\', true)">Mark Verified</button>' +
         '<button class="btn btn--sm btn--ghost" style="color:var(--terra)" onclick="markCorpVerified(\'' + profile.id + '\', false)">Mark Unverified</button>' +
@@ -524,6 +613,7 @@ function showAppDetail(profile) {
           '<option value="consumer">Consumer</option>' +
           '<option value="trade-restricted">Trade Restricted</option>' +
           '<option value="trade-full">Trade Full</option>' +
+          '<option value="admin">Admin</option>' +
           '<option value="rejected">Rejected</option>' +
         '</select>' +
       '</div>';
@@ -547,11 +637,6 @@ function showAppDetail(profile) {
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  var verifyBtn = document.getElementById('btn-verify-corp');
-  if (verifyBtn) {
-    verifyBtn.addEventListener('click', function() { searchOpenCorporates(verifyBtn); });
-  }
-
   overlay.addEventListener('click', function(e) {
     if (e.target === overlay) closeAppDetail();
   });
@@ -562,83 +647,6 @@ function closeAppDetail() {
   if (overlay) {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
-  }
-}
-
-// --- OpenCorporates Search ---------------------------------
-
-async function searchOpenCorporates(btn) {
-  var company = btn.dataset.company;
-  var corpNum = btn.dataset.corpNum;
-  var country = btn.dataset.country;
-  var results = document.getElementById('corp-verify-results');
-
-  if (!company) {
-    results.innerHTML = '<p class="text-xs text-dim">No company name to search.</p>';
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Searching…';
-  results.innerHTML = '<div class="spinner" style="margin:var(--sp-sm) 0"></div>';
-
-  try {
-    var jurisdictionMap = {
-      'US': 'us', 'GB': 'gb', 'CA': 'ca', 'AU': 'au', 'DE': 'de',
-      'NL': 'nl', 'FR': 'fr', 'IE': 'ie', 'NZ': 'nz', 'ZA': 'za',
-    };
-
-    var url = 'https://api.opencorporates.com/v0.4/companies/search?q=' + encodeURIComponent(company) + '&per_page=5';
-
-    var jurisdiction = jurisdictionMap[country];
-    if (jurisdiction) url += '&jurisdiction_code=' + jurisdiction;
-    if (corpNum) url += '&company_number=' + encodeURIComponent(corpNum);
-
-    var res = await fetch(url);
-    var data = await res.json();
-    var companies = (data && data.results && data.results.companies) || [];
-
-    if (!companies.length) {
-      results.innerHTML =
-        '<div style="padding:var(--sp-md);background:rgba(196,106,58,0.08);border-radius:var(--radius-md);border:1px solid rgba(196,106,58,0.2)">' +
-          '<p class="text-sm" style="color:var(--terra)">No matching companies found in registry.</p>' +
-          '<p class="text-xs text-dim" style="margin-top:4px">Searched: "' + escapeHtml(company) + '"' + (jurisdiction ? ' in ' + jurisdiction.toUpperCase() : '') + '</p>' +
-        '</div>';
-      return;
-    }
-
-    results.innerHTML =
-      '<p class="text-xs text-dim" style="margin-bottom:var(--sp-sm)">Found ' + companies.length + ' result' + (companies.length !== 1 ? 's' : '') + ':</p>' +
-      companies.map(function(item) {
-        var c = item.company;
-        var isActive = c.current_status && c.current_status.toLowerCase().indexOf('active') >= 0;
-        var statusBadge = isActive
-          ? '<span class="badge badge--green">Active</span>'
-          : '<span class="badge badge--terra">' + escapeHtml(c.current_status || 'Unknown') + '</span>';
-
-        var nameMatch = c.name.toLowerCase().indexOf(company.toLowerCase()) >= 0 || company.toLowerCase().indexOf(c.name.toLowerCase()) >= 0;
-        var numMatch = corpNum && c.company_number === corpNum;
-
-        return '<div class="card" style="padding:var(--sp-md);margin-bottom:var(--sp-sm)">' +
-          '<div style="display:flex;justify-content:space-between;align-items:start">' +
-            '<div><strong style="color:var(--cream)">' + escapeHtml(c.name) + '</strong>' +
-              (nameMatch ? ' <span class="badge badge--green" style="font-size:10px">Name match</span>' : '') +
-              (numMatch ? ' <span class="badge badge--green" style="font-size:10px">Number match</span>' : '') +
-              '<div class="text-xs text-dim" style="margin-top:4px">' +
-                (c.company_number ? 'Reg: ' + escapeHtml(c.company_number) + ' · ' : '') +
-                (c.jurisdiction_code ? escapeHtml(c.jurisdiction_code.toUpperCase()) + ' · ' : '') +
-                (c.incorporation_date || '') +
-              '</div>' +
-            '</div>' + statusBadge +
-          '</div>' +
-          (c.registered_address_in_full ? '<div class="text-xs text-dim" style="margin-top:4px">' + escapeHtml(c.registered_address_in_full) + '</div>' : '') +
-        '</div>';
-      }).join('');
-  } catch (err) {
-    results.innerHTML = '<p class="text-sm" style="color:var(--terra)">Search failed: ' + escapeHtml(err.message) + '</p>';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Search OpenCorporates';
   }
 }
 
