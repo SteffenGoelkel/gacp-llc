@@ -5,7 +5,7 @@
 
 // --- Portal Sidebar HTML -----------------------------------
 
-function getPortalSidebarHTML(activePage = '') {
+function getPortalSidebarHTML(activePage = '', profile = null) {
   const links = [
     { href: PATHS.DASHBOARD,   label: 'Dashboard',     icon: 'grid',    key: 'dashboard' },
     { href: PATHS.CATALOGUE,   label: 'Catalogue',     icon: 'package', key: 'catalogue' },
@@ -13,8 +13,12 @@ function getPortalSidebarHTML(activePage = '') {
     { href: PATHS.COA,         label: 'CoA Library',   icon: 'file',    key: 'coa' },
     { href: PATHS.FORMULATION, label: 'Formulation',   icon: 'flask',   key: 'formulation' },
     { href: PATHS.PRICING,     label: 'Bulk Pricing',  icon: 'tag',     key: 'pricing' },
-    { href: PATHS.ADMIN,       label: 'Admin',         icon: 'shield',  key: 'admin' },
   ];
+
+  // Only show admin link to admin users
+  if (profile && profile.role === 'admin') {
+    links.push({ href: PATHS.ADMIN, label: 'Admin', icon: 'shield', key: 'admin' });
+  }
 
   const icons = {
     grid:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
@@ -54,11 +58,16 @@ function getPortalSidebarHTML(activePage = '') {
 // --- Init Portal Layout ------------------------------------
 
 function initPortalLayout(activePage) {
+  renderPortalSidebar(activePage);
+  updateCartBadge();
+}
+
+function renderPortalSidebar(activePage) {
   const sidebarSlot = document.getElementById('portal-sidebar-slot');
   if (sidebarSlot) {
-    sidebarSlot.innerHTML = getPortalSidebarHTML(activePage);
+    const profile = getCachedProfile();
+    sidebarSlot.innerHTML = getPortalSidebarHTML(activePage, profile);
 
-    // Logout handler
     const logoutBtn = document.getElementById('portal-logout');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', (e) => {
@@ -67,7 +76,11 @@ function initPortalLayout(activePage) {
       });
     }
   }
+}
 
+/** Call after requireAuth to update sidebar with profile data */
+function refreshPortalSidebar(activePage) {
+  renderPortalSidebar(activePage);
   updateCartBadge();
 }
 
@@ -78,6 +91,7 @@ async function initDashboard() {
   if (!auth) return;
   const { profile } = auth;
 
+  refreshPortalSidebar('dashboard');
   await loadProducts();
 
   // Greeting
@@ -99,6 +113,7 @@ async function initDashboard() {
       consumer: 'Consumer',
       'trade-restricted': 'Trade',
       'trade-full': 'Trade (Full)',
+      admin: 'Admin',
       rejected: 'Application Rejected',
     };
     const roleColors = {
@@ -106,6 +121,7 @@ async function initDashboard() {
       consumer: 'green',
       'trade-restricted': 'green',
       'trade-full': 'green',
+      admin: 'green',
       rejected: 'terra',
     };
     roleBadge.className = `badge badge--dot badge--${roleColors[profile.role] || 'neutral'}`;

@@ -12,7 +12,7 @@ async function initAdminPanel() {
   if (!auth) return;
   const { profile } = auth;
 
-  if (profile.role !== 'trade-full') {
+  if (profile.role !== 'trade-full' && profile.role !== 'admin') {
     document.querySelector('.portal-content').innerHTML =
       '<div class="empty-state"><h3 class="empty-state__title">Access Denied</h3><p class="empty-state__text">Admin access required.</p></div>';
     return;
@@ -344,7 +344,7 @@ async function loadApplications() {
   var result = await _sb
     .from('profiles')
     .select('*')
-    .in('role', ['pending', 'consumer', 'trade-restricted', 'trade-full', 'rejected'])
+    .in('role', ['pending', 'consumer', 'trade-restricted', 'trade-full', 'admin', 'rejected'])
     .order('created_at', { ascending: false });
 
   if (result.error) {
@@ -418,6 +418,7 @@ function renderAppTable(filter) {
       consumer: '<span class="badge badge--green">Consumer</span>',
       'trade-restricted': '<span class="badge badge--green">Trade</span>',
       'trade-full': '<span class="badge badge--green">Trade Full</span>',
+      admin: '<span class="badge badge--green">Admin</span>',
       rejected: '<span class="badge badge--terra">Rejected</span>',
     };
     var roleBadge = roleMap[p.role] || '<span class="badge badge--neutral">' + p.role + '</span>';
@@ -480,6 +481,7 @@ async function sendApplicationNotification(profile, role) {
       consumer: 'Consumer',
       'trade-restricted': 'Trade',
       'trade-full': 'Trade (Full Access)',
+      admin: 'Admin',
     }[role] || role;
 
     subject = 'GACP LLC — Account Approved';
@@ -584,6 +586,7 @@ function showAppDetail(profile) {
           '<option value="consumer">Consumer</option>' +
           '<option value="trade-restricted">Trade Restricted</option>' +
           '<option value="trade-full">Trade Full</option>' +
+          '<option value="admin">Admin</option>' +
           '<option value="rejected">Rejected</option>' +
         '</select>' +
       '</div>';

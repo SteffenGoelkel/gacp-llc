@@ -15,6 +15,7 @@ const ROLES = {
   CONSUMER:         'consumer',
   TRADE_RESTRICTED: 'trade-restricted',
   TRADE_FULL:       'trade-full',
+  ADMIN:            'admin',
   REJECTED:         'rejected',
 };
 

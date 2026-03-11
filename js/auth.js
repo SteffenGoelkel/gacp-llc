@@ -108,15 +108,15 @@ function hasRole(profile, ...roles) {
 }
 
 function canViewTrade(profile) {
-  return hasRole(profile, ROLES.TRADE_RESTRICTED, ROLES.TRADE_FULL);
+  return hasRole(profile, ROLES.TRADE_RESTRICTED, ROLES.TRADE_FULL, ROLES.ADMIN);
 }
 
 function canViewCompounds(profile) {
-  return hasRole(profile, ROLES.TRADE_FULL);
+  return hasRole(profile, ROLES.TRADE_FULL, ROLES.ADMIN);
 }
 
 function canToggleView(profile) {
-  return hasRole(profile, ROLES.TRADE_FULL);
+  return hasRole(profile, ROLES.TRADE_FULL, ROLES.ADMIN);
 }
 
 // --- Auth State Listener -----------------------------------
