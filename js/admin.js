@@ -372,6 +372,7 @@ async function loadApplications() {
   var result = await _sb
     .from('profiles')
     .select('*')
+    .eq('site_id', SITE_ID)
     .in('role', ['pending', 'consumer', 'trade-restricted', 'trade-full', 'admin', 'rejected'])
     .order('created_at', { ascending: false });
 
@@ -709,7 +710,7 @@ async function loadCoaList() {
   var listEl = document.getElementById('coa-admin-list');
   var countEl = document.getElementById('coa-count');
 
-  var result = await _sb.from('product_coas').select('*').order('uploaded_at', { ascending: false });
+  var result = await _sb.from('product_coas').select('*').eq('site_id', SITE_ID).order('uploaded_at', { ascending: false });
 
   if (result.error) {
     listEl.innerHTML = '<p class="text-dim">Unable to load CoAs.</p>';

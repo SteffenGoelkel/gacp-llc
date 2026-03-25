@@ -35,6 +35,7 @@ async function loadProducts() {
   const { data: products, error } = await _sb
     .from('products')
     .select('*')
+    .eq('site_id', SITE_ID)
     .eq('active', true)
     .order('sort_order', { ascending: true });
 
