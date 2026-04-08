@@ -53,6 +53,41 @@ function renderProduct(product) {
               <span class="product-spec__value">${escapeHtml(catLabel)}</span>
             </div>` : ''}
         </div>
+
+        <!-- Ordering Information -->
+        <div class="ordering-info">
+          <h3 class="ordering-info__title">Ordering Information</h3>
+
+          <div class="ordering-info__grid">
+            <div class="ordering-info__card">
+              <div class="ordering-info__icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+              </div>
+              <h4>Order Quantities</h4>
+              <p>Available in <strong>1 kg</strong> and <strong>25 kg</strong></p>
+            </div>
+
+            <div class="ordering-info__card">
+              <div class="ordering-info__icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M9 3h6M10 3v6.5L4 20h16L14 9.5V3"/></svg>
+              </div>
+              <h4>Free Samples</h4>
+              <p>Available in <strong>50 g</strong> and <strong>100 g</strong></p>
+              <p class="ordering-info__sub">Ship on your UPS/FedEx account (ground). Expedited shipping available — contact for quote.</p>
+              <a href="/login.html" class="btn btn--amber btn--sm" style="margin-top:var(--sp-sm)">Sign In to Request Sample</a>
+            </div>
+
+            <div class="ordering-info__card">
+              <div class="ordering-info__icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              </div>
+              <h4>Shipping</h4>
+              <p><strong>Domestic (US):</strong> Ships via UPS/FedEx ground on your shipping account.</p>
+              <p><strong>International:</strong> Contact for shipping quote, or provide your freight account details.</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   `;

@@ -130,6 +130,78 @@
   font-weight: 500;
 }
 
+/* --- Ordering Information ----------------------------------- */
+.ordering-info {
+  grid-column: 1 / -1;
+  margin-top: var(--sp-2xl);
+}
+
+.ordering-info__title {
+  font-size: var(--fs-lg);
+  margin-bottom: var(--sp-lg);
+}
+
+.ordering-info__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-md);
+}
+
+.ordering-info__grid--compact {
+  gap: var(--sp-sm);
+}
+
+.ordering-info__card {
+  padding: var(--sp-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.ordering-info__card h4 {
+  font-size: var(--fs-sm);
+  color: var(--cream);
+  margin-bottom: var(--sp-sm);
+}
+
+.ordering-info__card p {
+  font-size: var(--fs-sm);
+  color: var(--cream-dim);
+  line-height: 1.6;
+  margin-bottom: var(--sp-xs);
+}
+
+.ordering-info__card p:last-of-type {
+  margin-bottom: 0;
+}
+
+.ordering-info__card strong {
+  color: var(--cream);
+}
+
+.ordering-info__sub {
+  font-size: var(--fs-xs) !important;
+  color: var(--text-muted) !important;
+  margin-top: var(--sp-xs);
+}
+
+.ordering-info__icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(78, 138, 86, 0.08);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--sp-sm);
+}
+
+@media (max-width: 768px) {
+  .ordering-info__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --- Gated Teasers ----------------------------------------- */
 .gated-section {
   position: relative;
@@ -211,35 +283,6 @@
   }
 }
 
-/* --- Geo Banner -------------------------------------------- */
-.geo-banner {
-  background: var(--amber);
-  color: var(--ink);
-  text-align: center;
-  padding: 0.75rem 1rem;
-  font-family: var(--font-body);
-  font-size: var(--fs-sm);
-  position: relative;
-  z-index: 1002;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-.geo-banner a {
-  color: var(--ink);
-  font-weight: 600;
-  text-decoration: underline;
-}
-
-/* When geo banner is present, push the fixed nav down */
-.geo-banner + .page .nav {
-  top: var(--geo-banner-h, 0px);
-}
-
-/* Mobile overlay also needs offset */
-.geo-banner + .page .nav__mobile {
-  top: calc(var(--nav-h) + var(--geo-banner-h, 0px));
-}
 
 @media (max-width: 768px) {
   .product-detail {

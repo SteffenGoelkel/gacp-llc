@@ -256,6 +256,27 @@ function openProductDetail(product, profile, viewMode = 'auto') {
       ${benefitsHTML}
       ${compoundsHTML}
 
+      <!-- Ordering Information -->
+      <div class="product-detail__section">
+        <h4>Ordering Information</h4>
+        <div class="ordering-info__grid ordering-info__grid--compact">
+          <div class="ordering-info__card">
+            <h4 style="font-family:var(--font-body)">Order Quantities</h4>
+            <p>Available in <strong>1 kg</strong> and <strong>25 kg</strong></p>
+          </div>
+          <div class="ordering-info__card">
+            <h4 style="font-family:var(--font-body)">Free Samples</h4>
+            <p>Available in <strong>50 g</strong> and <strong>100 g</strong></p>
+            <p class="ordering-info__sub">Ship on your UPS/FedEx account (ground). Expedited available — contact for quote.</p>
+          </div>
+          <div class="ordering-info__card">
+            <h4 style="font-family:var(--font-body)">Shipping</h4>
+            <p><strong>US:</strong> UPS/FedEx ground on your account.</p>
+            <p><strong>International:</strong> Contact for quote or provide freight details.</p>
+          </div>
+        </div>
+      </div>
+
       ${product.sample_available ? `
       <div class="product-detail__section product-detail__sample">
         <h4>Request a Sample</h4>
