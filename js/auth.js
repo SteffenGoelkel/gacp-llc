@@ -97,7 +97,7 @@ async function requireAuth() {
 async function redirectIfAuth() {
   const session = await getSession();
   if (session) {
-    window.location.href = PATHS.DASHBOARD;
+    await handlePostLogin(session);
     return true;
   }
   return false;
@@ -117,6 +117,28 @@ function canViewCompounds(profile) {
 
 function canToggleView(profile) {
   return hasRole(profile, ROLES.TRADE_FULL, ROLES.ADMIN);
+}
+
+// --- Post-Login Routing ------------------------------------
+
+async function handlePostLogin(session) {
+  const { data: profile } = await _sb
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+
+  if (!profile || profile.role === 'pending') {
+    window.location.href = '/portal/pending.html';
+    return;
+  }
+
+  if (profile.role === 'rejected') {
+    window.location.href = '/portal/rejected.html';
+    return;
+  }
+
+  window.location.href = PATHS.DASHBOARD;
 }
 
 // --- Auth State Listener -----------------------------------
@@ -145,8 +167,8 @@ function initLoginPage() {
     submitBtn.textContent = 'Signing in…';
 
     try {
-      await login(emailInput.value, passInput.value);
-      window.location.href = PATHS.DASHBOARD;
+      const result = await login(emailInput.value, passInput.value);
+      await handlePostLogin(result.session);
     } catch (err) {
       errorEl.textContent = err.message || 'Invalid credentials. Please try again.';
       submitBtn.disabled = false;
@@ -155,128 +177,120 @@ function initLoginPage() {
   });
 }
 
-// --- Registration Page Logic (Single Page) -----------------
+// --- Registration Page Logic (Single Step) -----------------
 
 function initRegisterPage() {
   const form = document.getElementById('register-form');
   if (!form) return;
 
-  // Toggle business fields
-  form.querySelectorAll('[name="account_type"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      const bizFields = document.getElementById('biz-fields');
-      bizFields.classList.toggle('hidden', radio.value !== 'business');
-
-      // Style the radio cards
-      form.querySelectorAll('.account-type-card').forEach(c => c.classList.remove('account-type-card--active'));
-      radio.closest('label').querySelector('.account-type-card').classList.add('account-type-card--active');
-    });
-  });
-
-  // Set initial active state
-  const checkedRadio = form.querySelector('[name="account_type"]:checked');
-  if (checkedRadio) {
-    checkedRadio.closest('label').querySelector('.account-type-card').classList.add('account-type-card--active');
-  }
-
-  // Handle submit
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // Honeypot check
+    const honeypot = document.querySelector('input[name="website_url"]');
+    if (honeypot && honeypot.value) return;
+
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const company = document.getElementById('reg-company').value.trim();
+    const intendedUse = document.getElementById('reg-intended-use').value;
+    const errorEl = document.getElementById('register-error');
     const submitBtn = document.getElementById('register-submit');
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData);
 
-    // Validate password match
-    if (data.password !== data.password_confirm) {
-      showToast('Passwords do not match.', 'error');
+    errorEl.textContent = '';
+
+    if (!email || !password || !company || !intendedUse) {
+      errorEl.textContent = 'Please fill in all fields.';
       return;
     }
-
-    if (data.password.length < 8) {
-      showToast('Password must be at least 8 characters.', 'error');
+    if (password.length < 8) {
+      errorEl.textContent = 'Password must be at least 8 characters.';
       return;
-    }
-
-    // Validate age (21+)
-    if (data.dob) {
-      const dob = new Date(data.dob);
-      const today = new Date();
-      let age = today.getFullYear() - dob.getFullYear();
-      const monthDiff = today.getMonth() - dob.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-        age--;
-      }
-      if (age < 21) {
-        showToast('You must be 21 years or older to create an account.', 'error');
-        return;
-      }
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating account…';
+    submitBtn.textContent = 'Submitting…';
 
     try {
-      // Capture IP info
-      const geo = await detectLocation();
-      if (geo) {
-        data.ip_address = geo.ip;
-        data.ip_city = geo.city;
-        data.ip_country = geo.country;
-        data.ip_org = geo.org;
-        data.location_match = geo.country === data.country;
-      }
-
-      // Create auth user
-      const result = await register(data.email, data.password);
+      // 1. Create auth user
+      const result = await register(email, password);
       const user = result.user;
-      if (!user) throw new Error('Registration failed');
+      if (!user) throw new Error('Registration failed.');
 
-      // Build profile fields (exclude auth fields)
-      const profileFields = { ...data };
-      delete profileFields.email;
-      delete profileFields.password;
-      delete profileFields.password_confirm;
-      delete profileFields.terms;
-
-      await updateProfile(user.id, profileFields);
-
-      // Notify admin of new application
+      // 2. Update profile with company + intended use
       try {
-        const fullName = [data.first_name, data.last_name].filter(Boolean).join(' ') || 'Unknown';
-        await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: 'GACP Website',
-            email: data.email,
-            subject: 'New Application: ' + fullName,
-            message: [
-              'A new account application has been submitted.',
-              '',
-              'Name: ' + fullName,
-              'Email: ' + data.email,
-              'Account Type: ' + (data.account_type || 'individual'),
-              'Company: ' + (data.company || 'N/A'),
-              'Business Category: ' + (data.biz_category || 'N/A'),
-              'Intended Use: ' + (data.intended_use || 'N/A'),
-              'Country: ' + (data.country || 'N/A'),
-              '',
-              'Review this application at:',
-              'https://gacp.llc/admin.html',
-            ].join('\n'),
-          }),
+        await updateProfile(user.id, {
+          company: company,
+          intended_use: intendedUse,
         });
-      } catch (notifyErr) {
-        console.error('Admin notification failed:', notifyErr);
+      } catch (profileErr) {
+        console.error('Profile update failed (non-fatal):', profileErr);
       }
 
-      showToast('Account created! Your application is under review.', 'success');
-      setTimeout(() => { window.location.href = PATHS.LOGIN; }, 3000);
+      // 3. Silent IP geolocation capture (background, non-blocking)
+      captureGeoData(user.id);
+
+      // 4. Admin notification (background, non-blocking)
+      notifyAdminNewApplication(email, company, intendedUse);
+
+      // 5. Redirect to pending screen
+      window.location.href = '/portal/pending.html';
+
     } catch (err) {
-      showToast(err.message || 'Registration failed. Please try again.', 'error');
+      console.error('Registration error:', err);
+      errorEl.textContent = err.message || 'Registration failed. Please try again.';
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Application';
+      submitBtn.textContent = 'Apply Now';
     }
   });
+}
+
+// --- Silent Geo Capture (non-blocking) ---------------------
+
+async function captureGeoData(userId) {
+  try {
+    const geo = await detectLocation();
+    if (!geo) return;
+
+    await _sb
+      .from('profiles')
+      .update({
+        ip_address: geo.ip || null,
+        ip_city: geo.city || null,
+        ip_country: geo.country || null,
+        ip_org: geo.org || null,
+      })
+      .eq('id', userId);
+  } catch (err) {
+    console.error('Geo capture failed:', err);
+  }
+}
+
+// --- Admin Notification (non-blocking) ---------------------
+
+async function notifyAdminNewApplication(email, company, intendedUse) {
+  try {
+    await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: company,
+        email: email,
+        subject: 'New Trade Account Application — ' + company,
+        message: [
+          'New trade account application received:',
+          '',
+          'Company: ' + company,
+          'Email: ' + email,
+          'Intended use: ' + intendedUse,
+          'Applied: ' + new Date().toISOString(),
+          '',
+          'Review in Supabase:',
+          'https://supabase.com/dashboard/project/dbpgofivflbzjupwpegr/editor',
+        ].join('\n'),
+      }),
+    });
+  } catch (err) {
+    console.error('Admin notification failed:', err);
+  }
 }

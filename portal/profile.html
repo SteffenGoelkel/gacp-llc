@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — GACP LLC</title>
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+<body>
+  <div class="page">
+    <div id="nav-slot"></div>
+    <main class="page-main">
+      <div class="portal-layout">
+        <div id="portal-sidebar-slot"></div>
+        <div class="portal-content">
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-xs)">Your Profile</h2>
+          <p class="text-sm text-dim" style="margin-bottom:var(--sp-2xl)" id="profile-subtitle">Manage your contact, business, and shipping details.</p>
+
+          <!-- Contact Section -->
+          <div class="accordion" id="section-contact">
+            <button class="accordion__trigger" type="button" data-section="contact">
+              <span class="accordion__title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Contact Information
+              </span>
+              <svg class="accordion__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion__body">
+              <form class="profile-form" data-section="contact">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" name="first_name" class="form-input" placeholder="First name">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" name="last_name" class="form-input" placeholder="Last name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone</label>
+                  <input type="tel" name="phone" class="form-input" placeholder="+1 (555) 000-0000">
+                </div>
+                <button type="submit" class="btn btn--primary">Save Contact Info</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Business Section -->
+          <div class="accordion" id="section-business">
+            <button class="accordion__trigger" type="button" data-section="business">
+              <span class="accordion__title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                Business Details
+              </span>
+              <svg class="accordion__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion__body">
+              <form class="profile-form" data-section="business">
+                <div class="form-group">
+                  <label class="form-label">Account Type</label>
+                  <select name="account_type" class="form-select">
+                    <option value="individual">Individual</option>
+                    <option value="company">Company</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Business Category</label>
+                  <select name="biz_category" class="form-select">
+                    <option value="">Select category…</option>
+                    <option value="supplement">Dietary Supplement</option>
+                    <option value="cosmetic">Cosmetic / Skincare</option>
+                    <option value="food">Food & Beverage</option>
+                    <option value="pharma">Pharmaceutical</option>
+                    <option value="research">Research</option>
+                    <option value="wholesale">Wholesale / Distribution</option>
+                    <option value="retail">Retail</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Corp / Registration Number</label>
+                    <input type="text" name="corp_num" class="form-input" placeholder="e.g., EIN, ABN, CRN">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">VAT Number</label>
+                    <input type="text" name="vat" class="form-input" placeholder="e.g., GB123456789">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Website</label>
+                  <input type="url" name="website" class="form-input" placeholder="https://example.com">
+                </div>
+                <button type="submit" class="btn btn--primary">Save Business Details</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Shipping Section -->
+          <div class="accordion" id="section-shipping">
+            <button class="accordion__trigger" type="button" data-section="shipping">
+              <span class="accordion__title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Shipping Address
+              </span>
+              <svg class="accordion__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion__body">
+              <form class="profile-form" data-section="shipping">
+                <div class="form-group">
+                  <label class="form-label">Address Line 1</label>
+                  <input type="text" name="addr1" class="form-input" placeholder="Street address">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Address Line 2</label>
+                  <input type="text" name="addr2" class="form-input" placeholder="Apt, suite, unit (optional)">
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input type="text" name="city" class="form-input" placeholder="City">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">State / Province</label>
+                    <input type="text" name="state" class="form-input" placeholder="State">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Postal Code</label>
+                    <input type="text" name="zip" class="form-input" placeholder="Postal code">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <input type="text" name="country" class="form-input" placeholder="Country">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn--primary">Save Shipping Address</button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/portal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      initNavigation('profile', true);
+      initPortalLayout('profile');
+
+      const auth = await requireAuth();
+      if (!auth) return;
+      const { profile } = auth;
+
+      const params = new URLSearchParams(window.location.search);
+      const need = params.get('need');
+      const returnUrl = params.get('return');
+
+      // Show contextual subtitle when redirected from a gate
+      if (need) {
+        const subtitleEl = document.getElementById('profile-subtitle');
+        const sectionLabels = { contact: 'contact information', business: 'business details', shipping: 'shipping address' };
+        subtitleEl.textContent = `Please complete your ${sectionLabels[need] || need} to continue.`;
+        subtitleEl.style.color = 'var(--amber)';
+      }
+
+      // Pre-fill all forms from profile
+      const fields = [
+        'first_name', 'last_name', 'phone',
+        'account_type', 'biz_category', 'corp_num', 'vat', 'website',
+        'addr1', 'addr2', 'city', 'state', 'zip', 'country',
+      ];
+      fields.forEach(field => {
+        const input = document.querySelector(`[name="${field}"]`);
+        if (input && profile[field]) input.value = profile[field];
+      });
+
+      // Accordion toggle
+      document.querySelectorAll('.accordion__trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const accordion = trigger.closest('.accordion');
+          const isOpen = accordion.classList.contains('accordion--open');
+          // Close all
+          document.querySelectorAll('.accordion').forEach(a => a.classList.remove('accordion--open'));
+          // Toggle clicked
+          if (!isOpen) accordion.classList.add('accordion--open');
+        });
+      });
+
+      // Auto-expand the needed section (or first section by default)
+      const targetSection = need ? document.getElementById(`section-${need}`) : document.querySelector('.accordion');
+      if (targetSection) targetSection.classList.add('accordion--open');
+
+      // Section save handlers
+      document.querySelectorAll('.profile-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = form.querySelector('[type="submit"]');
+          const originalText = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = 'Saving…';
+
+          try {
+            const formData = new FormData(form);
+            const updates = Object.fromEntries(formData);
+
+            // Remove empty strings so we don't overwrite with blanks
+            Object.keys(updates).forEach(k => { if (updates[k] === '') delete updates[k]; });
+
+            await updateProfile(profile.id, updates);
+
+            // Update cached profile
+            Object.assign(profile, updates);
+            cacheProfile(profile);
+
+            showToast('Profile updated', 'success');
+
+            // If this was the needed section, redirect back
+            const section = form.dataset.section;
+            if (need === section && returnUrl) {
+              window.location.href = returnUrl;
+              return;
+            }
+          } catch (err) {
+            console.error('Profile save error:', err);
+            showToast('Failed to save. Please try again.', 'error');
+          } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

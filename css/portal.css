@@ -729,3 +729,70 @@
   color: var(--cream);
   font-size: var(--fs-sm);
 }
+
+/* --- Profile Accordion ------------------------------------- */
+.accordion {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  margin-bottom: var(--sp-md);
+  overflow: hidden;
+}
+
+.accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--sp-lg) var(--sp-xl);
+  background: none;
+  border: none;
+  color: var(--cream);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+
+.accordion__trigger:hover {
+  background: rgba(78, 138, 86, 0.04);
+}
+
+.accordion__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.accordion__title svg {
+  color: var(--green);
+}
+
+.accordion__chevron {
+  color: var(--text-muted);
+  transition: transform var(--dur-fast);
+  flex-shrink: 0;
+}
+
+.accordion--open .accordion__chevron {
+  transform: rotate(180deg);
+}
+
+.accordion__body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.accordion--open .accordion__body {
+  max-height: 800px;
+}
+
+.accordion__body .profile-form {
+  padding: 0 var(--sp-xl) var(--sp-xl);
+  max-width: 720px;
+}
+
+.accordion__body .form-group {
+  margin-bottom: var(--sp-lg);
+}

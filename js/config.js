@@ -54,6 +54,7 @@ const PATHS = {
   COA:         '/portal/coa.html',
   FORMULATION: '/portal/formulation.html',
   PRICING:     '/portal/pricing.html',
+  PROFILE:     '/portal/profile.html',
   ADMIN:       '/admin.html',
 };
 

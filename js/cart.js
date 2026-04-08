@@ -150,14 +150,30 @@ function renderCart(profile) {
         <span>Total</span>
         <span>${formatPrice(total)}</span>
       </div>
-      <button class="btn btn--primary btn--full" style="margin-top:var(--sp-lg)" disabled>
+      <button class="btn btn--primary btn--full" style="margin-top:var(--sp-lg)" id="checkout-btn">
         Proceed to Checkout
       </button>
-      <p class="text-xs text-muted" style="text-align:center;margin-top:var(--sp-sm)">
-        Checkout coming soon — contact us to place an order.
-      </p>
     </div>
   `;
+
+  // Checkout gate
+  const checkoutBtn = document.getElementById('checkout-btn');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', async () => {
+      checkoutBtn.disabled = true;
+      checkoutBtn.textContent = 'Checking profile…';
+      const complete = await requireProfileFields(
+        ['first_name', 'last_name', 'addr1', 'city', 'state', 'zip'],
+        '/portal/cart.html',
+        'shipping'
+      );
+      if (complete) {
+        showToast('Checkout coming soon — contact us to place an order.', 'info');
+      }
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = 'Proceed to Checkout';
+    });
+  }
 
   // Event delegation for qty buttons
   container.addEventListener('click', (e) => {
