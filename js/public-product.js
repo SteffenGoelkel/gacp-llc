@@ -69,21 +69,22 @@ function renderProduct(product) {
 
             <div class="ordering-info__card">
               <div class="ordering-info__icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M9 3h6M10 3v6.5L4 20h16L14 9.5V3"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
               </div>
-              <h4>Free Samples</h4>
-              <p>Available in <strong>50 g</strong> and <strong>100 g</strong></p>
-              <p class="ordering-info__sub">Ship on your UPS/FedEx account (ground). Expedited shipping available — contact for quote.</p>
-              <a href="/login.html" class="btn btn--amber btn--sm" style="margin-top:var(--sp-sm)">Sign In to Request Sample</a>
+              <h4>Shipping</h4>
+              <p><strong>US:</strong> UPS/FedEx ground on your shipping account</p>
+              <p><strong>International:</strong> Contact for quote or provide freight details</p>
+              <p><strong>Expedited/next-day:</strong> Available — contact for pricing</p>
             </div>
 
             <div class="ordering-info__card">
               <div class="ordering-info__icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M9 3h6M10 3v6.5L4 20h16L14 9.5V3"/></svg>
               </div>
-              <h4>Shipping</h4>
-              <p><strong>Domestic (US):</strong> Ships via UPS/FedEx ground on your shipping account.</p>
-              <p><strong>International:</strong> Contact for shipping quote, or provide your freight account details.</p>
+              <h4>Free Samples</h4>
+              <p>Available in <strong>50 g</strong> and <strong>100 g</strong></p>
+              <p class="ordering-info__sub">Provide your UPS or FedEx account number for ground shipping.</p>
+              <a href="/login.html" class="btn btn--amber btn--sm" style="margin-top:var(--sp-sm)">Sign In to Request Sample</a>
             </div>
           </div>
         </div>

@@ -265,14 +265,15 @@ function openProductDetail(product, profile, viewMode = 'auto') {
             <p>Available in <strong>1 kg</strong> and <strong>25 kg</strong></p>
           </div>
           <div class="ordering-info__card">
-            <h4 style="font-family:var(--font-body)">Free Samples</h4>
-            <p>Available in <strong>50 g</strong> and <strong>100 g</strong></p>
-            <p class="ordering-info__sub">Ship on your UPS/FedEx account (ground). Expedited available — contact for quote.</p>
+            <h4 style="font-family:var(--font-body)">Shipping</h4>
+            <p><strong>US:</strong> UPS/FedEx ground on your shipping account</p>
+            <p><strong>International:</strong> Contact for quote or provide freight details</p>
+            <p><strong>Expedited/next-day:</strong> Available — contact for pricing</p>
           </div>
           <div class="ordering-info__card">
-            <h4 style="font-family:var(--font-body)">Shipping</h4>
-            <p><strong>US:</strong> UPS/FedEx ground on your account.</p>
-            <p><strong>International:</strong> Contact for quote or provide freight details.</p>
+            <h4 style="font-family:var(--font-body)">Free Samples</h4>
+            <p>Available in <strong>50 g</strong> and <strong>100 g</strong></p>
+            <p class="ordering-info__sub">Provide your UPS or FedEx account number for ground shipping.</p>
           </div>
         </div>
       </div>
