@@ -86,6 +86,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const banner = document.createElement('div');
     banner.className = 'geo-banner';
     banner.innerHTML = 'GACP currently serves US-based businesses. International enquiries welcome — <a href="mailto:' + 'info' + '@' + 'gacp.llc' + '">contact us</a>';
-    document.body.prepend(banner);
+    // Insert before .page so CSS sibling selector (.geo-banner + .page) works
+    const page = document.querySelector('.page');
+    if (page) {
+      page.parentNode.insertBefore(banner, page);
+    } else {
+      document.body.prepend(banner);
+    }
+    // Set CSS variable for banner height so nav + content offset correctly
+    requestAnimationFrame(() => {
+      document.documentElement.style.setProperty('--geo-banner-h', banner.offsetHeight + 'px');
+    });
   }
 });
