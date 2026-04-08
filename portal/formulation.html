@@ -159,8 +159,24 @@
             body: JSON.stringify({ ...payload, subject: 'Custom Formulation Request' }),
           });
 
-          showToast('Formulation request submitted!', 'success');
-          form.reset();
+          form.style.display = 'none';
+          const success = document.createElement('div');
+          success.className = 'card';
+          success.style.cssText = 'border-color:var(--green);background:rgba(78,138,86,0.06);padding:var(--sp-2xl);text-align:center';
+          success.innerHTML = `
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="margin:0 auto var(--sp-lg)"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <h3 style="margin-bottom:var(--sp-md)">Request Submitted</h3>
+            <p class="text-sm text-dim" style="max-width:480px;margin:0 auto var(--sp-xl)">Formulation request submitted — we'll respond within 2-3 business days to discuss specifications and pricing.</p>
+            <a href="#" class="btn btn--secondary btn--sm" id="submit-another">Submit another request</a>
+          `;
+          form.parentNode.insertBefore(success, form.nextSibling);
+
+          document.getElementById('submit-another').addEventListener('click', (e) => {
+            e.preventDefault();
+            success.remove();
+            form.reset();
+            form.style.display = '';
+          });
         } catch (err) {
           showToast('Submission failed. Please email info@gacp.llc', 'error');
         } finally {
