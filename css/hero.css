@@ -21,9 +21,10 @@
 
 .hero__zone {
   flex: 1;
-  position: relative;
+  position: relative; /* anchor for .hero__zone-label */
   overflow: hidden;
   transition: flex var(--dur-slower) var(--ease-out);
+  isolation: isolate; /* create stacking context so labels stay within zone */
 }
 
 .hero__zone:hover {
@@ -106,7 +107,7 @@
 .hero__zone-label span {
   display: block;
   font-family: var(--font-display);
-  font-size: var(--fs-xl);
+  font-size: var(--fs-lg);
   color: var(--cream);
   white-space: nowrap;
   text-shadow: 0 1px 3px rgba(0,0,0,0.4);

@@ -25,6 +25,7 @@
   height: var(--nav-h);
   display: flex;
   align-items: center;
+  overflow: visible;
   transition: background var(--dur-base) var(--ease-smooth),
               box-shadow var(--dur-base) var(--ease-smooth);
 }
@@ -75,7 +76,7 @@
 .nav__links {
   display: flex;
   align-items: center;
-  gap: var(--sp-2xl);
+  gap: var(--sp-lg);
 }
 
 .nav__link {
