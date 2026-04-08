@@ -1,0 +1,220 @@
+/* ============================================================
+   GACP LLC — catalogue.css
+   Public catalogue grid + product detail page styles
+   ============================================================ */
+
+/* --- Catalogue Grid ---------------------------------------- */
+.catalogue-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-xl);
+}
+
+.catalogue-card {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.catalogue-card__specs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-sm);
+}
+
+.catalogue-card__spec {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+@media (max-width: 1024px) {
+  .catalogue-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .catalogue-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Product Detail Page ----------------------------------- */
+.product-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3xl);
+  align-items: start;
+}
+
+.product-detail__image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  background: var(--ink-mid);
+}
+
+.product-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-lg);
+}
+
+.product-detail__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  color: var(--cream);
+  line-height: 1.2;
+}
+
+.product-detail__desc {
+  font-size: var(--fs-md);
+  color: var(--cream-dim);
+  line-height: 1.8;
+}
+
+.product-detail__specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-md);
+}
+
+.product-spec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+  padding: var(--sp-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.product-spec__label {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.product-spec__value {
+  font-size: var(--fs-sm);
+  color: var(--cream);
+  font-weight: 500;
+}
+
+/* --- Gated Teasers ----------------------------------------- */
+.gated-section {
+  position: relative;
+  padding: var(--sp-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.gated-section__overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-sm);
+  text-align: center;
+  padding: var(--sp-xl);
+}
+
+.gated-section__icon {
+  width: 40px;
+  height: 40px;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.gated-section__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  color: var(--cream-dim);
+}
+
+.gated-section__text {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--sp-sm);
+}
+
+/* --- Breadcrumb -------------------------------------------- */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--sp-xl);
+}
+
+.breadcrumb a {
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color var(--dur-fast);
+}
+
+.breadcrumb a:hover {
+  color: var(--cream);
+}
+
+.breadcrumb__sep {
+  color: var(--border-strong);
+  font-size: var(--fs-xs);
+}
+
+.breadcrumb__current {
+  color: var(--cream-dim);
+}
+
+/* --- Gated Grid -------------------------------------------- */
+.gated-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-xl);
+}
+
+@media (max-width: 768px) {
+  .gated-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Geo Banner -------------------------------------------- */
+.geo-banner {
+  background: var(--amber);
+  color: var(--ink);
+  text-align: center;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+}
+
+.geo-banner a {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .product-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .product-detail__name {
+    font-size: var(--fs-2xl);
+  }
+
+  .product-detail__specs {
+    grid-template-columns: 1fr;
+  }
+}

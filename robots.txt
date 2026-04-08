@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /catalogue.html
+Allow: /product.html
+Allow: /about.html
+
+Disallow: /portal/
+Disallow: /admin.html
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://gacp.llc/sitemap.xml

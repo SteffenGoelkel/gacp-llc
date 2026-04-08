@@ -57,7 +57,14 @@ function renderLocationBanner(containerId) {
   `;
 }
 
-// Detect on page load
-document.addEventListener('DOMContentLoaded', () => {
-  detectLocation();
+// Detect on page load and show international banner if non-US
+document.addEventListener('DOMContentLoaded', async () => {
+  const geo = await detectLocation();
+  if (geo && geo.country && geo.country !== 'US') {
+    window.GACP_GEO = 'international';
+    const banner = document.createElement('div');
+    banner.className = 'geo-banner';
+    banner.innerHTML = 'GACP currently serves US-based businesses. International enquiries welcome — <a href="mailto:' + 'info' + '@' + 'gacp.llc' + '">contact us</a>';
+    document.body.prepend(banner);
+  }
 });

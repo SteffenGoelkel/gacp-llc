@@ -16,8 +16,8 @@ function getNavHTML(activePage = '') {
 
         <div class="nav__links">
           <a href="/" class="nav__link ${activePage === 'home' ? 'nav__link--active' : ''}">Home</a>
+          <a href="/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Catalogue</a>
           <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
-          <a href="/portal/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Products</a>
           <a href="/login.html" class="nav__cta" id="nav-auth-btn">Sign In</a>
           <a href="#" class="nav__link nav__logout hidden" id="nav-logout-btn">Sign Out</a>
         </div>
@@ -30,8 +30,8 @@ function getNavHTML(activePage = '') {
 
     <div class="nav__mobile" id="nav-mobile">
       <a href="/" class="nav__link ${activePage === 'home' ? 'nav__link--active' : ''}">Home</a>
+      <a href="/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Catalogue</a>
       <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
-      <a href="/portal/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Products</a>
       <a href="/login.html" class="nav__cta" id="nav-auth-btn-mobile">Sign In</a>
       <a href="#" class="nav__link nav__logout hidden" id="nav-logout-btn-mobile">Sign Out</a>
     </div>
@@ -56,7 +56,7 @@ function getFooterHTML() {
           <div>
             <h4 class="footer__col-heading">Company</h4>
             <a href="/about.html" class="footer__link">About Us</a>
-            <a href="/portal/catalogue.html" class="footer__link">Products</a>
+            <a href="/catalogue.html" class="footer__link">Products</a>
             <a href="/portal/coa.html" class="footer__link">CoA Library</a>
             <a href="/contact.html" class="footer__link">Contact</a>
           </div>
