@@ -53,7 +53,6 @@ function getFooterHTML() {
               <span>GACP LLC</span>
             </div>
             <p>US-based wholesale botanical ingredients — sourced at origin, refined in the lab, delivered with full traceability.</p>
-            <p class="footer__location">Based in Wyoming, USA</p>
           </div>
           <div>
             <h4 class="footer__col-heading">Products</h4>
