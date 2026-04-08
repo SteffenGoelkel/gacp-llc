@@ -150,14 +150,57 @@
         try {
           const formData = new FormData(form);
           const payload = Object.fromEntries(formData);
-          payload.user_id = auth.profile.id;
-          payload.email = auth.profile.email;
+          const profile = auth.profile;
 
-          await fetch('/api/contact', {
+          // Build regulatory notes from checkboxes
+          const regLabels = { reg_gmp: 'GMP', reg_organic: 'Organic', reg_kosher: 'Kosher/Halal', reg_novel: 'Novel food dossier' };
+          const regulatory = Object.keys(regLabels).filter(k => payload[k] === 'on').map(k => regLabels[k]);
+
+          // Build volume string
+          const volumeParts = [payload.volume_initial, payload.volume_monthly].filter(Boolean);
+          const volume = volumeParts.length ? volumeParts.join(' / monthly: ') : '';
+
+          // 1. Insert into Supabase
+          const { error: dbError } = await _sb.from('formulation_requests').insert({
+            user_id: profile.id,
+            site_id: SITE_ID,
+            product_type: payload.product_type,
+            application: payload.application,
+            compounds: payload.compounds,
+            volume: volume,
+            regulatory_notes: regulatory.join(', '),
+            additional_notes: payload.notes || '',
+          });
+          if (dbError) throw dbError;
+
+          // 2. Send email via Worker
+          const company = profile.company || '(no company)';
+          const emailBody = [
+            'New formulation request from ' + (profile.first_name || '') + ' ' + (profile.last_name || ''),
+            'Email: ' + (profile.email || ''),
+            'Company: ' + company,
+            '',
+            'Product type: ' + payload.product_type,
+            'Application: ' + payload.application,
+            'Compounds: ' + payload.compounds,
+            'Potency: ' + (payload.potency || '—'),
+            'Volume (initial): ' + (payload.volume_initial || '—'),
+            'Volume (monthly): ' + (payload.volume_monthly || '—'),
+            'Delivery form: ' + (payload.form || '—'),
+            'Regulatory: ' + (regulatory.join(', ') || 'None'),
+            'Notes: ' + (payload.notes || '—'),
+          ].join('\n');
+
+          fetch('/api/contact', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...payload, subject: 'Custom Formulation Request' }),
-          });
+            body: JSON.stringify({
+              name: company,
+              email: profile.email,
+              subject: 'Formulation Request — ' + company,
+              message: emailBody,
+            }),
+          }).catch(() => {});
 
           form.style.display = 'none';
           const success = document.createElement('div');
