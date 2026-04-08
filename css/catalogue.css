@@ -3,6 +3,31 @@
    Public catalogue grid + product detail page styles
    ============================================================ */
 
+/* --- Quality Signals Bar ----------------------------------- */
+.quality-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-md);
+  margin-bottom: var(--sp-xl);
+  padding: var(--sp-md) var(--sp-lg);
+  background: rgba(78, 138, 86, 0.04);
+  border: 1px solid rgba(78, 138, 86, 0.12);
+  border-radius: var(--radius-md);
+}
+
+.quality-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  font-size: var(--fs-xs);
+  color: var(--green);
+  font-weight: 500;
+}
+
+.quality-badge svg {
+  flex-shrink: 0;
+}
+
 /* --- Catalogue Grid ---------------------------------------- */
 .catalogue-grid {
   display: grid;

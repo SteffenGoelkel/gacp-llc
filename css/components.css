@@ -252,7 +252,7 @@
 .form-textarea {
   width: 100%;
   padding: 0.7rem 0.9rem;
-  font-size: var(--fs-sm);
+  font-size: 16px; /* Prevents iOS auto-zoom on focus */
   color: var(--cream);
   background: var(--ink-mid);
   border: 1px solid var(--border-strong);
@@ -529,9 +529,10 @@
 }
 
 .filter-btn {
-  padding: 0.4rem 1rem;
+  padding: 0.55rem 1rem;
   font-size: var(--fs-xs);
   font-weight: 600;
+  min-height: 44px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);

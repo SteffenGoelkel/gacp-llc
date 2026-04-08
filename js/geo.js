@@ -6,10 +6,23 @@
 
 const GEO_KEY = 'gacp_geo';
 
-/** Get cached location or return null */
+const GEO_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+/** Get cached location or return null (expires after TTL) */
 function getGeoLocation() {
   const raw = sessionStorage.getItem(GEO_KEY);
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+  try {
+    const cached = JSON.parse(raw);
+    if (cached._ts && Date.now() - cached._ts > GEO_TTL_MS) {
+      sessionStorage.removeItem(GEO_KEY);
+      return null;
+    }
+    return cached;
+  } catch {
+    sessionStorage.removeItem(GEO_KEY);
+    return null;
+  }
 }
 
 /** Detect visitor location via Cloudflare Pages Function */
@@ -27,6 +40,7 @@ async function detectLocation() {
       region: data.region || '',
       ip: data.ip || '',
       org: data.org || '',
+      _ts: Date.now(),
     };
 
     sessionStorage.setItem(GEO_KEY, JSON.stringify(geo));
@@ -45,7 +59,14 @@ function renderLocationBanner(containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
 
-  const location = [geo.city, geo.region, geo.country].filter(Boolean).join(', ');
+  // Display city + country name. Use Intl API to resolve ISO code to full name.
+  // Avoids showing region (e.g. "England") which is confusing for non-US locations.
+  let countryName = geo.country;
+  try {
+    const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+    countryName = displayNames.of(geo.country) || geo.country;
+  } catch { /* fallback to ISO code */ }
+  const location = [geo.city, countryName].filter(Boolean).join(', ');
   el.innerHTML = `
     <div class="location-banner">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

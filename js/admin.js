@@ -60,19 +60,47 @@ function renderProductList() {
   };
 
   list.innerHTML =
-    '<div class="product-list-item product-list-header"><span>Product</span><span>Category</span><span>Price</span><span>Visibility</span><span>Actions</span></div>' +
+    '<div class="product-list-item product-list-header"><span>Product</span><span>Category</span><span>Price</span><span>Status</span><span>Actions</span></div>' +
     PRODUCTS.map(p => '<div class="product-list-item" data-id="' + p.id + '">' +
       '<div><strong style="color:var(--cream)">' + escapeHtml(p.name) + '</strong>' +
       (p.is_dual_layer ? ' <span class="badge badge--green" style="font-size:10px">Dual</span>' : '') +
       '<br><span class="text-xs text-dim">' + escapeHtml(p.id) + '</span></div>' +
       '<span class="badge badge--neutral">' + escapeHtml(p.cat) + '</span>' +
       '<span>' + (p.price ? formatPrice(p.price) : '—') + '</span>' +
-      '<span class="text-xs">' + (p.active ? visLabel(p) : '<span style="color:var(--terra)">Inactive</span>') + '</span>' +
+      '<span>' +
+        '<button class="btn btn--sm ' + (p.active ? 'btn--primary' : 'btn--ghost') + '" style="min-width:72px;font-size:11px" onclick="toggleProductActive(\'' + p.id + '\',' + !p.active + ')">' +
+          (p.active ? 'Visible' : 'Hidden') +
+        '</button>' +
+      '</span>' +
       '<div style="display:flex;gap:var(--sp-xs)">' +
         '<button class="btn btn--sm btn--secondary" onclick="editProduct(\'' + p.id + '\')">Edit</button>' +
         '<button class="btn btn--sm btn--ghost" style="color:var(--terra)" onclick="deleteProduct(\'' + p.id + '\')">Del</button>' +
       '</div></div>'
     ).join('');
+}
+
+// --- Toggle Product Visibility ------------------------------
+
+async function toggleProductActive(productId, newState) {
+  try {
+    const { error } = await _sb
+      .from('products')
+      .update({ active: newState })
+      .eq('id', productId)
+      .eq('site_id', SITE_ID);
+
+    if (error) throw error;
+
+    // Update local cache
+    const product = PRODUCTS.find(p => p.id === productId);
+    if (product) product.active = newState;
+
+    renderProductList();
+    showToast(newState ? 'Product is now visible' : 'Product hidden from catalogue', 'success');
+  } catch (err) {
+    console.error('Toggle active error:', err);
+    showToast('Failed to update visibility', 'error');
+  }
 }
 
 // --- Image Upload ------------------------------------------

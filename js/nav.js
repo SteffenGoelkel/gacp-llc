@@ -42,6 +42,7 @@ function getNavHTML(activePage = '') {
 
 function getFooterHTML() {
   const year = new Date().getFullYear();
+  const email = 'info' + '@' + 'gacp.llc';
   return `
     <footer class="footer">
       <div class="container">
@@ -51,27 +52,30 @@ function getFooterHTML() {
               <img src="/images/logo.png" alt="GACP" width="32" height="32">
               <span>GACP LLC</span>
             </div>
-            <p>Precision botanicals sourced at origin, refined in the lab, and delivered with full traceability.</p>
+            <p>US-based wholesale botanical ingredients — sourced at origin, refined in the lab, delivered with full traceability.</p>
+            <p class="footer__location">Based in Wyoming, USA</p>
           </div>
           <div>
-            <h4 class="footer__col-heading">Company</h4>
+            <h4 class="footer__col-heading">Products</h4>
+            <a href="/catalogue.html" class="footer__link">Browse Catalogue</a>
+            <a href="/catalogue.html#tropical" class="footer__link">Tropical Botanicals</a>
+            <a href="/catalogue.html#ethno" class="footer__link">Ethno-Pharma</a>
+            <a href="/catalogue.html#extract" class="footer__link">Standardised Extracts</a>
+            <a href="/catalogue.html#isolate" class="footer__link">Isolates</a>
+            <a href="/catalogue.html#oil" class="footer__link">Oils &amp; Distillates</a>
+          </div>
+          <div>
+            <h4 class="footer__col-heading">Resources</h4>
             <a href="/about.html" class="footer__link">About Us</a>
-            <a href="/catalogue.html" class="footer__link">Products</a>
             <a href="/portal/coa.html" class="footer__link">CoA Library</a>
-            <a href="/contact.html" class="footer__link">Contact</a>
-          </div>
-          <div>
-            <h4 class="footer__col-heading">Trade</h4>
+            <a href="/portal/formulation.html" class="footer__link">Formulation Services</a>
             <a href="/portal/pricing.html" class="footer__link">Bulk Pricing</a>
-            <a href="/portal/formulation.html" class="footer__link">Custom Formulation</a>
             <a href="/register.html" class="footer__link">Apply for Trade Account</a>
           </div>
           <div>
-            <h4 class="footer__col-heading">Legal</h4>
-            <a href="/terms.html" class="footer__link">Terms of Service</a>
-            <a href="/privacy.html" class="footer__link">Privacy Policy</a>
-            <a href="/disclaimer.html" class="footer__link">Disclaimer</a>
-            <a href="/shipping.html" class="footer__link">Shipping & Returns</a>
+            <h4 class="footer__col-heading">Contact</h4>
+            <!--email_off--><a href="mailto:${email}" class="footer__link">${email}</a><!--email_on-->
+            <a href="/contact.html" class="footer__link">Contact Form</a>
           </div>
         </div>
         <div class="footer__disclaimer">
@@ -79,6 +83,10 @@ function getFooterHTML() {
         </div>
         <div class="footer__bottom">
           <span class="footer__copy">&copy; ${year} GACP LLC. All rights reserved.</span>
+          <div class="footer__legal-links">
+            <a href="/privacy.html">Privacy Policy</a>
+            <a href="/terms.html">Terms of Service</a>
+          </div>
         </div>
       </div>
     </footer>
