@@ -85,7 +85,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.GACP_GEO = 'international';
     const banner = document.createElement('div');
     banner.className = 'geo-banner';
-    banner.innerHTML = 'GACP currently serves US-based businesses. International enquiries welcome — <a href="mailto:' + 'info' + '@' + 'gacp.llc' + '">contact us</a>';
+    banner.innerHTML = 'GACP currently serves US-based businesses. International enquiries welcome — <a href="mailto:' + 'info' + '@' + 'gacp.llc' + '">contact us</a>' +
+      '<button class="geo-banner__close" aria-label="Dismiss">&times;</button>';
     // Insert before .page so CSS sibling selector (.geo-banner + .page) works
     const page = document.querySelector('.page');
     if (page) {
@@ -96,6 +97,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set CSS variable for banner height so nav + content offset correctly
     requestAnimationFrame(() => {
       document.documentElement.style.setProperty('--geo-banner-h', banner.offsetHeight + 'px');
+    });
+    // Dismiss handler
+    banner.querySelector('.geo-banner__close').addEventListener('click', () => {
+      banner.remove();
+      document.documentElement.style.setProperty('--geo-banner-h', '0px');
     });
   }
 });
