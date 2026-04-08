@@ -215,6 +215,7 @@
 .product-card__category--extract   { color: var(--green);  background: rgba(78,138,86,0.12); }
 .product-card__category--isolate   { color: var(--terra);  background: rgba(212,98,62,0.12); }
 .product-card__category--oil       { color: var(--amber);  background: rgba(224,149,64,0.12); }
+.product-card__category--superfood { color: var(--berry);  background: rgba(155,45,134,0.12); }
 
 .product-card__name {
   font-family: var(--font-display);

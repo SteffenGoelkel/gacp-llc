@@ -40,4 +40,44 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://gacp.llc/product.html?slug=acai-organic-powder-freeze-dried</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gacp.llc/product.html?slug=acerola-organic-powder-17-20-vit-c</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gacp.llc/product.html?slug=acerola-organic-powder-22-25-vit-c</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gacp.llc/product.html?slug=coconut-water-organic-clear-powder</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gacp.llc/product.html?slug=coconut-milk-organic-powder</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gacp.llc/product.html?slug=dragon-fruit-organic-powder-freeze-dried</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gacp.llc/product.html?slug=elderberry-organic-powder-freeze-dried</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gacp.llc/product.html?slug=maqui-berry-organic-powder-freeze-dried</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

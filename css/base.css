@@ -41,6 +41,9 @@ button { cursor: pointer; border: none; background: none; }
   --terra:      #d4623e;
   --terra-dim:  #b55232;
   --terra-glow: #e0764e;
+  --berry:      #9B2D86;
+  --berry-dim:  #7d2470;
+  --berry-glow: #b53a9c;
   --sage:       #7a9a88;
   --sage-dim:   #607a6c;
   --sage-lt:    #8aaa96;
@@ -67,6 +70,7 @@ button { cursor: pointer; border: none; background: none; }
   --cat-extract:  var(--green);
   --cat-isolate:  var(--terra);
   --cat-oil:      var(--amber);
+  --cat-superfood: var(--berry);
 
   /* Spacing scale */
   --sp-xs:  0.25rem;

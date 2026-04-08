@@ -40,6 +40,7 @@ const CATEGORIES = [
   { key: 'extract',  label: 'Standardised Extracts', color: 'var(--green)' },
   { key: 'isolate',  label: 'Isolates',            color: 'var(--terra)' },
   { key: 'oil',      label: 'Oils & Distillates',  color: 'var(--amber)' },
+  { key: 'superfood', label: 'Superfoods',         color: 'var(--berry)' },
 ];
 
 // Paths
