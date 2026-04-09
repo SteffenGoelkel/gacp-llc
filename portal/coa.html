@@ -67,7 +67,8 @@
       const searchInput = document.getElementById('coa-search');
 
       // Load CoAs from database
-      const { data: coas, error } = await _sb.from('product_coas').select('*').order('uploaded_at', { ascending: false });
+      const COA_STORAGE_BASE = SUPABASE_URL + '/storage/v1/object/public/coa-documents/';
+      const { data: coas, error } = await _sb.from('coa_documents').select('*').eq('site_id', SITE_ID).order('uploaded_at', { ascending: false });
 
       if (error) {
         grid.innerHTML = '<p class="text-dim">Unable to load certificates.</p>';
@@ -116,13 +117,14 @@
             '<div class="coa-product-group__list">' +
               productCoas.map(coa => {
                 const testDate = coa.tested_date ? new Date(coa.tested_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+                var downloadUrl = coa.file_url || (coa.file_name ? COA_STORAGE_BASE + encodeURIComponent(coa.file_name) : '#');
                 return '<div class="coa-item">' +
                   '<div class="coa-item__info">' +
                     '<span class="coa-item__batch">' + escapeHtml(coa.batch_number) + '</span>' +
                     (testDate ? '<span class="text-xs text-dim"> · Tested ' + testDate + '</span>' : '') +
                     (coa.notes ? '<span class="text-xs text-dim"> · ' + escapeHtml(coa.notes) + '</span>' : '') +
                   '</div>' +
-                  '<a href="' + coa.file_url + '" target="_blank" class="btn btn--sm btn--secondary">Download PDF ↓</a>' +
+                  '<a href="' + downloadUrl + '" target="_blank" class="btn btn--sm btn--secondary">Download PDF ↓</a>' +
                 '</div>';
               }).join('') +
             '</div>' +
