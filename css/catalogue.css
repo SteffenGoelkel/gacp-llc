@@ -28,6 +28,25 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .quality-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: var(--sp-sm);
+    padding: var(--sp-sm) var(--sp-md);
+    margin-bottom: var(--sp-md);
+  }
+  .quality-bar::-webkit-scrollbar { display: none; }
+  .quality-badge {
+    flex-shrink: 0;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .quality-badge svg { width: 12px; height: 12px; }
+}
+
 /* --- Catalogue Grid ---------------------------------------- */
 .catalogue-grid {
   display: grid;

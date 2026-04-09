@@ -554,6 +554,24 @@
   color: var(--ink);
 }
 
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: var(--sp-xs);
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    flex-shrink: 0;
+    font-size: 13px;
+    padding: 6px 14px;
+    min-height: unset;
+    white-space: nowrap;
+  }
+}
+
 /* --- Toast / Notification ---------------------------------- */
 .toast {
   position: fixed;
