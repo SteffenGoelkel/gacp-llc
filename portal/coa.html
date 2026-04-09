@@ -68,7 +68,7 @@
 
       // Load CoAs from database
       const COA_STORAGE_BASE = SUPABASE_URL + '/storage/v1/object/public/coa-documents/';
-      const { data: coas, error } = await _sb.from('coa_documents').select('*').eq('site_id', SITE_ID).order('uploaded_at', { ascending: false });
+      const { data: coas, error } = await _sb.from('coa_documents').select('*').eq('site_id', SITE_ID).order('created_at', { ascending: false });
 
       if (error) {
         grid.innerHTML = '<p class="text-dim">Unable to load certificates.</p>';
