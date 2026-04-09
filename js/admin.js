@@ -449,7 +449,7 @@ async function loadApplications() {
       var p = appProfiles.find(function(x) { return x.id === detailBtn.dataset.detail; });
       if (p) showAppDetail(p);
     }
-    if (approveBtn) await setAppRole(approveBtn.dataset.approve, 'consumer');
+    if (approveBtn) await setAppRole(approveBtn.dataset.approve, ROLES.TRADE_RESTRICTED);
     if (rejectBtn) {
       if (!confirm('Reject this application?')) return;
       await setAppRole(rejectBtn.dataset.reject, 'rejected');

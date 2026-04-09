@@ -6,6 +6,12 @@
 // --- Shared Navigation HTML --------------------------------
 
 function getNavHTML(activePage = '') {
+  const cached = getCachedProfile();
+  const isLoggedIn = !!cached;
+  const authLabel = isLoggedIn ? 'Portal' : 'Sign In';
+  const authHref = isLoggedIn ? PATHS.DASHBOARD : PATHS.LOGIN;
+  const logoutClass = isLoggedIn ? '' : ' hidden';
+
   return `
     <nav class="nav nav--transparent" id="main-nav">
       <div class="nav__inner">
@@ -18,8 +24,8 @@ function getNavHTML(activePage = '') {
           <a href="/" class="nav__link ${activePage === 'home' ? 'nav__link--active' : ''}">Home</a>
           <a href="/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Catalogue</a>
           <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
-          <a href="/login.html" class="nav__cta" id="nav-auth-btn">Sign In</a>
-          <a href="#" class="nav__link nav__logout hidden" id="nav-logout-btn">Sign Out</a>
+          <a href="${authHref}" class="nav__cta" id="nav-auth-btn">${authLabel}</a>
+          <a href="#" class="nav__link nav__logout${logoutClass}" id="nav-logout-btn">Sign Out</a>
         </div>
 
         <button class="nav__toggle" id="nav-toggle" aria-label="Toggle menu">
@@ -32,8 +38,8 @@ function getNavHTML(activePage = '') {
       <a href="/" class="nav__link ${activePage === 'home' ? 'nav__link--active' : ''}">Home</a>
       <a href="/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Catalogue</a>
       <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
-      <a href="/login.html" class="nav__cta" id="nav-auth-btn-mobile">Sign In</a>
-      <a href="#" class="nav__link nav__logout hidden" id="nav-logout-btn-mobile">Sign Out</a>
+      <a href="${authHref}" class="nav__cta" id="nav-auth-btn-mobile">${authLabel}</a>
+      <a href="#" class="nav__link nav__logout${logoutClass}" id="nav-logout-btn-mobile">Sign Out</a>
     </div>
   `;
 }
