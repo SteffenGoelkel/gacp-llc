@@ -23,6 +23,7 @@ function getNavHTML(activePage = '') {
         <div class="nav__links">
           <a href="/" class="nav__link ${activePage === 'home' ? 'nav__link--active' : ''}">Home</a>
           <a href="/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Catalogue</a>
+          <a href="/quality.html" class="nav__link ${activePage === 'quality' ? 'nav__link--active' : ''}">Quality</a>
           <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
           <a href="${authHref}" class="nav__cta" id="nav-auth-btn">${authLabel}</a>
           <a href="#" class="nav__link nav__logout${logoutClass}" id="nav-logout-btn">Sign Out</a>
