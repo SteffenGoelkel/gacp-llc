@@ -689,8 +689,24 @@
 
 /* --- CoA Library (grouped) --------------------------------- */
 .coa-product-group {
+  position: relative;
+  overflow: hidden;
   padding: var(--sp-lg);
   margin-bottom: var(--sp-md);
+}
+
+.coa-product-group__bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  pointer-events: none;
+  mask-image: linear-gradient(to right, transparent 0%, black 50%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 50%);
 }
 
 .coa-product-group__header {
