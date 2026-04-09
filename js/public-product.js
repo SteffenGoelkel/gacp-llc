@@ -21,13 +21,14 @@ function renderProduct(product) {
   const cat = product.category || '';
   const catLabel = (CATEGORIES.find(c => c.key === cat) || {}).label || cat;
   const imgSrc = product.image_url || '/images/logo.png';
+  const displayName = product.trade_name || product.name || product.consumer_name || 'Unnamed Product';
 
   detail.innerHTML = `
     <div class="product-detail">
-      <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(product.trade_name)}" class="product-detail__image">
+      <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(displayName)}" class="product-detail__image">
       <div class="product-detail__info">
         <span class="product-card__category product-card__category--${escapeHtml(cat)}">${escapeHtml(catLabel)}</span>
-        <h1 class="product-detail__name">${escapeHtml(product.trade_name)}</h1>
+        <h1 class="product-detail__name">${escapeHtml(displayName)}</h1>
         ${product.description ? `<p class="product-detail__desc">${escapeHtml(product.description)}</p>` : ''}
         <div class="product-detail__specs">
           ${product.purity ? `
@@ -93,10 +94,10 @@ function renderProduct(product) {
 
   // Update breadcrumb
   const crumb = document.getElementById('breadcrumb-name');
-  if (crumb) crumb.textContent = product.trade_name;
+  if (crumb) crumb.textContent = displayName;
 
   // Update page title
-  document.title = product.trade_name + ' | GACP — Wholesale Botanical Ingredients';
+  document.title = displayName + ' | GACP — Wholesale Botanical Ingredients';
 
   // Show gated teasers and CTA
   const teasers = document.getElementById('gated-teasers');
@@ -105,14 +106,14 @@ function renderProduct(product) {
   if (cta) cta.style.display = '';
 
   // Inject JSON-LD
-  injectProductSchema(product);
+  injectProductSchema(product, displayName);
 }
 
-function injectProductSchema(product) {
+function injectProductSchema(product, name) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": product.trade_name,
+    "name": name,
     "description": product.description || '',
     "category": "Botanical Extracts",
     "brand": { "@type": "Brand", "name": "GACP LLC" },

@@ -25,11 +25,12 @@ function renderCatalogueCard(product) {
   card.dataset.category = cat;
 
   const imgSrc = product.image_url || '/images/logo.png';
+  const displayName = product.trade_name || product.name || product.consumer_name || 'Unnamed Product';
 
   card.innerHTML = `
-    <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(product.trade_name)}" class="product-card__img" loading="lazy">
+    <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(displayName)}" class="product-card__img" loading="lazy">
     <span class="product-card__category product-card__category--${escapeHtml(cat)}">${escapeHtml(catLabel)}</span>
-    <h3 class="product-card__name">${escapeHtml(product.trade_name)}</h3>
+    <h3 class="product-card__name">${escapeHtml(displayName)}</h3>
     <div class="catalogue-card__specs">
       ${product.purity ? `<span class="catalogue-card__spec">Purity: ${escapeHtml(product.purity)}</span>` : ''}
       ${product.form ? `<span class="catalogue-card__spec">Form: ${escapeHtml(product.form)}</span>` : ''}
