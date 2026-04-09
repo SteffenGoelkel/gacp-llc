@@ -44,8 +44,8 @@ function renderProduct(product) {
             </div>` : ''}
           ${product.moq_unit ? `
             <div class="product-spec">
-              <span class="product-spec__label">MOQ Unit</span>
-              <span class="product-spec__value">${escapeHtml(product.moq_unit)}</span>
+              <span class="product-spec__label">MOQ</span>
+              <span class="product-spec__value">${product.moq ? escapeHtml(product.moq + ' ' + product.moq_unit) : '1 ' + escapeHtml(product.moq_unit)}</span>
             </div>` : ''}
           ${cat ? `
             <div class="product-spec">

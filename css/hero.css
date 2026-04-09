@@ -243,17 +243,31 @@
     max-height: unset;
   }
 
+  /* Single-image background instead of 3-zone layout */
   .hero__panoramic {
-    position: relative;
-    height: 50vh;
-    min-height: 320px;
+    position: absolute;
+    inset: 0;
+    display: block;
   }
 
-  .hero__zone:hover { flex: 1; }
+  .hero__zone { display: none; }
+  .hero__zone:first-child {
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+  .hero__zone:first-child::after {
+    background: linear-gradient(
+      to bottom,
+      rgba(12, 16, 14, 0.4),
+      rgba(12, 16, 14, 0.85) 80%
+    );
+  }
   .hero__zone-label { display: none; }
 
   .hero__content {
-    padding: var(--sp-2xl) var(--sp-md);
+    position: relative;
+    padding: calc(var(--nav-h) + var(--sp-3xl)) var(--sp-md) var(--sp-3xl);
   }
 
   .hero__title { font-size: var(--fs-3xl); }
