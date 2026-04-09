@@ -82,6 +82,27 @@ function initCategoryFilter(allProducts) {
 
 async function initPublicCatalogue() {
   const products = await loadPublicCatalogue();
-  renderCatalogueGrid(products);
+
+  // Auto-select category from URL param (e.g. ?category=tropical)
+  const urlCat = new URLSearchParams(window.location.search).get('category');
+  if (urlCat && urlCat !== 'all') {
+    const filtered = products.filter(p => p.category === urlCat);
+    renderCatalogueGrid(filtered.length ? filtered : products);
+
+    // Activate matching filter button after DOM is ready
+    requestAnimationFrame(() => {
+      const filterBar = document.getElementById('category-filter');
+      if (filterBar) {
+        const match = filterBar.querySelector('[data-cat="' + urlCat + '"]');
+        if (match) {
+          filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
+          match.classList.add('filter-btn--active');
+        }
+      }
+    });
+  } else {
+    renderCatalogueGrid(products);
+  }
+
   initCategoryFilter(products);
 }
