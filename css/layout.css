@@ -197,8 +197,8 @@
   .nav__toggle { display: flex; }
   .nav__mobile { display: flex; }
   .nav__inner { padding: 0 var(--sp-md); }
-  .nav__logo img { height: 48px; }
-  .nav__logo { padding: 6px 16px 6px 8px; font-size: var(--fs-lg); }
+  .nav__logo img { height: 40px; }
+  .nav__logo { padding: 6px 14px 6px 6px; font-size: var(--fs-md); }
 }
 
 /* --- Portal Sidebar Layout --------------------------------- */

@@ -92,7 +92,7 @@
         </div>
       </section>
 
-      <!-- Stats Bar -->
+      <!-- Stats Bar (desktop only) -->
       <div class="hero__stats">
         <div class="hero__stats-inner">
           <div class="hero__stat">
@@ -114,8 +114,55 @@
         </div>
       </div>
 
+      <!-- Trust Strip (mobile only) -->
+      <div class="trust-strip">
+        <div class="trust-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Third-Party Tested
+        </div>
+        <div class="trust-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Full CoA Documentation
+        </div>
+        <div class="trust-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          US-Based Operations
+        </div>
+      </div>
+
+      <!-- Mobile Category Grid (mobile only) -->
+      <div class="mobile-categories">
+        <h2 class="mobile-categories__title">What We Supply</h2>
+        <div class="mobile-categories__grid">
+          <a href="/catalogue.html?category=tropical" class="mobile-cat-card" style="border-left-color:var(--green)">
+            <div class="mobile-cat-card__name">Tropical</div>
+            <div class="mobile-cat-card__desc">Southeast Asian & South American extracts</div>
+          </a>
+          <a href="/catalogue.html?category=ethno" class="mobile-cat-card" style="border-left-color:var(--amber)">
+            <div class="mobile-cat-card__name">Ethno-Pharma</div>
+            <div class="mobile-cat-card__desc">Ethnobotanical preparations</div>
+          </a>
+          <a href="/catalogue.html?category=extract" class="mobile-cat-card" style="border-left-color:var(--green)">
+            <div class="mobile-cat-card__name">Extracts</div>
+            <div class="mobile-cat-card__desc">Standardised active compounds</div>
+          </a>
+          <a href="/catalogue.html?category=isolate" class="mobile-cat-card" style="border-left-color:var(--terra)">
+            <div class="mobile-cat-card__name">Isolates</div>
+            <div class="mobile-cat-card__desc">HPLC-verified high purity</div>
+          </a>
+          <a href="/catalogue.html?category=oil" class="mobile-cat-card" style="border-left-color:var(--amber)">
+            <div class="mobile-cat-card__name">Oils & Distillates</div>
+            <div class="mobile-cat-card__desc">Full & broad spectrum</div>
+          </a>
+          <a href="/catalogue.html?category=superfood" class="mobile-cat-card" style="border-left-color:var(--berry)">
+            <div class="mobile-cat-card__name">Superfoods</div>
+            <div class="mobile-cat-card__desc">Organic freeze-dried powders</div>
+          </a>
+        </div>
+      </div>
+
       <!-- Sourcing Section 1: Tropical -->
-      <section class="section">
+      <section class="section sourcing-section">
         <div class="container">
           <div class="grid grid-2 gap-2xl items-center fade-in">
             <div>
@@ -133,7 +180,7 @@
       </section>
 
       <!-- Sourcing Section 2: Ethno-Pharma -->
-      <section class="section" style="background:var(--ink-light)">
+      <section class="section sourcing-section" style="background:var(--ink-light)">
         <div class="container">
           <div class="grid grid-2 gap-2xl items-center fade-in">
             <div class="grid grid-3 gap-md" style="order:-1">
@@ -151,7 +198,7 @@
       </section>
 
       <!-- Sourcing Section 3: Laboratory -->
-      <section class="section">
+      <section class="section sourcing-section">
         <div class="container">
           <div class="grid grid-2 gap-2xl items-center fade-in">
             <div>
@@ -168,8 +215,8 @@
         </div>
       </section>
 
-      <!-- CTA Banner -->
-      <section class="section" style="background:linear-gradient(135deg, rgba(78,138,86,0.08), rgba(224,149,64,0.08))">
+      <!-- CTA Banner (desktop) -->
+      <section class="section desktop-cta" style="background:linear-gradient(135deg, rgba(78,138,86,0.08), rgba(224,149,64,0.08))">
         <div class="container text-center">
           <div class="fade-in" style="max-width:600px;margin:0 auto">
             <h2>Ready to Source?</h2>
@@ -181,6 +228,13 @@
           </div>
         </div>
       </section>
+
+      <!-- Mobile CTA -->
+      <div class="mobile-cta">
+        <h2>Ready to source?</h2>
+        <a href="/catalogue.html" class="btn btn--primary">Browse Catalogue</a>
+        <a href="/register.html" class="btn btn--secondary">Apply for Trade Account</a>
+      </div>
 
     </main>
 

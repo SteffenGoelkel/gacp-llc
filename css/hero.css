@@ -238,12 +238,12 @@
 
 @media (max-width: 768px) {
   .hero {
-    height: auto;
-    min-height: unset;
+    height: 85vh;
+    min-height: 540px;
     max-height: unset;
   }
 
-  /* Single-image background instead of 3-zone layout */
+  /* Single-image background */
   .hero__panoramic {
     position: absolute;
     inset: 0;
@@ -259,30 +259,126 @@
   .hero__zone:first-child::after {
     background: linear-gradient(
       to bottom,
-      rgba(12, 16, 14, 0.4),
-      rgba(12, 16, 14, 0.85) 80%
+      rgba(12, 16, 14, 0.3) 0%,
+      rgba(12, 16, 14, 0.6) 50%,
+      rgba(12, 16, 14, 0.92) 85%
     );
   }
   .hero__zone-label { display: none; }
 
+  .hero__eyebrow { display: none; }
+
   .hero__content {
     position: relative;
-    padding: calc(var(--nav-h) + var(--sp-3xl)) var(--sp-md) var(--sp-3xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    padding: 0 var(--sp-lg) var(--sp-2xl);
   }
 
-  .hero__title { font-size: var(--fs-3xl); }
+  .hero__title { font-size: var(--fs-3xl); max-width: none; }
 
-  .hero__stats-inner {
-    grid-template-columns: repeat(2, 1fr);
+  .hero__subtitle {
+    font-size: var(--fs-sm);
+    max-width: none;
+    margin-bottom: var(--sp-xl);
   }
 
-  .hero__stat:nth-child(2) { border-right: none; }
+  .hero__actions {
+    flex-direction: column;
+  }
+  .hero__actions .btn { width: 100%; }
+
+  /* Hide stats bar on mobile */
+  .hero__stats { display: none; }
 }
 
-@media (max-width: 480px) {
-  .hero__stats-inner { grid-template-columns: 1fr; }
-  .hero__stat { border-right: none; border-bottom: 1px solid var(--border); }
-  .hero__stat:last-child { border-bottom: none; }
-  .hero__actions { flex-direction: column; }
-  .hero__actions .btn { width: 100%; }
+/* --- Mobile-Only Sections ---------------------------------- */
+.trust-strip { display: none; }
+.mobile-categories { display: none; }
+.mobile-cta { display: none; }
+
+@media (max-width: 768px) {
+  /* Trust strip */
+  .trust-strip {
+    display: flex;
+    gap: var(--sp-md);
+    padding: var(--sp-md) var(--sp-lg);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: rgba(12, 16, 14, 0.95);
+    border-bottom: 1px solid var(--border);
+  }
+  .trust-strip::-webkit-scrollbar { display: none; }
+  .trust-pill {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-xs);
+    white-space: nowrap;
+    font-size: var(--fs-xs);
+    color: var(--cream-dim);
+    padding: var(--sp-xs) var(--sp-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+  }
+  .trust-pill svg { flex-shrink: 0; }
+
+  /* Mobile category grid */
+  .mobile-categories {
+    display: block;
+    padding: var(--sp-2xl) var(--sp-lg);
+  }
+  .mobile-categories__title {
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    color: var(--cream);
+    margin-bottom: var(--sp-lg);
+  }
+  .mobile-categories__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-sm);
+  }
+  .mobile-cat-card {
+    display: block;
+    padding: var(--sp-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--green);
+    text-decoration: none;
+  }
+  .mobile-cat-card__name {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 2px;
+  }
+  .mobile-cat-card__desc {
+    font-size: var(--fs-xs);
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* Mobile CTA */
+  .mobile-cta {
+    display: block;
+    padding: var(--sp-3xl) var(--sp-lg);
+    text-align: center;
+  }
+  .mobile-cta h2 {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    color: var(--cream);
+    margin-bottom: var(--sp-lg);
+  }
+  .mobile-cta .btn { width: 100%; }
+  .mobile-cta .btn + .btn { margin-top: var(--sp-sm); }
+
+  /* Hide sourcing sections on mobile */
+  .sourcing-section { display: none; }
+  .desktop-cta { display: none; }
 }
