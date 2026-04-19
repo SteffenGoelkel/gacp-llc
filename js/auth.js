@@ -194,6 +194,7 @@ function initRegisterPage() {
     const password = document.getElementById('reg-password').value;
     const company = document.getElementById('reg-company').value.trim();
     const intendedUse = document.getElementById('reg-intended-use').value;
+    const eligibilityCheckbox = document.getElementById('eligibility-confirm');
     const errorEl = document.getElementById('register-error');
     const submitBtn = document.getElementById('register-submit');
 
@@ -205,6 +206,10 @@ function initRegisterPage() {
     }
     if (password.length < 8) {
       errorEl.textContent = 'Password must be at least 8 characters.';
+      return;
+    }
+    if (eligibilityCheckbox && !eligibilityCheckbox.checked) {
+      errorEl.textContent = 'You must confirm eligibility and agree to the Terms of Service, Terms of Sale, and Privacy Policy to create an account.';
       return;
     }
 

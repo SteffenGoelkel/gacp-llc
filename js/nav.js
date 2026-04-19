@@ -71,27 +71,39 @@ function getFooterHTML() {
             <a href="/catalogue.html#oil" class="footer__link">Oils &amp; Distillates</a>
           </div>
           <div>
-            <h4 class="footer__col-heading">Resources</h4>
+            <h4 class="footer__col-heading">Legal</h4>
+            <a href="/terms.html" class="footer__link">Terms of Service</a>
+            <a href="/terms-of-sale.html" class="footer__link">Terms of Sale</a>
+            <a href="/privacy.html" class="footer__link">Privacy Policy</a>
+            <a href="/refund-policy.html" class="footer__link">Refund &amp; Returns</a>
+          </div>
+          <div>
+            <h4 class="footer__col-heading">Company</h4>
             <a href="/about.html" class="footer__link">About Us</a>
-            <a href="/portal/coa.html" class="footer__link">CoA Library</a>
-            <a href="/portal/formulation.html" class="footer__link">Formulation Services</a>
-            <a href="/portal/pricing.html" class="footer__link">Bulk Pricing</a>
-            <a href="/register.html" class="footer__link">Apply for Trade Account</a>
+            <a href="/product-disclaimer.html" class="footer__link">Product Disclaimer</a>
+            <a href="/restricted-products.html" class="footer__link">Restricted Products</a>
+            <a href="/compliance.html" class="footer__link">Quality &amp; Controlled Access</a>
+            <a href="/quality-assurance.html" class="footer__link">Quality Assurance &amp; CoA</a>
+            <a href="/accessibility.html" class="footer__link">Accessibility</a>
           </div>
           <div>
             <h4 class="footer__col-heading">Contact</h4>
             <!--email_off--><a href="mailto:${email}" class="footer__link">${email}</a><!--email_on-->
+            <a href="tel:+18556834227" class="footer__link">1-855-683-GACP (4227)</a>
             <a href="/contact.html" class="footer__link">Contact Form</a>
+            <a href="/portal/coa.html" class="footer__link">CoA Library</a>
+            <a href="/register.html" class="footer__link">Apply for Trade Account</a>
           </div>
         </div>
         <div class="footer__disclaimer">
-          <p>These statements have not been evaluated by the Food and Drug Administration. Products are not intended to diagnose, treat, cure, or prevent any disease. Products are sold as raw botanical materials for use by qualified manufacturers and formulators. All products are restricted to individuals aged 21 years or older. Consult a healthcare professional before use.</p>
+          <p>Products sold by GACP LLC are raw materials and ingredients intended for use by qualified trade buyers in manufacturing, formulation, or research. Products are not sold as finished dietary supplements or consumer goods. Statements on this website have not been evaluated by the Food and Drug Administration. Products are not intended to diagnose, treat, cure, or prevent any disease.</p>
         </div>
         <div class="footer__bottom">
           <span class="footer__copy">&copy; ${year} GACP LLC. All rights reserved.</span>
           <div class="footer__legal-links">
-            <a href="/privacy.html">Privacy Policy</a>
-            <a href="/terms.html">Terms of Service</a>
+            <a href="/privacy.html">Privacy</a>
+            <a href="/terms.html">Terms</a>
+            <a href="/accessibility.html">Accessibility</a>
           </div>
         </div>
       </div>

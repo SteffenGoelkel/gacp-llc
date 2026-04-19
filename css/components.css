@@ -757,3 +757,204 @@
   color: var(--cream);
   font-weight: 600;
 }
+
+.legal-content ul,
+.legal-content ol {
+  margin: 0 0 var(--sp-lg);
+  padding-left: 0;
+  color: var(--sage);
+  font-size: var(--fs-sm);
+  line-height: 1.9;
+}
+
+.legal-content ol {
+  padding-left: 1.25rem;
+  list-style: decimal;
+}
+
+.legal-content ul li,
+.legal-content ol li {
+  margin-bottom: var(--sp-sm);
+}
+
+.legal-content ul li {
+  position: relative;
+  padding-left: 1.25rem;
+  list-style: none;
+}
+
+.legal-content ul li::before {
+  content: '•';
+  color: var(--green);
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.legal-content .legal-effective-date {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--sp-2xl);
+  display: block;
+}
+
+.legal-content .legal-crosslink {
+  background: rgba(78, 138, 86, 0.08);
+  border-left: 3px solid var(--green);
+  padding: var(--sp-md) var(--sp-lg);
+  margin: var(--sp-lg) 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.legal-content .legal-crosslink p {
+  margin-bottom: 0;
+  color: var(--cream-dim);
+}
+
+.legal-content .legal-caps {
+  font-size: var(--fs-xs);
+  line-height: 1.8;
+  color: var(--sage);
+}
+
+/* --- Cookie Consent Banner --------------------------------- */
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: rgba(12, 16, 14, 0.97);
+  border-top: 1px solid rgba(78, 138, 86, 0.3);
+  backdrop-filter: blur(10px);
+  transform: translateY(100%);
+  transition: transform var(--dur-base) var(--ease-smooth);
+}
+
+.cookie-banner--visible {
+  transform: translateY(0);
+}
+
+.cookie-banner__content {
+  max-width: var(--max-w-sm);
+  margin: 0 auto;
+  padding: var(--sp-md) var(--sp-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+}
+
+.cookie-banner__content p {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin: 0;
+  flex: 1;
+  max-width: none;
+}
+
+.cookie-banner__content a {
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cookie-banner__content a:hover {
+  color: var(--green-glow);
+}
+
+.cookie-banner__btn {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  padding: 0.55rem 1.25rem;
+  background: var(--green);
+  color: var(--ink);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 40px;
+  transition: background var(--dur-fast) var(--ease-smooth);
+}
+
+.cookie-banner__btn:hover {
+  background: var(--green-glow);
+}
+
+@media (max-width: 600px) {
+  .cookie-banner__content {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--sp-md);
+    padding: var(--sp-md);
+  }
+}
+
+/* --- Register eligibility checkbox ------------------------- */
+.register-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--cream-dim);
+  cursor: pointer;
+  margin: var(--sp-md) 0;
+}
+
+.register-checkbox input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: var(--green);
+  min-width: 16px;
+  min-height: 16px;
+  cursor: pointer;
+}
+
+.register-checkbox a {
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.register-checkbox a:hover {
+  color: var(--green-glow);
+}
+
+/* --- Product detail DSHEA disclaimer ----------------------- */
+.product-dshea-disclaimer {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-top: var(--sp-lg);
+  padding-top: var(--sp-md);
+  border-top: 1px solid var(--border);
+  font-style: italic;
+}
+
+/* --- Footer phone + contact polish ------------------------- */
+.footer__contact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-bottom: var(--sp-md);
+}
+
+.footer__contact-label {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.footer__contact-value {
+  font-size: var(--fs-sm);
+  color: var(--cream-dim);
+}
+
+.footer__contact-value:hover {
+  color: var(--cream);
+}

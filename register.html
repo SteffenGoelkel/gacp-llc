@@ -123,6 +123,11 @@
             <input type="text" name="website_url" tabindex="-1" autocomplete="off">
           </div>
 
+          <label class="register-checkbox">
+            <input type="checkbox" id="eligibility-confirm" required>
+            <span>I confirm that I am at least 18 years of age (or 21 years of age where required by my state or local law), that I am authorized to purchase botanical ingredients for lawful commercial or research purposes, and that I have read and agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms of Service</a>, <a href="/terms-of-sale.html" target="_blank" rel="noopener">Terms of Sale</a>, and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+          </label>
+
           <div id="register-error" class="form-error" style="margin-bottom:var(--sp-md)"></div>
 
           <button type="submit" class="btn btn--primary btn--full btn--lg" id="register-submit">Apply Now</button>
@@ -147,5 +152,6 @@
       if (!already) initRegisterPage();
     });
   </script>
+  <script src="/js/cookie-banner.js"></script>
 </body>
 </html>

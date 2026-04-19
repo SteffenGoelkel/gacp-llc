@@ -251,6 +251,7 @@ function openProductDetail(product, profile, viewMode = 'auto') {
       <div class="product-detail__section">
         <h4>Description</h4>
         <p class="product-detail__desc">${escapeHtml(layer.desc)}</p>
+        <p class="product-dshea-disclaimer">&dagger; This statement has not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.</p>
       </div>
 
       ${benefitsHTML}

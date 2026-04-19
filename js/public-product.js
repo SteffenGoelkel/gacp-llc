@@ -30,6 +30,7 @@ function renderProduct(product) {
         <span class="product-card__category product-card__category--${escapeHtml(cat)}">${escapeHtml(catLabel)}</span>
         <h1 class="product-detail__name">${escapeHtml(displayName)}</h1>
         ${product.description ? `<p class="product-detail__desc">${escapeHtml(product.description)}</p>` : ''}
+        <p class="product-dshea-disclaimer">&dagger; This statement has not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.</p>
         <div class="product-detail__specs">
           ${product.purity ? `
             <div class="product-spec">

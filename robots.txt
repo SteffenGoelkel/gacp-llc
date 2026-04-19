@@ -3,6 +3,16 @@ Allow: /
 Allow: /catalogue.html
 Allow: /product.html
 Allow: /about.html
+Allow: /quality.html
+Allow: /quality-assurance.html
+Allow: /compliance.html
+Allow: /terms.html
+Allow: /terms-of-sale.html
+Allow: /privacy.html
+Allow: /refund-policy.html
+Allow: /product-disclaimer.html
+Allow: /restricted-products.html
+Allow: /accessibility.html
 
 Disallow: /portal/
 Disallow: /admin.html

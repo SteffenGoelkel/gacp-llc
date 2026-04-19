@@ -305,8 +305,8 @@
 
 .footer__grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: var(--sp-3xl);
+  grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr;
+  gap: var(--sp-2xl);
   margin-bottom: var(--sp-3xl);
 }
 
@@ -420,12 +420,15 @@
   color: var(--green);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .footer__grid {
     grid-template-columns: 1fr 1fr;
     gap: var(--sp-xl);
   }
   .footer__brand { grid-column: 1 / -1; }
+}
+
+@media (max-width: 768px) {
   .footer__bottom {
     flex-direction: column;
     gap: var(--sp-md);
