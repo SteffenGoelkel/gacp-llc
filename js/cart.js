@@ -1,66 +1,267 @@
 /* ============================================================
    GACP LLC — cart.js
-   Cart management: add, remove, update, render, persist
+   Cart state (v2), cart page renderer, and a purchase-gate check
+   used by both the product detail overlay and the cart page.
+
+   Storage: localStorage[gacp_cart_v2] holds a snapshot-per-line so
+   the checkout page can render totals without the products table
+   being loaded. Pricing is also recomputed server-side in the
+   gacp-checkout Worker — this module is UX only.
    ============================================================ */
 
-const CART_KEY = 'gacp_cart';
+(function () {
+  const KEY = 'gacp_cart_v2';
+  const LEGACY_KEY = 'gacp_cart';
+  const TIER_DISCOUNT = { bronze: 0, silver: 0.08, gold: 0.15, platinum: 0.22 };
 
-function getCart() {
-  const raw = localStorage.getItem(CART_KEY);
-  return raw ? JSON.parse(raw) : [];
-}
-
-function saveCart(cart) {
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  updateCartBadge();
-}
-
-function addToCart(productId, qty = 1) {
-  const product = PRODUCTS.find(p => p.id === productId);
-  if (!product) return;
-
-  const cart = getCart();
-  const existing = cart.find(item => item.id === productId);
-
-  if (existing) {
-    existing.qty += qty;
-  } else {
-    cart.push({ id: productId, qty });
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || []; }
+    catch { return []; }
   }
 
-  saveCart(cart);
-  showToast('Added to cart', 'success');
-  closeOverlay();
-}
+  function save(v) {
+    localStorage.setItem(KEY, JSON.stringify(v));
+    broadcast();
+  }
 
-function removeFromCart(productId) {
-  const cart = getCart().filter(item => item.id !== productId);
-  saveCart(cart);
-}
+  function broadcast() {
+    document.dispatchEvent(new CustomEvent('cart:change', { detail: load() }));
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+  }
 
-function updateCartQty(productId, qty) {
-  if (qty < 1) return removeFromCart(productId);
-  const cart = getCart();
-  const item = cart.find(i => i.id === productId);
-  if (item) item.qty = qty;
-  saveCart(cart);
-}
+  // One-shot migration from the legacy {id, qty} schema to {id, qty, snapshot}.
+  // We don't have the product prices at this point, so if the old key is
+  // populated we discard it — users will need to re-add their items.
+  (function migrate() {
+    try {
+      if (localStorage.getItem(LEGACY_KEY)) localStorage.removeItem(LEGACY_KEY);
+    } catch (_) {}
+  })();
 
-function getCartCount() {
-  return getCart().reduce((sum, item) => sum + item.qty, 0);
+  const formatUSD = (cents) => '$' + (cents / 100).toLocaleString('en-US', {
+    minimumFractionDigits: 2, maximumFractionDigits: 2,
+  });
+
+  const Cart = {
+    all:   () => load(),
+    count: () => load().reduce((n, l) => n + l.qty, 0),
+
+    /**
+     * Can the current profile place orders? Returns { ok, reason, msg }.
+     * Called by the product detail overlay and the cart page.
+     */
+    canPurchase(profile) {
+      if (!profile) return { ok: false, reason: 'anon',     msg: 'Sign in to order' };
+      if (profile.role === 'pending')  return { ok: false, reason: 'pending',  msg: 'Account under review' };
+      if (profile.role === 'rejected') return { ok: false, reason: 'rejected', msg: 'Account not approved' };
+      if (profile.role === 'consumer') return { ok: false, reason: 'consumer', msg: 'Trade account required' };
+      if (['trade-restricted', 'trade-full', 'admin'].includes(profile.role)) return { ok: true };
+      return { ok: false, reason: 'unknown', msg: 'Sign in to order' };
+    },
+
+    add(product, qty) {
+      const cart = load();
+      const q = Math.max(1, Math.floor(Number(qty) || 1));
+      const existing = cart.find((l) => l.id === product.id);
+      if (existing) {
+        existing.qty += q;
+        // Refresh snapshot in case price/name/unit changed since last add.
+        existing.snapshot = snapshotFor(product);
+      } else {
+        cart.push({ id: product.id, qty: q, snapshot: snapshotFor(product) });
+      }
+      save(cart);
+      this.toast(`Added ${q} ${product.unit || 'kg'} — ${product.trade_name || product.name}`);
+    },
+
+    updateQty(id, qty) {
+      const cart = load();
+      const line = cart.find((l) => l.id === id);
+      if (!line) return;
+      const q = Math.max(1, Math.floor(Number(qty) || 1));
+      line.qty = q;
+      save(cart);
+    },
+
+    remove(id) { save(load().filter((l) => l.id !== id)); },
+    clear()    { save([]); },
+
+    totals(tier = 'bronze') {
+      const cart = load();
+      const subtotal = cart.reduce((s, l) => s + l.snapshot.price * l.qty, 0);
+      const pct      = TIER_DISCOUNT[tier] || 0;
+      const discount = Math.round(subtotal * pct);
+      const shipping = 0;
+      const tax      = 0;
+      const total    = subtotal - discount + shipping + tax;
+      return { subtotal, discount, discountPct: pct, shipping, tax, total, cart };
+    },
+
+    formatUSD,
+
+    /** Lightweight toast. Uses the shared .toast style if available. */
+    toast(msg) {
+      if (typeof showToast === 'function') {
+        showToast(msg, 'success');
+        return;
+      }
+      let el = document.getElementById('cart-toast');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'cart-toast';
+        el.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--green);' +
+          'color:var(--ink);padding:12px 18px;border-radius:6px;font-family:var(--font-body);' +
+          'font-size:14px;z-index:9999;opacity:0;transition:opacity .2s;box-shadow:0 6px 20px rgba(0,0,0,.4)';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      requestAnimationFrame(() => (el.style.opacity = '1'));
+      clearTimeout(el._t);
+      el._t = setTimeout(() => (el.style.opacity = '0'), 2600);
+    },
+
+    // ---------- Cart page renderer ----------
+    renderCartPage(container, profile) {
+      const t = this.totals(profile?.tier);
+      if (!t.cart.length) {
+        container.innerHTML = `
+          <div class="cart-empty">
+            <h2>Your cart is empty</h2>
+            <p class="text-dim">Browse the catalogue to add products.</p>
+            <a href="/portal/catalogue.html" class="btn btn--primary">Browse catalogue</a>
+          </div>`;
+        return;
+      }
+
+      const esc = (typeof escapeHtml === 'function')
+        ? escapeHtml
+        : (s) => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+      const lines = t.cart.map((l) => `
+        <tr data-line="${esc(l.id)}">
+          <td class="cart-line-product">
+            ${l.snapshot.img ? `<img src="${esc(l.snapshot.img)}" alt="">` : ''}
+            <div><strong>${esc(l.snapshot.name)}</strong><br>
+              <span class="text-dim">${esc(l.id)} &middot; ${formatUSD(l.snapshot.price)} / ${esc(l.snapshot.unit)}</span>
+            </div>
+          </td>
+          <td class="cart-line-qty">
+            <button type="button" class="qty-dec" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" min="1" step="1" value="${l.qty}" class="qty-input" aria-label="Quantity">
+            <button type="button" class="qty-inc" aria-label="Increase quantity">+</button>
+            <span class="text-dim">${esc(l.snapshot.unit)}</span>
+          </td>
+          <td class="cart-line-total">${formatUSD(l.snapshot.price * l.qty)}</td>
+          <td><button type="button" class="cart-line-remove" aria-label="Remove line">&times;</button></td>
+        </tr>`).join('');
+
+      const gate = this.canPurchase(profile);
+      const gateBlock = gate.ok
+        ? `<a href="/portal/checkout.html" class="btn btn--primary btn--full">Proceed to checkout</a>`
+        : `<div class="gate-notice">${esc(gate.msg)}</div>
+           ${gate.reason === 'consumer' || gate.reason === 'pending'
+             ? `<a href="/portal/formulation.html" class="btn btn--secondary btn--full">Request a formulation consultation</a>`
+             : ''}`;
+
+      container.innerHTML = `
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Line total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>${lines}</tbody>
+        </table>
+        <div class="cart-summary">
+          <div class="cart-summary__row"><span>Subtotal</span><span>${formatUSD(t.subtotal)}</span></div>
+          ${t.discount > 0
+            ? `<div class="cart-summary__row"><span>Tier discount (${esc(profile.tier)} &minus; ${(t.discountPct * 100).toFixed(0)}%)</span><span>&minus;${formatUSD(t.discount)}</span></div>`
+            : ''}
+          <div class="cart-summary__row text-dim"><span>Shipping</span><span>Quoted separately</span></div>
+          <div class="cart-summary__row cart-summary__row--total"><span>Total</span><span>${formatUSD(t.total)}</span></div>
+          ${gateBlock}
+          <button type="button" class="btn btn--text" id="cart-clear">Clear cart</button>
+        </div>`;
+
+      container.querySelectorAll('tr[data-line]').forEach((row) => {
+        const id = row.dataset.line;
+        const input = row.querySelector('.qty-input');
+        row.querySelector('.qty-dec').addEventListener('click', () => {
+          input.value = Math.max(1, Number(input.value) - 1);
+          Cart.updateQty(id, input.value); Cart.renderCartPage(container, profile);
+        });
+        row.querySelector('.qty-inc').addEventListener('click', () => {
+          input.value = Number(input.value) + 1;
+          Cart.updateQty(id, input.value); Cart.renderCartPage(container, profile);
+        });
+        input.addEventListener('change', () => {
+          Cart.updateQty(id, input.value); Cart.renderCartPage(container, profile);
+        });
+        row.querySelector('.cart-line-remove').addEventListener('click', () => {
+          Cart.remove(id); Cart.renderCartPage(container, profile);
+        });
+      });
+      const clearBtn = container.querySelector('#cart-clear');
+      if (clearBtn) clearBtn.addEventListener('click', () => {
+        if (confirm('Clear cart?')) { Cart.clear(); Cart.renderCartPage(container, profile); }
+      });
+    },
+  };
+
+  function snapshotFor(product) {
+    return {
+      name:  product.trade_name || product.name,
+      price: product.price,
+      unit:  product.unit || 'kg',
+      img:   product.img || product.image_url || '',
+      moq:   product.moq || 1,
+    };
+  }
+
+  window.Cart = Cart;
+})();
+
+// --- Legacy flat-function shims ---------------------------------
+// Existing call sites (portal dashboard, product overlay click handlers)
+// still reference these names. They now proxy into window.Cart.
+
+function getCart()       { return window.Cart.all(); }
+function getCartCount()  { return window.Cart.count(); }
+function removeFromCart(id) { window.Cart.remove(id); }
+function updateCartQty(id, qty) { window.Cart.updateQty(id, qty); }
+
+/** Legacy: called as `addToCart(productId, qty=1)` from inline onclick
+ *  handlers in the product overlay. Looks up the product in the loaded
+ *  PRODUCTS list so we can snapshot name/price/unit. */
+function addToCart(productId, qty = 1) {
+  const product = (typeof PRODUCTS !== 'undefined')
+    ? PRODUCTS.find((p) => p.id === productId)
+    : null;
+  if (!product) {
+    console.warn('addToCart: product not in PRODUCTS', productId);
+    return;
+  }
+  window.Cart.add(product, qty);
+  if (typeof closeOverlay === 'function') closeOverlay();
 }
 
 function updateCartBadge() {
   const badges = document.querySelectorAll('.cart-badge');
-  const count = getCartCount();
-  badges.forEach(b => {
+  const count = window.Cart.count();
+  badges.forEach((b) => {
     b.textContent = count;
     b.classList.toggle('hidden', count === 0);
   });
 }
 
-// --- Cart Page Rendering -----------------------------------
+// Keep the badge in sync whenever the cart changes.
+document.addEventListener('cart:change', updateCartBadge);
+document.addEventListener('DOMContentLoaded', updateCartBadge);
 
+// --- Cart page init (called from portal/cart.html) -----------
 async function initCartPage() {
   const container = document.getElementById('cart-container');
   if (!container) return;
@@ -69,129 +270,10 @@ async function initCartPage() {
   if (!auth) return;
   const { profile } = auth;
 
-  await loadProducts();
-  renderCart(profile);
-}
+  // loadProducts is not strictly required — snapshot holds pricing —
+  // but keep it so the nav/sidebar counts etc. reflect catalogue state.
+  if (typeof loadProducts === 'function') await loadProducts();
 
-function renderCart(profile) {
-  const container = document.getElementById('cart-container');
-  if (!container) return;
-
-  const cart = getCart();
-
-  if (cart.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
-          </svg>
-        </div>
-        <h3 class="empty-state__title">Your cart is empty</h3>
-        <p class="empty-state__text">Browse our catalogue to find products.</p>
-        <a href="${PATHS.CATALOGUE}" class="btn btn--primary">View Catalogue</a>
-      </div>
-    `;
-    return;
-  }
-
-  const discount = getTierDiscount(profile?.tier);
-  let subtotal = 0;
-
-  const itemsHTML = cart.map(item => {
-    const product = PRODUCTS.find(p => p.id === item.id);
-    if (!product) return '';
-
-    const layer = getProductLayer(product, profile);
-    const lineTotal = product.price * item.qty;
-    subtotal += lineTotal;
-
-    return `
-      <div class="cart-item" data-id="${product.id}">
-        <img class="cart-item__img" src="${product.img}" alt="${escapeHtml(layer.name)}"
-             onerror="this.style.background='var(--ink-mid)'">
-        <div>
-          <div class="cart-item__name">${escapeHtml(layer.name)}</div>
-          <div class="cart-item__unit">${product.unit} · ${formatPrice(product.price)} each</div>
-        </div>
-        <div class="qty">
-          <button class="qty__btn" data-action="dec" data-id="${product.id}">−</button>
-          <span class="qty__val">${item.qty}</span>
-          <button class="qty__btn" data-action="inc" data-id="${product.id}">+</button>
-        </div>
-        <span class="cart-item__price">${formatPrice(lineTotal)}</span>
-        <button class="cart-item__remove" data-action="remove" data-id="${product.id}" aria-label="Remove">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-    `;
-  }).join('');
-
-  const discountAmount = Math.round(subtotal * discount);
-  const total = subtotal - discountAmount;
-
-  container.innerHTML = `
-    <div class="cart-items">${itemsHTML}</div>
-    <div class="cart-summary">
-      <div class="cart-summary__row">
-        <span>Subtotal</span>
-        <span>${formatPrice(subtotal)}</span>
-      </div>
-      ${discount > 0 ? `
-        <div class="cart-summary__row cart-summary__discount">
-          <span>${profile.tier.charAt(0).toUpperCase() + profile.tier.slice(1)} discount (${(discount * 100).toFixed(0)}%)</span>
-          <span>−${formatPrice(discountAmount)}</span>
-        </div>
-      ` : ''}
-      <div class="cart-summary__row cart-summary__row--total">
-        <span>Total</span>
-        <span>${formatPrice(total)}</span>
-      </div>
-      <button class="btn btn--primary btn--full" style="margin-top:var(--sp-lg)" id="checkout-btn">
-        Proceed to Checkout
-      </button>
-    </div>
-  `;
-
-  // Checkout gate
-  const checkoutBtn = document.getElementById('checkout-btn');
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', async () => {
-      checkoutBtn.disabled = true;
-      checkoutBtn.textContent = 'Checking profile…';
-      const complete = await requireProfileFields(
-        ['first_name', 'last_name', 'addr1', 'city', 'state', 'zip'],
-        '/portal/cart.html',
-        'shipping'
-      );
-      if (complete) {
-        showToast('Checkout coming soon — contact us to place an order.', 'info');
-      }
-      checkoutBtn.disabled = false;
-      checkoutBtn.textContent = 'Proceed to Checkout';
-    });
-  }
-
-  // Event delegation for qty buttons
-  container.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-
-    const id = btn.dataset.id;
-    const action = btn.dataset.action;
-
-    if (action === 'remove') {
-      removeFromCart(id);
-      renderCart(profile);
-    } else if (action === 'inc') {
-      const item = getCart().find(i => i.id === id);
-      if (item) { updateCartQty(id, item.qty + 1); renderCart(profile); }
-    } else if (action === 'dec') {
-      const item = getCart().find(i => i.id === id);
-      if (item) { updateCartQty(id, item.qty - 1); renderCart(profile); }
-    }
-  });
+  window.Cart.renderCartPage(container, profile);
+  document.addEventListener('cart:change', () => window.Cart.renderCartPage(container, profile));
 }

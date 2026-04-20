@@ -302,15 +302,86 @@ function openProductDetail(product, profile, viewMode = 'auto') {
       </div>
       ` : ''}
 
-      <div style="display:flex;gap:var(--sp-md);margin-top:var(--sp-xl)">
-        ${product.price ? `<button class="btn btn--primary" onclick="addToCart('${product.id}')">Add to Cart</button>` : ''}
-        <button class="btn btn--secondary" onclick="closeOverlay()">Close</button>
-      </div>
+      ${renderPurchaseBlock(product, profile)}
     </div>
   `;
 
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  wirePurchaseBlock(product, profile);
+}
+
+/**
+ * Render the qty input + Add-to-Cart / gate notice for a product.
+ * Gate logic lives in Cart.canPurchase() so the cart page and the
+ * overlay stay in sync.
+ */
+function renderPurchaseBlock(product, profile) {
+  if (!product.price) {
+    return `<div style="display:flex;gap:var(--sp-md);margin-top:var(--sp-xl)">
+      <button class="btn btn--secondary" onclick="closeOverlay()">Close</button>
+    </div>`;
+  }
+
+  const gate = window.Cart.canPurchase(profile);
+  const minQty = product.moq || 1;
+  const unit   = product.unit || 'kg';
+
+  if (!gate.ok) {
+    const ctaLink =
+      gate.reason === 'anon'
+        ? `<a href="/login.html?next=/portal/catalogue.html" class="btn btn--primary">Sign in</a>`
+        : (gate.reason === 'consumer' || gate.reason === 'pending')
+          ? `<a href="/portal/formulation.html" class="btn btn--secondary">Request a formulation consultation</a>`
+          : '';
+    return `
+      <div class="product-detail-actions" style="margin-top:var(--sp-xl)">
+        <div class="gate-notice">${escapeHtml(gate.msg)}</div>
+        <div style="display:flex;gap:var(--sp-md)">
+          ${ctaLink}
+          <button class="btn btn--secondary" onclick="closeOverlay()">Close</button>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="product-detail-qty" style="margin-top:var(--sp-xl)">
+      <label for="qty-input-${product.id}">Quantity (${escapeHtml(unit)})</label>
+      <div class="qty-row">
+        <button type="button" id="qty-dec-${product.id}" aria-label="Decrease quantity">&minus;</button>
+        <input id="qty-input-${product.id}" type="number" min="${minQty}" step="1" value="${minQty}" aria-label="Quantity">
+        <button type="button" id="qty-inc-${product.id}" aria-label="Increase quantity">+</button>
+      </div>
+      <small class="text-dim">MOQ: ${minQty} ${escapeHtml(unit)}</small>
+    </div>
+    <div class="product-detail-actions" style="display:flex;gap:var(--sp-md);margin-top:var(--sp-lg)">
+      <button class="btn btn--primary" id="add-to-cart-btn-${product.id}">Add to cart</button>
+      <button class="btn btn--secondary" onclick="closeOverlay()">Close</button>
+    </div>`;
+}
+
+function wirePurchaseBlock(product, profile) {
+  if (!product.price) return;
+  const gate = window.Cart.canPurchase(profile);
+  if (!gate.ok) return;
+
+  const minQty = product.moq || 1;
+  const qtyInput = document.getElementById(`qty-input-${product.id}`);
+  const decBtn = document.getElementById(`qty-dec-${product.id}`);
+  const incBtn = document.getElementById(`qty-inc-${product.id}`);
+  const addBtn = document.getElementById(`add-to-cart-btn-${product.id}`);
+
+  if (decBtn) decBtn.addEventListener('click', () => {
+    qtyInput.value = Math.max(minQty, Number(qtyInput.value) - 1);
+  });
+  if (incBtn) incBtn.addEventListener('click', () => {
+    qtyInput.value = Number(qtyInput.value) + 1;
+  });
+  if (addBtn) addBtn.addEventListener('click', () => {
+    window.Cart.add(product, qtyInput.value);
+    closeOverlay();
+  });
 }
 
 /** Request a sample — sends email notification to admin */

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LVQBKN9FE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-3LVQBKN9FE');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — GACP LLC</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+<body data-env="sandbox">
+  <div class="page">
+
+    <!-- Focused nav: logo-only, always a way out home -->
+    <header class="checkout-nav">
+      <div class="container">
+        <a href="/" class="checkout-nav__logo" aria-label="GACP LLC home">
+          <img src="/images/logo.png" alt="GACP" width="40" height="40">
+          <span>GACP</span>
+        </a>
+        <a href="/portal/cart.html" class="checkout-nav__back">&larr; Back to cart</a>
+      </div>
+    </header>
+
+    <main class="page-main">
+      <div class="container" style="max-width:1080px">
+
+        <header class="portal-header" style="margin-top:var(--sp-2xl)">
+          <h1 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-sm)">Checkout</h1>
+          <div class="sandbox-badge" aria-live="polite">Sandbox — no real funds will be captured</div>
+        </header>
+
+        <div id="checkout-root" class="checkout-grid">
+          <form id="checkout-form" class="checkout-form" novalidate>
+            <section>
+              <h2>Shipping address</h2>
+              <div class="form-row">
+                <label>Contact name<input name="ship_name" required></label>
+                <label>Company<input name="ship_company"></label>
+              </div>
+              <label>Address line 1<input name="ship_addr1" required></label>
+              <label>Address line 2<input name="ship_addr2"></label>
+              <div class="form-row">
+                <label>City<input name="ship_city" required></label>
+                <label>State<input name="ship_state" required maxlength="2" placeholder="CA"></label>
+                <label>ZIP<input name="ship_zip" required inputmode="numeric"></label>
+              </div>
+              <div class="form-row">
+                <label>Phone<input name="ship_phone" type="tel" inputmode="tel"></label>
+                <label>Delivery notes<input name="notes" placeholder="e.g. dock hours, PO #"></label>
+              </div>
+            </section>
+
+            <section>
+              <h2>Payment</h2>
+              <p class="text-dim" style="font-size:var(--fs-sm);margin-bottom:var(--sp-md)">
+                Test card pre-filled — Visa 4111 1111 1111 1111, 12/27, CVV 123.
+              </p>
+              <label>Cardholder name<input name="card_name" required value="Trade Account"></label>
+              <div class="form-row">
+                <label>Card number<input name="card_number" required value="4111 1111 1111 1111" inputmode="numeric" autocomplete="cc-number"></label>
+                <label>Expiry (MMYY)<input name="card_expiry" required value="1227" maxlength="4" inputmode="numeric" autocomplete="cc-exp"></label>
+                <label>CVV<input name="card_cvv" required value="123" maxlength="4" inputmode="numeric" autocomplete="cc-csc"></label>
+              </div>
+              <label class="checkbox-row">
+                <input type="checkbox" id="billing_same" checked>
+                <span>Billing address same as shipping</span>
+              </label>
+              <div id="billing-fields" hidden>
+                <label>Billing ZIP<input name="bill_zip" inputmode="numeric"></label>
+              </div>
+            </section>
+
+            <button type="submit" class="btn btn--primary btn--full" id="place-order-btn">Place order</button>
+            <p class="text-dim fineprint">By placing this order you confirm your trade account details are accurate and that you are purchasing raw materials for qualified trade use. Freight will be quoted and billed separately against your carrier account.</p>
+          </form>
+
+          <aside id="order-summary" class="order-summary">
+            <h2>Order summary</h2>
+            <div id="summary-body"><p class="text-dim">Loading…</p></div>
+          </aside>
+        </div>
+
+        <div id="checkout-result" class="checkout-result" hidden></div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/geo.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/checkout.js"></script>
+  <script src="/js/cookie-banner.js"></script>
+</body>
+</html>

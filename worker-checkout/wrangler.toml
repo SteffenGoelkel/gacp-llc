@@ -1,0 +1,18 @@
+name = "gacp-checkout"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Route is bound manually in the Cloudflare dashboard (Workers Routes under
+# the gacp.llc zone). Intended binding:
+#
+#   [triggers]
+#   routes = ["gacp.llc/api/checkout*"]
+
+# Secrets (set via `wrangler secret put <NAME>` or the dashboard — do NOT commit):
+#   MICAMP_API_USER
+#   MICAMP_API_PASS
+#   MICAMP_MERCHANT_KEY
+#   MICAMP_GATEWAY_URL     = https://gateway.mipaymentchoice.com
+#   SUPABASE_URL           = https://dbpgofivflbzjupwpegr.supabase.co
+#   SUPABASE_SERVICE_KEY   = <service-role key from Supabase project settings>
+
