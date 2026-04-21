@@ -1086,10 +1086,8 @@ body[data-env="production"] .sandbox-badge { display: none; }
   border-radius: var(--radius-md);
   background: var(--ink-light);
   align-self: start;
-  position: sticky;
-  /* === Sticky summary under fixed nav: nav is z-index:1000, stays above === */
-  top: calc(var(--nav-h) + var(--sp-md));
-  z-index: 1;
+  /* === No sticky: summary scrolls with page. Sticky+fixed-nav interaction
+        was causing overlap under the nav; not worth the layout fight. === */
 }
 .order-summary h2 {
   font-family: var(--font-display);
@@ -1126,7 +1124,8 @@ body[data-env="production"] .sandbox-badge { display: none; }
 }
 
 .checkout-result {
-  /* === Fit the form column; summary stays visible in the right column === */
+  /* === Fit the form column; summary stays visible in the right column.
+        Class is .failed (not BEM --failed) — must match js/checkout.js === */
   width: 100%;
   margin: 0;
   padding: var(--sp-2xl);
@@ -1135,7 +1134,7 @@ body[data-env="production"] .sandbox-badge { display: none; }
   background: rgba(78, 138, 86, 0.06);
   text-align: left;
 }
-.checkout-result--failed {
+.checkout-result.failed {
   border-color: rgba(212, 98, 62, 0.5);
   background: rgba(212, 98, 62, 0.08);
 }
@@ -1143,6 +1142,10 @@ body[data-env="production"] .sandbox-badge { display: none; }
   font-family: var(--font-display);
   font-size: var(--fs-xl);
   margin-bottom: var(--sp-md);
+  color: var(--green);
+}
+.checkout-result.failed h2 {
+  color: var(--terra);
 }
 .checkout-result dl {
   display: grid;
@@ -1266,18 +1269,19 @@ body[data-env="production"] .sandbox-badge { display: none; }
 }
 .form-error-summary a:hover { color: var(--cream); }
 
-/* Card brand hint (small text beside card number field) */
-.field-card-number { position: relative; }
+/* Card brand hint — sits as a static block below the input (was absolute
+   and overlapped typed text) */
 .card-brand-hint {
-  position: absolute;
-  top: 32px;
-  right: 12px;
+  display: block;
+  margin-top: 4px;
+  min-height: 1em;
   font-size: 0.75rem;
   color: var(--sage-lt);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   pointer-events: none;
 }
+.card-brand-hint:empty { display: none; }
 
 /* Hide sandbox badge when body[data-env="production"] */
 body[data-env="production"] .sandbox-badge { display: none; }
