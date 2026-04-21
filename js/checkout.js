@@ -42,6 +42,31 @@
     bill_zip:     form.bill_zip,
   };
 
+  // ---- Pre-fill from profile (only empty fields; no card data) -------------
+  function prefillIfEmpty(field, value) {
+    if (!field) return;
+    if (field.value && field.value.trim()) return; // don't overwrite existing
+    if (value == null || value === '') return;     // nothing to set
+    field.value = String(value).trim();
+  }
+
+  const fullName = `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim();
+  prefillIfEmpty(fields.ship_name,  fullName);
+  prefillIfEmpty(form.ship_company, profile?.company);
+  prefillIfEmpty(fields.ship_addr1, profile?.addr1);
+  prefillIfEmpty(form.ship_addr2,   profile?.addr2);
+  prefillIfEmpty(fields.ship_city,  profile?.city);
+  prefillIfEmpty(fields.ship_zip,   profile?.zip);
+  prefillIfEmpty(fields.ship_phone, profile?.phone);
+  prefillIfEmpty(fields.card_name,  fullName); // kept as "Trade Account" unless field empty
+
+  // State dropdown: only set if value matches a US_STATES entry AND an <option> exists
+  if (fields.ship_state && !fields.ship_state.value && profile?.state) {
+    const st = String(profile.state).trim().toUpperCase();
+    const hasOption = Array.from(fields.ship_state.options).some((o) => o.value === st);
+    if (V.US_STATES.has(st) && hasOption) fields.ship_state.value = st;
+  }
+
   // ---- Attach formatters ---------------------------------------------------
   V.attachCardFormatter(fields.card_number, document.getElementById('card_brand_hint'));
   fields.card_number.dispatchEvent(new Event('input')); // fire once so pre-filled value sets brand hint
