@@ -4,9 +4,9 @@
   'use strict';
 
   const V = window.Validation;
-  const profile = await Auth.requireProfile();
-  const { createClient } = supabase; // from @supabase/supabase-js UMD
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const auth = await requireAuth();
+  if (!auth) return;
+  const { profile } = auth;
 
   const totals = Cart.totals(profile?.tier);
   if (!totals.cart.length) { location.replace('/portal/cart.html'); return; }
@@ -157,7 +157,7 @@
       client_order_id: crypto.randomUUID(),
     };
 
-    const { data: { session } } = await sb.auth.getSession();
+    const { data: { session } } = await _sb.auth.getSession();
     if (!session) {
       showResult({ ok: false, gateway_message: 'Your session has expired. Please sign in again.' });
       return;
