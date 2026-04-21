@@ -862,12 +862,15 @@
 }
 
 /* --- Cart page --------------------------------------------- */
+/* === Empty cart layout: centred block within the portal column === */
 .cart-empty {
   text-align: center;
-  padding: var(--sp-4xl) var(--sp-md);
+  padding: var(--sp-3xl) var(--sp-md);
+  max-width: 480px;
+  margin: 0 auto;
 }
-.cart-empty h2 { margin-bottom: var(--sp-md); }
-.cart-empty p { margin-bottom: var(--sp-lg); }
+.cart-empty h2 { font-family: var(--font-display); margin-bottom: var(--sp-md); }
+.cart-empty p  { color: var(--text-dim); margin-bottom: var(--sp-lg); }
 
 .cart-table {
   width: 100%;
