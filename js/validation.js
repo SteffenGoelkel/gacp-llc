@@ -81,6 +81,16 @@
     return { ok: true, value: v };
   }
 
+  function validatePhoneRequired(value) {
+    const v = String(value || '').trim();
+    if (!v) return { ok: false, msg: 'Phone number is required.' };
+    const digits = v.replace(/\D/g, '');
+    if (digits.length < 7 || digits.length > 15) {
+      return { ok: false, msg: 'Phone number looks invalid.' };
+    }
+    return { ok: true, value: v };
+  }
+
   // Luhn check for card number
   function luhn(digits) {
     let sum = 0, alt = false;
@@ -237,7 +247,7 @@
     required, minLen,
     // field validators
     validateName, validateAddress1, validateCity, validateState, validateZip,
-    validatePhoneOptional,
+    validatePhoneOptional, validatePhoneRequired,
     validateCardNumber, validateExpiry, validateCvv,
     // helpers
     detectBrand, luhn,

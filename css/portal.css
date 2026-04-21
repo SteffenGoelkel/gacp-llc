@@ -1087,7 +1087,9 @@ body[data-env="production"] .sandbox-badge { display: none; }
   background: var(--ink-light);
   align-self: start;
   position: sticky;
-  top: var(--sp-lg);
+  /* === Sticky summary under fixed nav: nav is z-index:1000, stays above === */
+  top: calc(var(--nav-h) + var(--sp-md));
+  z-index: 1;
 }
 .order-summary h2 {
   font-family: var(--font-display);
@@ -1124,13 +1126,14 @@ body[data-env="production"] .sandbox-badge { display: none; }
 }
 
 .checkout-result {
-  max-width: 640px;
-  margin: var(--sp-3xl) auto;
+  /* === Fit the form column; summary stays visible in the right column === */
+  width: 100%;
+  margin: 0;
   padding: var(--sp-2xl);
   border: 1px solid rgba(78, 138, 86, 0.4);
   border-radius: var(--radius-md);
   background: rgba(78, 138, 86, 0.06);
-  text-align: center;
+  text-align: left;
 }
 .checkout-result--failed {
   border-color: rgba(212, 98, 62, 0.5);

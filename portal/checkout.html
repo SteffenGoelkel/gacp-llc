@@ -38,6 +38,7 @@
           </div>
 
           <div id="checkout-root" class="checkout-grid">
+            <div class="checkout-main-col">
             <form id="checkout-form" class="checkout-form" novalidate aria-describedby="form-error-summary">
               <div id="form-error-summary" class="form-error-summary" hidden aria-live="polite" role="alert">
                 <strong>Please review the following:</strong>
@@ -141,13 +142,14 @@
 
                 <div class="form-row">
                   <div class="field">
-                    <label for="ship_phone">Phone <span class="optional">optional</span></label>
+                    <label for="ship_phone">Phone <span class="req" aria-hidden="true">*</span></label>
                     <input id="ship_phone" name="ship_phone" type="tel"
+                           required
                            pattern="[\d\s\-\+\(\)\.]{7,20}"
                            inputmode="tel" maxlength="20"
                            autocomplete="tel"
                            placeholder="(555) 123-4567"
-                           aria-describedby="err-ship_phone">
+                           aria-required="true" aria-describedby="err-ship_phone">
                     <div id="err-ship_phone" class="field-error" aria-live="polite"></div>
                   </div>
                   <div class="field">
@@ -229,13 +231,14 @@
               <p class="text-sm text-dim fineprint">By placing this order you confirm your trade account details are accurate and that you are purchasing raw materials for qualified trade use. Freight will be quoted and billed separately against your carrier account.</p>
             </form>
 
+            <div id="checkout-result" class="checkout-result" hidden></div>
+            </div>
+
             <aside id="order-summary" class="order-summary">
               <h2>Order summary</h2>
               <div id="summary-body"><p class="text-sm text-dim">Loading…</p></div>
             </aside>
           </div>
-
-          <div id="checkout-result" class="checkout-result" hidden></div>
 
         </div>
       </div>

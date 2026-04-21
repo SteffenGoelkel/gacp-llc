@@ -94,7 +94,7 @@
       case 'ship_city':   res = V.validateCity(el.value); break;
       case 'ship_state':  res = V.validateState(el.value); break;
       case 'ship_zip':    res = V.validateZip(el.value, 'ZIP'); break;
-      case 'ship_phone':  res = V.validatePhoneOptional(el.value); break;
+      case 'ship_phone':  res = V.validatePhoneRequired(el.value); break;
       case 'card_name':   res = V.validateName(el.value, 'Cardholder name'); break;
       case 'card_number': res = V.validateCardNumber(el.value); break;
       case 'card_expiry': res = V.validateExpiry(el.value); break;
@@ -124,7 +124,6 @@
 
   // ---- Submit --------------------------------------------------------------
   const resultEl = document.getElementById('checkout-result');
-  const rootEl   = document.getElementById('checkout-root');
   const btn      = document.getElementById('place-order-btn');
 
   form.addEventListener('submit', async (e) => {
@@ -212,7 +211,8 @@
   function showResult(r) {
     btn.disabled = false;
     btn.textContent = 'Place order';
-    rootEl.hidden = true;
+    // Hide only the form — keep order summary visible in the right column.
+    form.hidden = true;
     resultEl.hidden = false;
     if (r.ok) {
       Cart.clear();
@@ -234,7 +234,14 @@
         <h2>Payment not completed</h2>
         <p>${escapeHtml(r.gateway_message || r.error || 'The transaction could not be processed.')}</p>
         <a href="/portal/cart.html" class="btn btn--primary">Back to cart</a>
-        <button class="btn btn--secondary" onclick="location.reload()">Try again</button>`;
+        <button type="button" class="btn btn--secondary" id="checkout-try-again">Try again</button>`;
+      const tryAgainBtn = resultEl.querySelector('#checkout-try-again');
+      if (tryAgainBtn) tryAgainBtn.addEventListener('click', () => {
+        resultEl.hidden = true;
+        resultEl.classList.remove('failed');
+        resultEl.innerHTML = '';
+        form.hidden = false;
+      });
     }
   }
 
