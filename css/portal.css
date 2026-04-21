@@ -1278,3 +1278,30 @@ body[data-env="production"] .sandbox-badge { display: none; }
 
 /* Hide sandbox badge when body[data-env="production"] */
 body[data-env="production"] .sandbox-badge { display: none; }
+
+/* === International order notice === */
+.cart-international-notice {
+  max-width: 380px;
+  margin: 32px 0 0 auto;
+  padding: 22px;
+  border: 1px solid var(--terra);
+  border-radius: 6px;
+  background: rgba(196, 106, 58, 0.06);
+}
+.cart-international-notice h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.125rem;
+  margin: 0 0 10px 0;
+  color: var(--terra);
+}
+.cart-international-notice p {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--cream);
+  margin: 0 0 16px 0;
+}
+.cart-international-notice .btn--primary {
+  display: block;
+  text-align: center;
+  margin-bottom: 8px;
+}

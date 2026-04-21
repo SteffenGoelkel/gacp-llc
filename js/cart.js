@@ -156,12 +156,24 @@
         </tr>`).join('');
 
       const gate = this.canPurchase(profile);
-      const gateBlock = gate.ok
-        ? `<a href="/portal/checkout.html" class="btn btn--primary btn--full">Proceed to checkout</a>`
-        : `<div class="gate-notice">${esc(gate.msg)}</div>
-           ${gate.reason === 'consumer' || gate.reason === 'pending'
-             ? `<a href="/portal/formulation.html" class="btn btn--secondary btn--full">Request a formulation consultation</a>`
-             : ''}`;
+      // International gate: country set AND not US → show inquiry notice instead of checkout CTA.
+      // Null/empty country treated as US-equivalent for legacy accounts.
+      const country = String(profile?.country || '').trim().toUpperCase();
+      const isIntl = country && country !== 'US';
+
+      const gateBlock = isIntl
+        ? `<div class="cart-international-notice">
+             <h3>International orders</h3>
+             <p>GACP currently ships to US destinations only. For international inquiries, please contact our sales team — we'll work with you on freight quoting, customs documentation, and product availability for your jurisdiction.</p>
+             <a href="mailto:info@gacp.llc?subject=International%20Order%20Inquiry%20-%20GACP" class="btn btn--primary">Contact sales</a>
+             <button type="button" class="btn btn--secondary" id="cart-clear">Clear cart</button>
+           </div>`
+        : (gate.ok
+          ? `<a href="/portal/checkout.html" class="btn btn--primary btn--full">Proceed to checkout</a>`
+          : `<div class="gate-notice">${esc(gate.msg)}</div>
+             ${gate.reason === 'consumer' || gate.reason === 'pending'
+               ? `<a href="/portal/formulation.html" class="btn btn--secondary btn--full">Request a formulation consultation</a>`
+               : ''}`);
 
       container.innerHTML = `
         <table class="cart-table">
@@ -183,7 +195,7 @@
           <div class="cart-summary__row text-dim"><span>Shipping</span><span>Quoted separately</span></div>
           <div class="cart-summary__row cart-summary__row--total"><span>Total</span><span>${formatUSD(t.total)}</span></div>
           ${gateBlock}
-          <button type="button" class="btn btn--text" id="cart-clear">Clear cart</button>
+          ${isIntl ? '' : `<button type="button" class="btn btn--text" id="cart-clear">Clear cart</button>`}
         </div>`;
 
       container.querySelectorAll('tr[data-line]').forEach((row) => {
