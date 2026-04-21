@@ -44,6 +44,7 @@
 
   // ---- Attach formatters ---------------------------------------------------
   V.attachCardFormatter(fields.card_number, document.getElementById('card_brand_hint'));
+  fields.card_number.dispatchEvent(new Event('input')); // fire once so pre-filled value sets brand hint
   V.attachExpiryFormatter(fields.card_expiry);
   V.attachDigitsOnly(fields.card_cvv);
   V.attachDigitsOnly(fields.ship_zip);  // keep separators out; pattern allows dash via paste
