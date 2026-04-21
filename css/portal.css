@@ -1164,3 +1164,117 @@ body[data-env="production"] .sandbox-badge { display: none; }
   padding: 6px 0;
 }
 .btn--text:hover { color: var(--cream); }
+
+/* === Validation UI additions === */
+/* ==========================================================================
+   Append to css/portal.css — validation UI additions
+   ========================================================================== */
+
+/* Field container — wraps each label + input + inline error */
+.checkout-form .field { margin-bottom: 14px; }
+
+/* Required asterisk */
+.checkout-form .req {
+  color: var(--terra);
+  margin-left: 2px;
+  font-weight: 600;
+}
+
+/* Optional hint */
+.checkout-form .optional {
+  color: var(--sage-lt);
+  font-size: 0.75rem;
+  font-style: italic;
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+/* Select styling matches input */
+.checkout-form select {
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 4px;
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9375rem;
+  margin-top: 4px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%236b8f7a' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+.checkout-form select option {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+/* Focus state */
+.checkout-form input:focus,
+.checkout-form select:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px rgba(74,154,90,.2);
+}
+
+/* Invalid state */
+.checkout-form input.is-invalid,
+.checkout-form select.is-invalid {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px rgba(196,106,58,.15);
+}
+
+/* Inline error message under field */
+.checkout-form .field-error {
+  color: var(--terra);
+  font-size: 0.75rem;
+  margin-top: 4px;
+  min-height: 1em;
+  line-height: 1.4;
+}
+.checkout-form .field-error:empty { display: none; }
+
+/* Summary banner at top of form */
+.form-error-summary {
+  background: rgba(196,106,58,.08);
+  border: 1px solid var(--terra);
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+}
+.form-error-summary strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--terra);
+}
+.form-error-summary ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--cream);
+}
+.form-error-summary li { margin-bottom: 3px; }
+.form-error-summary a {
+  color: var(--terra);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.form-error-summary a:hover { color: var(--cream); }
+
+/* Card brand hint (small text beside card number field) */
+.field-card-number { position: relative; }
+.card-brand-hint {
+  position: absolute;
+  top: 32px;
+  right: 12px;
+  font-size: 0.75rem;
+  color: var(--sage-lt);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  pointer-events: none;
+}
+
+/* Hide sandbox badge when body[data-env="production"] */
+body[data-env="production"] .sandbox-badge { display: none; }

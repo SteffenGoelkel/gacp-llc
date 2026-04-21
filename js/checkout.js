@@ -1,107 +1,169 @@
-/* ============================================================
-   GACP LLC — checkout.js
-   Drives the Checkout form: renders summary from the cart,
-   submits to /api/checkout, renders result.
-   Pricing is recomputed server-side — this file is UX only.
-   ============================================================ */
-
+// js/checkout.js — drives the checkout form, validates via Validation module,
+// submits to /api/checkout, renders success/decline result screen.
 (async function () {
-  const auth = await requireAuth();
-  if (!auth) return;
-  const { profile } = auth;
+  'use strict';
 
-  const gate = window.Cart.canPurchase(profile);
-  if (!gate.ok) {
-    window.location.replace('/portal/cart.html');
-    return;
-  }
+  const V = window.Validation;
+  const profile = await Auth.requireProfile();
+  const { createClient } = supabase; // from @supabase/supabase-js UMD
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const totals = window.Cart.totals(profile?.tier);
-  if (!totals.cart.length) {
-    window.location.replace('/portal/cart.html');
-    return;
-  }
+  const totals = Cart.totals(profile?.tier);
+  if (!totals.cart.length) { location.replace('/portal/cart.html'); return; }
 
-  const { formatUSD } = window.Cart;
-  const esc = escapeHtml;
-
-  // ---- Render summary ----------------------------------------------------
-  const body = document.getElementById('summary-body');
-  body.innerHTML =
+  // ---- Render summary ------------------------------------------------------
+  const summaryBody = document.getElementById('summary-body');
+  summaryBody.innerHTML =
     totals.cart.map((l) => `
       <div class="summary-line">
-        <div>
-          <strong>${esc(l.snapshot.name)}</strong>
-          <small>${l.qty} ${esc(l.snapshot.unit)} &times; ${formatUSD(l.snapshot.price)}</small>
-        </div>
-        <div>${formatUSD(l.snapshot.price * l.qty)}</div>
+        <div>${escapeHtml(l.snapshot.name)}<small>${l.qty} ${escapeHtml(l.snapshot.unit)} × ${Cart.formatUSD(l.snapshot.price)}</small></div>
+        <div>${Cart.formatUSD(l.snapshot.price * l.qty)}</div>
       </div>`).join('') +
-    `<div class="summary-row"><span>Subtotal</span><span>${formatUSD(totals.subtotal)}</span></div>` +
+    `<div class="summary-row"><span>Subtotal</span><span>${Cart.formatUSD(totals.subtotal)}</span></div>` +
     (totals.discount > 0
-      ? `<div class="summary-row"><span>Tier discount (${esc(profile.tier)})</span><span>&minus;${formatUSD(totals.discount)}</span></div>`
+      ? `<div class="summary-row"><span>Tier discount (${escapeHtml(profile.tier)})</span><span>&minus;${Cart.formatUSD(totals.discount)}</span></div>`
       : '') +
-    `<div class="summary-row"><span>Shipping</span><span class="text-dim">Quoted separately</span></div>
-     <div class="summary-row summary-row--total"><span>Total</span><span>${formatUSD(totals.total)}</span></div>`;
+    `<div class="summary-row"><span>Shipping</span><span>Quoted separately</span></div>
+     <div class="summary-row total"><span>Total</span><span>${Cart.formatUSD(totals.total)}</span></div>`;
 
-  // ---- Pre-fill shipping fields from profile if we have them --------------
+  // ---- Grab form elements --------------------------------------------------
   const form = document.getElementById('checkout-form');
-  const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ');
-  const setIfEmpty = (name, value) => {
-    const el = form.elements.namedItem(name);
-    if (el && !el.value && value) el.value = value;
+  const fields = {
+    ship_name:    form.ship_name,
+    ship_addr1:   form.ship_addr1,
+    ship_city:    form.ship_city,
+    ship_state:   form.ship_state,
+    ship_zip:     form.ship_zip,
+    ship_phone:   form.ship_phone,
+    card_name:    form.card_name,
+    card_number:  form.card_number,
+    card_expiry:  form.card_expiry,
+    card_cvv:     form.card_cvv,
+    bill_zip:     form.bill_zip,
   };
-  setIfEmpty('ship_name',    fullName);
-  setIfEmpty('ship_company', profile.company);
-  setIfEmpty('ship_addr1',   profile.addr1);
-  setIfEmpty('ship_addr2',   profile.addr2);
-  setIfEmpty('ship_city',    profile.city);
-  setIfEmpty('ship_state',   profile.state);
-  setIfEmpty('ship_zip',     profile.zip);
-  setIfEmpty('ship_phone',   profile.phone);
 
-  // ---- Billing toggle ----------------------------------------------------
-  const billingSame = document.getElementById('billing_same');
+  // ---- Attach formatters ---------------------------------------------------
+  V.attachCardFormatter(fields.card_number, document.getElementById('card_brand_hint'));
+  V.attachExpiryFormatter(fields.card_expiry);
+  V.attachDigitsOnly(fields.card_cvv);
+  V.attachDigitsOnly(fields.ship_zip);  // keep separators out; pattern allows dash via paste
+  V.attachDigitsOnly(fields.bill_zip);
+
+  // ---- Billing toggle ------------------------------------------------------
+  const billingSame   = document.getElementById('billing_same');
   const billingFields = document.getElementById('billing-fields');
-  billingSame.addEventListener('change', () => { billingFields.hidden = billingSame.checked; });
+  billingSame.addEventListener('change', () => {
+    billingFields.hidden = billingSame.checked;
+    if (billingSame.checked) V.setFieldError(fields.bill_zip, '');
+  });
 
-  // ---- Submit ------------------------------------------------------------
+  // ---- On-blur validation (per field) --------------------------------------
+  function validateField(name) {
+    const el = fields[name];
+    if (!el) return { ok: true };
+    let res;
+    switch (name) {
+      case 'ship_name':   res = V.validateName(el.value, 'Contact name'); break;
+      case 'ship_addr1':  res = V.validateAddress1(el.value); break;
+      case 'ship_city':   res = V.validateCity(el.value); break;
+      case 'ship_state':  res = V.validateState(el.value); break;
+      case 'ship_zip':    res = V.validateZip(el.value, 'ZIP'); break;
+      case 'ship_phone':  res = V.validatePhoneOptional(el.value); break;
+      case 'card_name':   res = V.validateName(el.value, 'Cardholder name'); break;
+      case 'card_number': res = V.validateCardNumber(el.value); break;
+      case 'card_expiry': res = V.validateExpiry(el.value); break;
+      case 'card_cvv': {
+        const cardRes = V.validateCardNumber(fields.card_number.value);
+        res = V.validateCvv(el.value, cardRes.ok ? cardRes.brand : null);
+        break;
+      }
+      case 'bill_zip':
+        if (billingSame.checked) { res = { ok: true }; break; }
+        res = V.validateZip(el.value, 'Billing ZIP'); break;
+      default: res = { ok: true };
+    }
+    V.setFieldError(el, res.ok ? '' : res.msg);
+    return res;
+  }
+
+  Object.keys(fields).forEach((name) => {
+    const el = fields[name];
+    if (!el) return;
+    el.addEventListener('blur', () => validateField(name));
+    el.addEventListener('input', () => {
+      // Clear error as user edits, but don't re-validate until blur
+      if (el.classList.contains('is-invalid')) V.setFieldError(el, '');
+    });
+  });
+
+  // ---- Submit --------------------------------------------------------------
   const resultEl = document.getElementById('checkout-result');
-  const rootEl = document.getElementById('checkout-root');
-  const btn = document.getElementById('place-order-btn');
+  const rootEl   = document.getElementById('checkout-root');
+  const btn      = document.getElementById('place-order-btn');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Validate all fields
+    const errors = [];
+    const names = ['ship_name','ship_addr1','ship_city','ship_state','ship_zip','ship_phone',
+                   'card_name','card_number','card_expiry','card_cvv','bill_zip'];
+    const results = {};
+    for (const name of names) {
+      const r = validateField(name);
+      results[name] = r;
+      if (!r.ok) errors.push({ id: name, msg: r.msg });
+    }
+
+    if (errors.length) {
+      V.showSummary(errors);
+      const first = document.getElementById(errors[0].id);
+      if (first) { first.focus(); first.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      return;
+    }
+    V.showSummary([]);
+
     btn.disabled = true;
     btn.textContent = 'Processing…';
 
     const data = Object.fromEntries(new FormData(form));
     const shipping_addr = {
-      name: data.ship_name, company: data.ship_company,
-      addr1: data.ship_addr1, addr2: data.ship_addr2,
-      city: data.ship_city, state: data.ship_state, zip: data.ship_zip,
-      phone: data.ship_phone,
+      name:    results.ship_name.value,
+      company: (data.ship_company || '').trim(),
+      addr1:   results.ship_addr1.value,
+      addr2:   (data.ship_addr2 || '').trim(),
+      city:    results.ship_city.value,
+      state:   results.ship_state.value,
+      zip:     results.ship_zip.value,
+      phone:   results.ship_phone.value,
     };
     const billing_addr = billingSame.checked
       ? shipping_addr
-      : { ...shipping_addr, zip: data.bill_zip || data.ship_zip };
+      : { ...shipping_addr, zip: results.bill_zip.value };
 
     const payload = {
       items: totals.cart.map((l) => ({ id: l.id, qty: l.qty })),
       shipping_addr,
       billing_addr,
-      contact_phone: data.ship_phone,
-      notes: data.notes,
+      contact_phone: shipping_addr.phone,
+      notes: (data.notes || '').trim(),
       card: {
-        number: data.card_number,
-        expiry: data.card_expiry,
-        cvv:    data.card_cvv,
-        name:   data.card_name,
+        number: results.card_number.value,   // digits only (from Luhn validator)
+        expiry: results.card_expiry.value,   // MMYY
+        cvv:    results.card_cvv.value,
+        name:   results.card_name.value,
+        brand:  results.card_number.brand || 'Card',
       },
       client_order_id: crypto.randomUUID(),
     };
 
-    const { data: { session } } = await _sb.auth.getSession();
-    let res, respJson;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      showResult({ ok: false, gateway_message: 'Your session has expired. Please sign in again.' });
+      return;
+    }
+
+    let res;
     try {
       res = await fetch('/api/checkout', {
         method: 'POST',
@@ -111,12 +173,14 @@
         },
         body: JSON.stringify(payload),
       });
-      respJson = await res.json().catch(() => ({ ok: false, error: 'bad_response' }));
     } catch (err) {
       showResult({ ok: false, gateway_message: 'Network error. Check connection and retry.' });
       return;
     }
-    showResult(respJson);
+    let json;
+    try { json = await res.json(); }
+    catch { json = { ok: false, gateway_message: 'Unexpected server response.' }; }
+    showResult(json);
   });
 
   function showResult(r) {
@@ -124,33 +188,33 @@
     btn.textContent = 'Place order';
     rootEl.hidden = true;
     resultEl.hidden = false;
-
     if (r.ok) {
-      window.Cart.clear();
-      resultEl.classList.remove('checkout-result--failed');
+      Cart.clear();
+      resultEl.classList.remove('failed');
       resultEl.innerHTML = `
         <h2>Order placed</h2>
-        <p>Thank you — a confirmation has been logged against your account.</p>
+        <p>Thank you — a confirmation has been logged against your account. A receipt will arrive by email shortly.</p>
         <dl>
-          <dt>Order ID</dt><dd>${esc(r.order_id || '—')}</dd>
-          <dt>Transaction ID</dt><dd>${esc(r.payment_id || '—')}</dd>
-          <dt>Auth code</dt><dd>${esc(r.auth_code || '—')}</dd>
-          <dt>Amount</dt><dd>${formatUSD(r.total_cents || 0)}</dd>
-          <dt>Card</dt><dd>${esc(r.card_brand || 'Card')} ending ${esc(r.last4 || '----')}</dd>
+          <dt>Order ID</dt><dd>${escapeHtml(r.order_id || '—')}</dd>
+          <dt>Transaction ID</dt><dd>${escapeHtml(r.payment_id || '—')}</dd>
+          <dt>Auth code</dt><dd>${escapeHtml(r.auth_code || '—')}</dd>
+          <dt>Amount</dt><dd>${Cart.formatUSD(r.total_cents || 0)}</dd>
+          <dt>Card</dt><dd>${escapeHtml(r.card_brand || 'Card')} ending ${escapeHtml(r.last4 || '----')}</dd>
         </dl>
-        <div style="display:flex;gap:var(--sp-md);justify-content:center;margin-top:var(--sp-lg)">
-          <a href="/portal/dashboard.html" class="btn btn--primary">Back to dashboard</a>
-          <a href="/portal/catalogue.html" class="btn btn--secondary">Keep browsing</a>
-        </div>`;
+        <a href="/portal/dashboard.html" class="btn btn--primary">Back to dashboard</a>`;
     } else {
-      resultEl.classList.add('checkout-result--failed');
+      resultEl.classList.add('failed');
       resultEl.innerHTML = `
         <h2>Payment not completed</h2>
-        <p>${esc(r.gateway_message || r.error || 'The transaction could not be processed.')}</p>
-        <div style="display:flex;gap:var(--sp-md);justify-content:center;margin-top:var(--sp-lg)">
-          <a href="/portal/cart.html" class="btn btn--primary">Back to cart</a>
-          <button type="button" class="btn btn--secondary" onclick="location.reload()">Try again</button>
-        </div>`;
+        <p>${escapeHtml(r.gateway_message || r.error || 'The transaction could not be processed.')}</p>
+        <a href="/portal/cart.html" class="btn btn--primary">Back to cart</a>
+        <button class="btn btn--secondary" onclick="location.reload()">Try again</button>`;
     }
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+    );
   }
 })();

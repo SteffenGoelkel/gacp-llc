@@ -1,113 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LVQBKN9FE"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-3LVQBKN9FE');
-  </script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout — GACP LLC</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout — GACP</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" href="/images/logo.png" type="image/png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/images/favicon.ico">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/layout.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/portal.css">
+  <link rel="stylesheet" href="/css/geo-block.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body data-env="sandbox">
-  <div class="page">
+<body class="portal-body" data-env="sandbox">
+  <div id="geo-banner-slot"></div>
+  <div id="nav-slot"></div>
 
-    <!-- Focused nav: logo-only, always a way out home -->
-    <header class="checkout-nav">
-      <div class="container">
-        <a href="/" class="checkout-nav__logo" aria-label="GACP LLC home">
-          <img src="/images/logo.png" alt="GACP" width="40" height="40">
-          <span>GACP</span>
-        </a>
-        <a href="/portal/cart.html" class="checkout-nav__back">&larr; Back to cart</a>
-      </div>
+  <main class="portal-main">
+    <header class="portal-header">
+      <h1>Checkout</h1>
+      <div class="sandbox-badge" aria-live="polite">SANDBOX — no real funds will be captured</div>
     </header>
 
-    <main class="page-main">
-      <div class="container" style="max-width:1080px">
-
-        <header class="portal-header" style="margin-top:var(--sp-2xl)">
-          <h1 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-sm)">Checkout</h1>
-          <div class="sandbox-badge" aria-live="polite">Sandbox — no real funds will be captured</div>
-        </header>
-
-        <div id="checkout-root" class="checkout-grid">
-          <form id="checkout-form" class="checkout-form" novalidate>
-            <section>
-              <h2>Shipping address</h2>
-              <div class="form-row">
-                <label>Contact name<input name="ship_name" required></label>
-                <label>Company<input name="ship_company"></label>
-              </div>
-              <label>Address line 1<input name="ship_addr1" required></label>
-              <label>Address line 2<input name="ship_addr2"></label>
-              <div class="form-row">
-                <label>City<input name="ship_city" required></label>
-                <label>State<input name="ship_state" required maxlength="2" placeholder="CA"></label>
-                <label>ZIP<input name="ship_zip" required inputmode="numeric"></label>
-              </div>
-              <div class="form-row">
-                <label>Phone<input name="ship_phone" type="tel" inputmode="tel"></label>
-                <label>Delivery notes<input name="notes" placeholder="e.g. dock hours, PO #"></label>
-              </div>
-            </section>
-
-            <section>
-              <h2>Payment</h2>
-              <p class="text-dim" style="font-size:var(--fs-sm);margin-bottom:var(--sp-md)">
-                Test card pre-filled — Visa 4111 1111 1111 1111, 12/27, CVV 123.
-              </p>
-              <label>Cardholder name<input name="card_name" required value="Trade Account"></label>
-              <div class="form-row">
-                <label>Card number<input name="card_number" required value="4111 1111 1111 1111" inputmode="numeric" autocomplete="cc-number"></label>
-                <label>Expiry (MMYY)<input name="card_expiry" required value="1227" maxlength="4" inputmode="numeric" autocomplete="cc-exp"></label>
-                <label>CVV<input name="card_cvv" required value="123" maxlength="4" inputmode="numeric" autocomplete="cc-csc"></label>
-              </div>
-              <label class="checkbox-row">
-                <input type="checkbox" id="billing_same" checked>
-                <span>Billing address same as shipping</span>
-              </label>
-              <div id="billing-fields" hidden>
-                <label>Billing ZIP<input name="bill_zip" inputmode="numeric"></label>
-              </div>
-            </section>
-
-            <button type="submit" class="btn btn--primary btn--full" id="place-order-btn">Place order</button>
-            <p class="text-dim fineprint">By placing this order you confirm your trade account details are accurate and that you are purchasing raw materials for qualified trade use. Freight will be quoted and billed separately against your carrier account.</p>
-          </form>
-
-          <aside id="order-summary" class="order-summary">
-            <h2>Order summary</h2>
-            <div id="summary-body"><p class="text-dim">Loading…</p></div>
-          </aside>
+    <div id="checkout-root" class="checkout-grid">
+      <form id="checkout-form" class="checkout-form" novalidate aria-describedby="form-error-summary">
+        <div id="form-error-summary" class="form-error-summary" hidden aria-live="polite" role="alert">
+          <strong>Please review the following:</strong>
+          <ul></ul>
         </div>
 
-        <div id="checkout-result" class="checkout-result" hidden></div>
+        <!-- ============================================================ -->
+        <!-- Shipping address                                              -->
+        <!-- ============================================================ -->
+        <section aria-labelledby="ship-heading">
+          <h2 id="ship-heading">Shipping address</h2>
 
-      </div>
-    </main>
+          <div class="form-row">
+            <div class="field">
+              <label for="ship_name">Contact name <span class="req" aria-hidden="true">*</span></label>
+              <input id="ship_name" name="ship_name" type="text"
+                     required minlength="2" maxlength="80"
+                     autocomplete="name"
+                     aria-required="true" aria-describedby="err-ship_name">
+              <div id="err-ship_name" class="field-error" aria-live="polite"></div>
+            </div>
+            <div class="field">
+              <label for="ship_company">Company <span class="optional">optional</span></label>
+              <input id="ship_company" name="ship_company" type="text"
+                     maxlength="120"
+                     autocomplete="organization">
+            </div>
+          </div>
 
-  </div>
+          <div class="field">
+            <label for="ship_addr1">Address line 1 <span class="req" aria-hidden="true">*</span></label>
+            <input id="ship_addr1" name="ship_addr1" type="text"
+                   required minlength="3" maxlength="120"
+                   autocomplete="address-line1"
+                   aria-required="true" aria-describedby="err-ship_addr1">
+            <div id="err-ship_addr1" class="field-error" aria-live="polite"></div>
+          </div>
 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+          <div class="field">
+            <label for="ship_addr2">Address line 2 <span class="optional">optional</span></label>
+            <input id="ship_addr2" name="ship_addr2" type="text"
+                   maxlength="120"
+                   autocomplete="address-line2">
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="ship_city">City <span class="req" aria-hidden="true">*</span></label>
+              <input id="ship_city" name="ship_city" type="text"
+                     required minlength="2" maxlength="60"
+                     autocomplete="address-level2"
+                     aria-required="true" aria-describedby="err-ship_city">
+              <div id="err-ship_city" class="field-error" aria-live="polite"></div>
+            </div>
+            <div class="field">
+              <label for="ship_state">State <span class="req" aria-hidden="true">*</span></label>
+              <select id="ship_state" name="ship_state" required
+                      autocomplete="address-level1"
+                      aria-required="true" aria-describedby="err-ship_state">
+                <option value="">Select…</option>
+                <option value="AL">AL — Alabama</option><option value="AK">AK — Alaska</option>
+                <option value="AZ">AZ — Arizona</option><option value="AR">AR — Arkansas</option>
+                <option value="CA">CA — California</option><option value="CO">CO — Colorado</option>
+                <option value="CT">CT — Connecticut</option><option value="DE">DE — Delaware</option>
+                <option value="DC">DC — District of Columbia</option>
+                <option value="FL">FL — Florida</option><option value="GA">GA — Georgia</option>
+                <option value="HI">HI — Hawaii</option><option value="ID">ID — Idaho</option>
+                <option value="IL">IL — Illinois</option><option value="IN">IN — Indiana</option>
+                <option value="IA">IA — Iowa</option><option value="KS">KS — Kansas</option>
+                <option value="KY">KY — Kentucky</option><option value="LA">LA — Louisiana</option>
+                <option value="ME">ME — Maine</option><option value="MD">MD — Maryland</option>
+                <option value="MA">MA — Massachusetts</option><option value="MI">MI — Michigan</option>
+                <option value="MN">MN — Minnesota</option><option value="MS">MS — Mississippi</option>
+                <option value="MO">MO — Missouri</option><option value="MT">MT — Montana</option>
+                <option value="NE">NE — Nebraska</option><option value="NV">NV — Nevada</option>
+                <option value="NH">NH — New Hampshire</option><option value="NJ">NJ — New Jersey</option>
+                <option value="NM">NM — New Mexico</option><option value="NY">NY — New York</option>
+                <option value="NC">NC — North Carolina</option><option value="ND">ND — North Dakota</option>
+                <option value="OH">OH — Ohio</option><option value="OK">OK — Oklahoma</option>
+                <option value="OR">OR — Oregon</option><option value="PA">PA — Pennsylvania</option>
+                <option value="RI">RI — Rhode Island</option><option value="SC">SC — South Carolina</option>
+                <option value="SD">SD — South Dakota</option><option value="TN">TN — Tennessee</option>
+                <option value="TX">TX — Texas</option><option value="UT">UT — Utah</option>
+                <option value="VT">VT — Vermont</option><option value="VA">VA — Virginia</option>
+                <option value="WA">WA — Washington</option><option value="WV">WV — West Virginia</option>
+                <option value="WI">WI — Wisconsin</option><option value="WY">WY — Wyoming</option>
+              </select>
+              <div id="err-ship_state" class="field-error" aria-live="polite"></div>
+            </div>
+            <div class="field">
+              <label for="ship_zip">ZIP <span class="req" aria-hidden="true">*</span></label>
+              <input id="ship_zip" name="ship_zip" type="text"
+                     required pattern="\d{5}(-\d{4})?"
+                     inputmode="numeric" maxlength="10"
+                     autocomplete="postal-code"
+                     placeholder="12345 or 12345-6789"
+                     aria-required="true" aria-describedby="err-ship_zip">
+              <div id="err-ship_zip" class="field-error" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="ship_phone">Phone <span class="optional">optional</span></label>
+              <input id="ship_phone" name="ship_phone" type="tel"
+                     pattern="[\d\s\-\+\(\)\.]{7,20}"
+                     inputmode="tel" maxlength="20"
+                     autocomplete="tel"
+                     placeholder="(555) 123-4567"
+                     aria-describedby="err-ship_phone">
+              <div id="err-ship_phone" class="field-error" aria-live="polite"></div>
+            </div>
+            <div class="field">
+              <label for="notes">Delivery notes <span class="optional">optional</span></label>
+              <input id="notes" name="notes" type="text" maxlength="200"
+                     placeholder="e.g. dock hours, PO #">
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- Payment                                                       -->
+        <!-- ============================================================ -->
+        <section aria-labelledby="pay-heading">
+          <h2 id="pay-heading">Payment</h2>
+          <p class="muted">Test card pre-filled — Visa 4111 1111 1111 1111, 12/27, CVV 123.</p>
+
+          <div class="field">
+            <label for="card_name">Cardholder name <span class="req" aria-hidden="true">*</span></label>
+            <input id="card_name" name="card_name" type="text"
+                   required minlength="2" maxlength="80"
+                   autocomplete="cc-name"
+                   value="Trade Account"
+                   aria-required="true" aria-describedby="err-card_name">
+            <div id="err-card_name" class="field-error" aria-live="polite"></div>
+          </div>
+
+          <div class="form-row">
+            <div class="field field-card-number">
+              <label for="card_number">Card number <span class="req" aria-hidden="true">*</span></label>
+              <input id="card_number" name="card_number" type="text"
+                     required inputmode="numeric" maxlength="23"
+                     autocomplete="cc-number"
+                     value="4111 1111 1111 1111"
+                     aria-required="true" aria-describedby="err-card_number card_brand_hint">
+              <span id="card_brand_hint" class="card-brand-hint" aria-live="polite"></span>
+              <div id="err-card_number" class="field-error" aria-live="polite"></div>
+            </div>
+            <div class="field">
+              <label for="card_expiry">Expiry (MM/YY) <span class="req" aria-hidden="true">*</span></label>
+              <input id="card_expiry" name="card_expiry" type="text"
+                     required inputmode="numeric" maxlength="5"
+                     autocomplete="cc-exp"
+                     value="12/27"
+                     placeholder="MM/YY"
+                     aria-required="true" aria-describedby="err-card_expiry">
+              <div id="err-card_expiry" class="field-error" aria-live="polite"></div>
+            </div>
+            <div class="field">
+              <label for="card_cvv">CVV <span class="req" aria-hidden="true">*</span></label>
+              <input id="card_cvv" name="card_cvv" type="text"
+                     required inputmode="numeric" maxlength="4"
+                     autocomplete="cc-csc"
+                     value="123"
+                     aria-required="true" aria-describedby="err-card_cvv">
+              <div id="err-card_cvv" class="field-error" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <label class="checkbox-row">
+            <input type="checkbox" id="billing_same" checked>
+            <span>Billing address same as shipping</span>
+          </label>
+
+          <div id="billing-fields" hidden>
+            <div class="field">
+              <label for="bill_zip">Billing ZIP <span class="req" aria-hidden="true">*</span></label>
+              <input id="bill_zip" name="bill_zip" type="text"
+                     pattern="\d{5}(-\d{4})?"
+                     inputmode="numeric" maxlength="10"
+                     autocomplete="billing postal-code"
+                     aria-describedby="err-bill_zip">
+              <div id="err-bill_zip" class="field-error" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
+        <button type="submit" class="btn btn--primary btn--full" id="place-order-btn">Place order</button>
+        <p class="muted fineprint">By placing this order you confirm your trade account details are accurate and that you are purchasing raw materials for qualified trade use. Freight will be quoted and billed separately against your carrier account.</p>
+      </form>
+
+      <aside id="order-summary" class="order-summary">
+        <h2>Order summary</h2>
+        <div id="summary-body"><p class="muted">Loading…</p></div>
+      </aside>
+    </div>
+
+    <div id="checkout-result" class="checkout-result" hidden></div>
+  </main>
+
+  <div id="footer-slot"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/config.js"></script>
   <script src="/js/auth.js"></script>
+  <script src="/js/nav.js"></script>
   <script src="/js/geo.js"></script>
   <script src="/js/cart.js"></script>
+  <script src="/js/validation.js"></script>
   <script src="/js/checkout.js"></script>
-  <script src="/js/cookie-banner.js"></script>
 </body>
 </html>
