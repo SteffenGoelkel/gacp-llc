@@ -21,8 +21,6 @@
  *       spec; both point at the same value.
  */
 
-const TIER_DISCOUNT = { bronze: 0, silver: 0.08, gold: 0.15, platinum: 0.22 };
-
 const ADMIN_RECIPIENT = { email: 'info@gacp.llc', name: 'GACP LLC' };
 const FROM_ADDRESS = { email: 'noreply@gacp.llc', name: 'GACP Website' };
 
@@ -150,7 +148,24 @@ async function handleQuoteRequest(request, body, env) {
   const prods = await prodRes.json();
   const prodMap = Object.fromEntries((prods || []).map((p) => [p.id, p]));
 
-  const discountPct = TIER_DISCOUNT[profile.tier] || 0;
+  // Tier discount lookup (service_role — tier_discounts has no SELECT
+  // policy for `authenticated`). Same table is also read by the
+  // /api/my-tier-discount Pages Function for the cart-page display;
+  // intentional split, see functions/api/my-tier-discount.js header.
+  // Fail-safe: any error path → 0% discount (never overcharge by
+  // applying a discount we can't verify, never undercharge — match).
+  let discountPct = 0;
+  if (profile.tier) {
+    const tierRes = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/tier_discounts?tier=eq.${encodeURIComponent(profile.tier)}&select=discount_pct`,
+      { headers: supabaseServiceHeaders(env) },
+    );
+    if (tierRes.ok) {
+      const [row] = await tierRes.json();
+      const pct = Number(row && row.discount_pct);
+      if (Number.isFinite(pct)) discountPct = pct / 100;
+    }
+  }
   let subtotalCents = 0;
   const computedItems = [];
   for (const li of body.line_items) {

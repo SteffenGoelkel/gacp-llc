@@ -12,7 +12,14 @@
 (function () {
   const KEY = 'gacp_cart_v2';
   const LEGACY_KEY = 'gacp_cart';
-  const TIER_DISCOUNT = { bronze: 0, silver: 0.08, gold: 0.15, platinum: 0.22 };
+
+  // Tier discount cache, populated by fetchTierDiscount() on cart-page
+  // load. _discountDecimal drives the math; _userTier and _userPct drive
+  // the display label. Defaults are the fail-safe state — if the fetch
+  // fails for any reason, no tier line is shown and 0% is applied.
+  let _userTier = null;
+  let _userPct = 0;
+  let _discountDecimal = 0;
 
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY)) || []; }
@@ -86,15 +93,43 @@
     remove(id) { save(load().filter((l) => l.id !== id)); },
     clear()    { save([]); },
 
-    totals(tier = 'bronze') {
+    totals() {
       const cart = load();
       const subtotal = cart.reduce((s, l) => s + l.snapshot.price * l.qty, 0);
-      const pct      = TIER_DISCOUNT[tier] || 0;
-      const discount = Math.round(subtotal * pct);
+      const discount = Math.round(subtotal * _discountDecimal);
       const shipping = 0;
       const tax      = 0;
       const total    = subtotal - discount + shipping + tax;
-      return { subtotal, discount, discountPct: pct, shipping, tax, total, cart };
+      return {
+        subtotal, discount, shipping, tax, total, cart,
+        tier:    _userTier,
+        pct:     _userPct,
+        decimal: _discountDecimal,
+      };
+    },
+
+    /**
+     * Fetch the calling user's tier+pct from /api/my-tier-discount
+     * (Pages Function). Idempotent. On failure: defaults stay (no tier
+     * shown, 0% applied — never overcharge).
+     */
+    async fetchTierDiscount() {
+      try {
+        const sess = await _sb.auth.getSession();
+        const token = sess && sess.data && sess.data.session && sess.data.session.access_token;
+        if (!token) return;
+        const res = await fetch('/api/my-tier-discount', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const body = await res.json();
+        const tier = typeof body.tier === 'string' ? body.tier : null;
+        const pct  = Number(body.pct);
+        if (!tier || !Number.isFinite(pct)) return;
+        _userTier = tier;
+        _userPct = pct;
+        _discountDecimal = pct / 100;
+      } catch (_) { /* keep defaults */ }
     },
 
     formatUSD,
@@ -122,7 +157,7 @@
 
     // ---------- Cart page renderer ----------
     renderCartPage(container, profile) {
-      const t = this.totals(profile?.tier);
+      const t = this.totals();
       if (!t.cart.length) {
         container.innerHTML = `
           <div class="cart-empty">
@@ -169,13 +204,31 @@
              <button type="button" class="btn btn--secondary" id="cart-clear">Clear cart</button>
            </div>`
         : (gate.ok
-          ? `<textarea id="cart-quote-notes" class="cart-quote-notes" maxlength="2000" rows="4" placeholder="Target delivery date, batch requirements, additional documentation needs, your shipping account if you'd like to use it, anything else worth mentioning."></textarea>
-             <button type="button" id="cart-submit-quote" class="btn btn--primary btn--full">Submit Quote Request</button>
+          ? `<button type="button" id="cart-submit-quote" class="btn btn--primary btn--full">Submit Quote Request</button>
              <div id="cart-submit-error" class="gate-notice gate-notice--error" style="display:none;margin-top:var(--sp-sm)" role="alert"></div>`
           : `<div class="gate-notice">${esc(gate.msg)}</div>
              ${gate.reason === 'consumer' || gate.reason === 'pending'
                ? `<a href="/portal/formulation.html" class="btn btn--secondary btn--full">Request a formulation consultation</a>`
                : ''}`);
+
+      // Notes block — separate panel, only shown when the buyer is on
+      // the domestic submit path. International / blocked gates skip it.
+      const notesBlock = (!isIntl && gate.ok)
+        ? `<div class="cart-notes">
+             <h3 class="cart-notes__heading">Notes (optional)</h3>
+             <textarea id="cart-quote-notes" class="form-textarea cart-notes__textarea" maxlength="2000" rows="4"></textarea>
+             <p class="cart-notes__caption">Delivery date, batch needs, shipping account, anything else worth mentioning.</p>
+           </div>`
+        : '';
+
+      // Tier-discount label: shown only when there's an actual discount
+      // to display (Silver and above). Bronze (0%) is suppressed —
+      // surfaces the line as a visual reward for upgraded tiers, avoids
+      // zero-value noise. Trailing zeros are stripped by Number's
+      // default toString — 2 → "2", 3.5 → "3.5".
+      const discountLine = (t.tier && t.pct > 0)
+        ? `<div class="cart-summary__row"><span>Tier discount (${esc(t.tier)} &minus; ${String(t.pct)}%)</span><span>&minus;${formatUSD(t.discount)}</span></div>`
+        : '';
 
       container.innerHTML = `
         <table class="cart-table">
@@ -189,11 +242,10 @@
           </thead>
           <tbody>${lines}</tbody>
         </table>
+        ${notesBlock}
         <div class="cart-summary">
           <div class="cart-summary__row"><span>Subtotal</span><span>${formatUSD(t.subtotal)}</span></div>
-          ${t.discount > 0
-            ? `<div class="cart-summary__row"><span>Tier discount (${esc(profile.tier)} &minus; ${(t.discountPct * 100).toFixed(0)}%)</span><span>&minus;${formatUSD(t.discount)}</span></div>`
-            : ''}
+          ${discountLine}
           <div class="cart-summary__row text-dim"><span>Shipping</span><span>Quoted separately</span></div>
           <div class="cart-summary__row cart-summary__row--total"><span>Total</span><span>${formatUSD(t.total)}</span></div>
           ${gateBlock}
@@ -366,6 +418,10 @@ async function initCartPage() {
   // loadProducts is not strictly required — snapshot holds pricing —
   // but keep it so the nav/sidebar counts etc. reflect catalogue state.
   if (typeof loadProducts === 'function') await loadProducts();
+
+  // Populate the tier-discount cache before the first render so the
+  // discount line is correct on initial paint, not after a flicker.
+  await window.Cart.fetchTierDiscount();
 
   window.Cart.renderCartPage(container, profile);
   document.addEventListener('cart:change', () => window.Cart.renderCartPage(container, profile));
