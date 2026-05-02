@@ -247,8 +247,21 @@ async function handleQuoteRequest(request, body, env) {
     notes,
   };
 
+  // Serialize the two sends with a 1.1s gap. Near-simultaneous sends
+  // from one MailChannels account hit a soft per-account throttle and
+  // the relay 500s with a generic nginx page (no API error body). The
+  // gap stays well clear of the throttle window. Buyer is retried
+  // once on failure because losing the user-facing confirmation is
+  // the more visible UX failure; admin failures are recoverable from
+  // the DB row and don't warrant compounding the burst.
   const adminEmail = await sendMail(buildAdminEmail(ctx), env);
-  const buyerEmail = await sendMail(buildBuyerEmail(ctx), env);
+  await new Promise((r) => setTimeout(r, 1100));
+  let buyerEmail = await sendMail(buildBuyerEmail(ctx), env);
+  if (buyerEmail && !buyerEmail.ok) {
+    console.log('quote: buyer email failed once, retrying after 2s');
+    await new Promise((r) => setTimeout(r, 2000));
+    buyerEmail = await sendMail(buildBuyerEmail(ctx), env);
+  }
 
   if (!adminEmail.ok) console.error('quote: admin email failed', adminEmail.error);
   if (!buyerEmail.ok) console.error('quote: buyer email failed', buyerEmail.error);
