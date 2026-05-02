@@ -430,8 +430,12 @@ function supabaseServiceHeaders(env) {
 }
 
 async function sendMail({ to, from, reply_to, subject, text, html }, env) {
-  const content = [{ type: 'text/plain', value: text }];
-  if (html) content.push({ type: 'text/html', value: html });
+  // charset=utf-8 on both parts: admin email body has em dash, unicode
+  // minus, right-arrow — without an explicit charset MailChannels'
+  // nginx layer 500s on the multi-byte content. Buyer body is ASCII
+  // so it worked without it, but declaring charset is correct on both.
+  const content = [{ type: 'text/plain; charset=utf-8', value: text }];
+  if (html) content.push({ type: 'text/html; charset=utf-8', value: html });
   try {
     const res = await fetch('https://api.mailchannels.net/tx/v1/send', {
       method: 'POST',
