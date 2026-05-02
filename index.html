@@ -87,7 +87,7 @@
           <p class="hero__subtitle">GACP-compliant sourcing, precision extraction, and full chain-of-custody documentation — from canopy to capsule.</p>
           <div class="hero__actions">
             <a href="/catalogue.html" class="btn btn--primary btn--lg btn--pill">View Catalogue</a>
-            <a href="/register.html" class="btn btn--secondary btn--lg btn--pill">Apply for Trade</a>
+            <a href="/register.html" id="hero-secondary-cta" class="btn btn--secondary btn--lg btn--pill">Apply for Trade</a>
           </div>
         </div>
       </section>
@@ -233,7 +233,7 @@
       <div class="mobile-cta">
         <h2>Ready to source?</h2>
         <a href="/catalogue.html" class="btn btn--primary">Browse Catalogue</a>
-        <a href="/register.html" class="btn btn--secondary">Apply for Trade Account</a>
+        <a href="/register.html" id="mobile-secondary-cta" class="btn btn--secondary">Apply for Trade Account</a>
       </div>
 
     </main>
@@ -254,8 +254,30 @@
   <script src="/js/hero.js"></script>
   <script src="/js/contact.js"></script>
   <script>
+    // Auth-aware swap for the hero + mobile secondary CTAs.
+    // Two-stage update mirroring the pattern in js/nav.js updateNavAuthState():
+    // sync render from cached profile (instant), async re-check via Supabase
+    // session. Signed-in trade-account holders see "Open Portal" pointing at
+    // the dashboard; signed-out visitors keep the trade-application CTA.
+    function updateHomeAuthCTAs(isLoggedIn) {
+      const heroBtn = document.getElementById('hero-secondary-cta');
+      const mobileBtn = document.getElementById('mobile-secondary-cta');
+      if (heroBtn) {
+        heroBtn.textContent = isLoggedIn ? 'Open Portal' : 'Apply for Trade';
+        heroBtn.href = isLoggedIn ? PATHS.DASHBOARD : '/register.html';
+      }
+      if (mobileBtn) {
+        mobileBtn.textContent = isLoggedIn ? 'Open Portal' : 'Apply for Trade Account';
+        mobileBtn.href = isLoggedIn ? PATHS.DASHBOARD : '/register.html';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       initNavigation('home', false);
+
+      // Sync first paint from cached profile, then async re-check.
+      updateHomeAuthCTAs(!!getCachedProfile());
+      getSession().then((s) => updateHomeAuthCTAs(!!s));
 
       // Load product counts from database
       try {
