@@ -861,6 +861,12 @@
   margin-bottom: var(--sp-md);
 }
 
+.gate-notice--error {
+  border: 1px solid var(--terra);
+  background: color-mix(in srgb, var(--terra) 10%, transparent);
+  color: var(--terra);
+}
+
 /* --- Cart page --------------------------------------------- */
 /* === Empty cart layout: centred block within the portal column === */
 .cart-empty {

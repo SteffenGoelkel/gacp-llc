@@ -126,7 +126,7 @@
       if (!t.cart.length) {
         container.innerHTML = `
           <div class="cart-empty">
-            <h2>Your cart is empty</h2>
+            <h2>Your quote builder is empty</h2>
             <p class="text-dim">Browse the catalogue to add products.</p>
             <a href="/portal/catalogue.html" class="btn btn--primary">Browse catalogue</a>
           </div>`;
@@ -169,7 +169,9 @@
              <button type="button" class="btn btn--secondary" id="cart-clear">Clear cart</button>
            </div>`
         : (gate.ok
-          ? `<a href="/portal/checkout.html" class="btn btn--primary btn--full">Proceed to checkout</a>`
+          ? `<textarea id="cart-quote-notes" class="cart-quote-notes" maxlength="2000" rows="4" placeholder="Target delivery date, batch requirements, additional documentation needs, your shipping account if you'd like to use it, anything else worth mentioning."></textarea>
+             <button type="button" id="cart-submit-quote" class="btn btn--primary btn--full">Submit Quote Request</button>
+             <div id="cart-submit-error" class="gate-notice gate-notice--error" style="display:none;margin-top:var(--sp-sm)" role="alert"></div>`
           : `<div class="gate-notice">${esc(gate.msg)}</div>
              ${gate.reason === 'consumer' || gate.reason === 'pending'
                ? `<a href="/portal/formulation.html" class="btn btn--secondary btn--full">Request a formulation consultation</a>`
@@ -220,6 +222,85 @@
       if (clearBtn) clearBtn.addEventListener('click', () => {
         if (confirm('Clear cart?')) { Cart.clear(); Cart.renderCartPage(container, profile); }
       });
+
+      const submitBtn = container.querySelector('#cart-submit-quote');
+      if (submitBtn) {
+        submitBtn.addEventListener('click', async () => {
+          const errEl  = container.querySelector('#cart-submit-error');
+          const notesEl = container.querySelector('#cart-quote-notes');
+          const notes  = (notesEl?.value || '').trim();
+
+          const showErr = (msg) => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Quote Request';
+            errEl.textContent = msg;
+            errEl.style.display = 'block';
+          };
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Submitting…';
+          errEl.style.display = 'none';
+          errEl.textContent = '';
+
+          let session = null;
+          try {
+            const r = await _sb.auth.getSession();
+            session = r?.data?.session || null;
+          } catch (_) { session = null; }
+          if (!session) {
+            showErr('Your session has expired. Please sign in again to submit your quote.');
+            return;
+          }
+
+          const payload = {
+            type: 'quote_request',
+            line_items: Cart.all().map((l) => ({
+              product_id: l.id,
+              sku:        l.id,
+              name:       l.snapshot.name,
+              qty:        l.qty,
+              unit:       l.snapshot.unit,
+              unit_price_cents: l.snapshot.price,
+            })),
+            notes,
+          };
+
+          let res, body;
+          try {
+            res = await fetch('/api/contact', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify(payload),
+            });
+          } catch (_) {
+            showErr('Network error. Please check your connection and try again.');
+            return;
+          }
+          try { body = await res.json(); } catch { body = {}; }
+
+          if (res.status === 200) {
+            Cart.clear();
+            container.innerHTML = `
+              <div class="cart-empty">
+                <h2>Quote request received</h2>
+                <p>We'll respond within one US business day with a pro forma invoice.</p>
+                <a href="/portal/catalogue.html" class="btn btn--primary">Back to catalogue</a>
+              </div>`;
+            return;
+          }
+
+          if (res.status === 401) {
+            showErr('Your session has expired. Please sign in again to submit your quote.');
+          } else if (res.status === 400) {
+            showErr(body.error || body.message || 'There was a problem with your request.');
+          } else {
+            showErr('Something went wrong. Please try again, or email info@gacp.llc.');
+          }
+        });
+      }
     },
   };
 
