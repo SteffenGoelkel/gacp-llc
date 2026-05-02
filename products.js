@@ -279,7 +279,7 @@ function openProductDetail(product, profile, viewMode = 'auto') {
       ` : ''}
 
       <div style="display:flex;gap:var(--sp-md);margin-top:var(--sp-xl)">
-        ${product.price ? `<button class="btn btn--primary" onclick="addToCart('${product.id}')">Add to Cart</button>` : ''}
+        ${product.price ? `<button class="btn btn--primary" onclick="addToCart('${product.id}')">Add to Quote</button>` : ''}
         <button class="btn btn--secondary" onclick="closeOverlay()">Close</button>
       </div>
     </div>
@@ -352,6 +352,7 @@ async function requestSample(productId, productName, samplePrice, sampleUnit) {
       formEl.innerHTML = '<div style="padding:var(--sp-md);background:rgba(78,138,86,0.08);border-radius:var(--radius-md);border:1px solid rgba(78,138,86,0.2)">' +
         '<p style="color:var(--green);font-weight:600;margin-bottom:var(--sp-xs)">Sample request submitted</p>' +
         '<p class="text-sm text-dim">We\'ll be in touch at ' + escapeHtml(session.user.email) + ' to confirm your sample order and arrange payment.</p>' +
+        '<p class="text-sm text-dim" style="margin-top:var(--sp-sm)"><a href="/how-to-order.html" style="color:inherit;text-decoration:underline">See how ordering works &rarr;</a></p>' +
       '</div>';
     }
 

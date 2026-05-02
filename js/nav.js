@@ -63,6 +63,7 @@ function getFooterHTML() {
           </div>
           <div>
             <h4 class="footer__col-heading">Products</h4>
+            <a href="/how-to-order.html" class="footer__link">How to Order</a>
             <a href="/catalogue.html" class="footer__link">Browse Catalogue</a>
             <a href="/catalogue.html#tropical" class="footer__link">Tropical Botanicals</a>
             <a href="/catalogue.html#ethno" class="footer__link">Ethno-Pharma</a>

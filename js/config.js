@@ -45,18 +45,19 @@ const CATEGORIES = [
 
 // Paths
 const PATHS = {
-  HOME:        '/',
-  ABOUT:       '/about.html',
-  LOGIN:       '/login.html',
-  REGISTER:    '/register.html',
-  DASHBOARD:   '/portal/dashboard.html',
-  CATALOGUE:   '/portal/catalogue.html',
-  CART:        '/portal/cart.html',
-  COA:         '/portal/coa.html',
-  FORMULATION: '/portal/formulation.html',
-  PRICING:     '/portal/pricing.html',
-  PROFILE:     '/portal/profile.html',
-  ADMIN:       '/admin.html',
+  HOME:         '/',
+  ABOUT:        '/about.html',
+  LOGIN:        '/login.html',
+  REGISTER:     '/register.html',
+  HOW_TO_ORDER: '/how-to-order.html',
+  DASHBOARD:    '/portal/dashboard.html',
+  CATALOGUE:    '/portal/catalogue.html',
+  CART:         '/portal/cart.html',
+  COA:          '/portal/coa.html',
+  FORMULATION:  '/portal/formulation.html',
+  PRICING:      '/portal/pricing.html',
+  PROFILE:      '/portal/profile.html',
+  ADMIN:        '/admin.html',
 };
 
 // --- Utility helpers ----------------------------------------

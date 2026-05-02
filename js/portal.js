@@ -7,13 +7,14 @@
 
 function getPortalSidebarHTML(activePage = '', profile = null) {
   const links = [
-    { href: PATHS.DASHBOARD,   label: 'Dashboard',     icon: 'grid',    key: 'dashboard' },
-    { href: PATHS.CATALOGUE,   label: 'Catalogue',     icon: 'package', key: 'catalogue' },
-    { href: PATHS.CART,        label: 'Cart',          icon: 'cart',    key: 'cart' },
-    { href: PATHS.COA,         label: 'CoA Library',   icon: 'file',    key: 'coa' },
-    { href: PATHS.FORMULATION, label: 'Formulation',   icon: 'flask',   key: 'formulation' },
-    { href: PATHS.PRICING,     label: 'Bulk Pricing',  icon: 'tag',     key: 'pricing' },
-    { href: PATHS.PROFILE,     label: 'Profile',       icon: 'user',    key: 'profile' },
+    { href: PATHS.DASHBOARD,    label: 'Dashboard',     icon: 'grid',    key: 'dashboard' },
+    { href: PATHS.CATALOGUE,    label: 'Catalogue',     icon: 'package', key: 'catalogue' },
+    { href: PATHS.HOW_TO_ORDER, label: 'How to Order',  icon: 'book',    key: 'how-to-order' },
+    { href: PATHS.CART,         label: 'Cart',          icon: 'cart',    key: 'cart' },
+    { href: PATHS.COA,          label: 'CoA Library',   icon: 'file',    key: 'coa' },
+    { href: PATHS.FORMULATION,  label: 'Formulation',   icon: 'flask',   key: 'formulation' },
+    { href: PATHS.PRICING,      label: 'Bulk Pricing',  icon: 'tag',     key: 'pricing' },
+    { href: PATHS.PROFILE,      label: 'Profile',       icon: 'user',    key: 'profile' },
   ];
 
   // Only show admin link to admin users
@@ -24,6 +25,7 @@ function getPortalSidebarHTML(activePage = '', profile = null) {
   const icons = {
     grid:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
     package: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>',
+    book:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
     cart:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
     file:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>',
     flask:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6.5L4 20h16L14 9.5V3"/></svg>',

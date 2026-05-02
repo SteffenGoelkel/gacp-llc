@@ -356,7 +356,7 @@ function renderPurchaseBlock(product, profile) {
       <small class="text-dim">MOQ: ${minQty} ${escapeHtml(unit)}</small>
     </div>
     <div class="product-detail-actions" style="display:flex;gap:var(--sp-md);margin-top:var(--sp-lg)">
-      <button class="btn btn--primary" id="add-to-cart-btn-${product.id}">Add to cart</button>
+      <button class="btn btn--primary" id="add-to-cart-btn-${product.id}">Add to Quote</button>
       <button class="btn btn--secondary" onclick="closeOverlay()">Close</button>
     </div>`;
 }
