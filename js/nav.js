@@ -90,7 +90,6 @@ function getFooterHTML() {
           <div>
             <h4 class="footer__col-heading">Contact</h4>
             <!--email_off--><a href="mailto:${email}" class="footer__link">${email}</a><!--email_on-->
-            <a href="tel:+18556834227" class="footer__link">1-855-683-GACP (4227)</a>
             <a href="/contact.html" class="footer__link">Contact Form</a>
             <a href="/portal/coa.html" class="footer__link">CoA Library</a>
             <a href="/register.html" class="footer__link">Apply for Trade Account</a>
