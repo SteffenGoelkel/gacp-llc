@@ -76,7 +76,7 @@ async function handleContact(body, env) {
       `IP Country: ${body.ip_country || 'N/A'}`,
       `IP City: ${body.ip_city || 'N/A'}`,
     ].join('\n'),
-  });
+  }, env);
 
   if (!sent.ok) {
     console.error('contact: MailChannels error:', sent.error);
@@ -232,8 +232,8 @@ async function handleQuoteRequest(request, body, env) {
     notes,
   };
 
-  const adminEmail = await sendMail(buildAdminEmail(ctx));
-  const buyerEmail = await sendMail(buildBuyerEmail(ctx));
+  const adminEmail = await sendMail(buildAdminEmail(ctx), env);
+  const buyerEmail = await sendMail(buildBuyerEmail(ctx), env);
 
   if (!adminEmail.ok) console.error('quote: admin email failed', adminEmail.error);
   if (!buyerEmail.ok) console.error('quote: buyer email failed', buyerEmail.error);
@@ -414,13 +414,16 @@ function supabaseServiceHeaders(env) {
   };
 }
 
-async function sendMail({ to, from, reply_to, subject, text, html }) {
+async function sendMail({ to, from, reply_to, subject, text, html }, env) {
   const content = [{ type: 'text/plain', value: text }];
   if (html) content.push({ type: 'text/html', value: html });
   try {
     const res = await fetch('https://api.mailchannels.net/tx/v1/send', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': env.MAILCHANNELS_API_KEY,
+      },
       body: JSON.stringify({
         personalizations: [{ to }],
         from,
