@@ -98,6 +98,13 @@ async function initDashboard() {
   refreshPortalSidebar('dashboard');
   await loadProducts();
 
+  // Fetch tier discount from /api/my-tier-discount (cached for page).
+  // Render rule: known tier (incl. Bronze 0%) → "X%"; null tier (fetch
+  // failure) → "—". Avoids briefly flashing 0% to a Gold user during
+  // a flaky fetch. Trailing zeros stripped naturally by Number toString.
+  const myTier = await fetchMyTier();
+  const discountDisplay = myTier.tier ? `${String(myTier.pct)}%` : '—';
+
   // Greeting
   const greetingEl = document.getElementById('dash-greeting');
   if (greetingEl) {
@@ -136,7 +143,6 @@ async function initDashboard() {
   const accountEl = document.getElementById('account-details');
   if (accountEl) {
     const tierLabel = (profile.tier || 'bronze').charAt(0).toUpperCase() + (profile.tier || 'bronze').slice(1);
-    const discount = (getTierDiscount(profile.tier) * 100).toFixed(0) + '%';
     const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || '—';
     const address = [profile.addr1, profile.city, profile.state, profile.zip, profile.country].filter(Boolean).join(', ') || '—';
     const memberSince = profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
@@ -149,7 +155,7 @@ async function initDashboard() {
       ['Company', profile.company || '—'],
       ['Address', address],
       ['Tier', tierLabel],
-      ['Discount', discount],
+      ['Discount', discountDisplay],
       ['Member Since', memberSince],
     ];
 
@@ -166,7 +172,7 @@ async function initDashboard() {
     'stat-products': PRODUCTS.length,
     'stat-cart': getCartCount(),
     'stat-tier': (profile.tier || 'bronze').charAt(0).toUpperCase() + (profile.tier || 'bronze').slice(1),
-    'stat-discount': (getTierDiscount(profile.tier) * 100).toFixed(0) + '%',
+    'stat-discount': discountDisplay,
   };
 
   Object.entries(statsMap).forEach(([id, val]) => {

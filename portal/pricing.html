@@ -158,9 +158,13 @@
       if (!auth) return;
       const { profile } = auth;
 
-      // Build price table grouped by category
+      // Build price table grouped by category. Tier comes from
+      // /api/my-tier-discount (server reads tier_discounts via service_role).
+      // Bronze (pct=0) and fetch failures both suppress the Your Price column.
       const table = document.getElementById('price-table');
-      const discount = getTierDiscount(profile.tier);
+      const myTier = await fetchMyTier();
+      const decimal = myTier.pct / 100;
+      const showYourPrice = myTier.pct > 0;
 
       let html = `
         <thead>
@@ -169,7 +173,7 @@
             <th>Unit</th>
             <th>MOQ</th>
             <th>List Price</th>
-            ${discount > 0 ? '<th>Your Price</th>' : ''}
+            ${showYourPrice ? '<th>Your Price</th>' : ''}
           </tr>
         </thead>
         <tbody>
@@ -179,18 +183,18 @@
         const catProducts = PRODUCTS.filter(p => p.cat === cat.key);
         if (!catProducts.length) return;
 
-        html += `<tr><td colspan="${discount > 0 ? 5 : 4}" style="background:var(--ink);font-weight:600;color:${cat.color};text-transform:uppercase;font-size:var(--fs-xs);letter-spacing:0.08em">${cat.label}</td></tr>`;
+        html += `<tr><td colspan="${showYourPrice ? 5 : 4}" style="background:var(--ink);font-weight:600;color:${cat.color};text-transform:uppercase;font-size:var(--fs-xs);letter-spacing:0.08em">${cat.label}</td></tr>`;
 
         catProducts.forEach(p => {
           const layer = getProductLayer(p, profile);
-          const yourPrice = Math.round(p.price * (1 - discount));
+          const yourPrice = Math.round(p.price * (1 - decimal));
           html += `
             <tr>
               <td>${escapeHtml(layer.name)}</td>
               <td>${p.unit}</td>
               <td>${p.moq}</td>
               <td>${formatPrice(p.price)}</td>
-              ${discount > 0 ? `<td style="color:var(--green);font-weight:600">${formatPrice(yourPrice)}</td>` : ''}
+              ${showYourPrice ? `<td style="color:var(--green);font-weight:600">${formatPrice(yourPrice)}</td>` : ''}
             </tr>
           `;
         });

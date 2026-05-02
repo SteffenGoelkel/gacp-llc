@@ -21,16 +21,32 @@ const ROLES = {
 };
 
 // Tiers
-const TIERS = {
-  BRONZE:   { key: 'bronze',   label: 'Bronze',   discount: 0 },
-  SILVER:   { key: 'silver',   label: 'Silver',   discount: 0.08 },
-  GOLD:     { key: 'gold',     label: 'Gold',     discount: 0.15 },
-  PLATINUM: { key: 'platinum', label: 'Platinum', discount: 0.22 },
-};
-
-function getTierDiscount(tierKey) {
-  const t = Object.values(TIERS).find(t => t.key === tierKey);
-  return t ? t.discount : 0;
+// Fetch the calling user's tier + pct from /api/my-tier-discount, cached
+// for the page lifetime. Source of truth is the tier_discounts table
+// (RLS-locked, read via service_role inside the Pages Function). On any
+// failure: { tier: null, pct: 0 } — never throws, never reads stale state.
+// Concurrent first-callers share one in-flight promise.
+let _myTierPromise = null;
+async function fetchMyTier() {
+  if (_myTierPromise !== null) return _myTierPromise;
+  _myTierPromise = (async () => {
+    try {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (!session) return { tier: null, pct: 0 };
+      const r = await fetch('/api/my-tier-discount', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!r.ok) return { tier: null, pct: 0 };
+      const body = await r.json();
+      const tier = typeof body.tier === 'string' ? body.tier : null;
+      const pct  = Number(body.pct);
+      if (!tier || !Number.isFinite(pct)) return { tier: null, pct: 0 };
+      return { tier, pct };
+    } catch (_) {
+      return { tier: null, pct: 0 };
+    }
+  })();
+  return _myTierPromise;
 }
 
 // Categories
