@@ -16,6 +16,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://gacp.llc/functional-stack-development.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://gacp.llc/about.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

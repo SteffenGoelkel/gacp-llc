@@ -23,6 +23,7 @@ function getNavHTML(activePage = '') {
         <div class="nav__links">
           <a href="/" class="nav__link ${activePage === 'home' ? 'nav__link--active' : ''}">Home</a>
           <a href="/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Catalogue</a>
+          <a href="/functional-stack-development.html" class="nav__link ${activePage === 'services' ? 'nav__link--active' : ''}">Services</a>
           <a href="/quality.html" class="nav__link ${activePage === 'quality' ? 'nav__link--active' : ''}">Quality</a>
           <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
           <a href="${authHref}" class="nav__cta" id="nav-auth-btn">${authLabel}</a>
@@ -38,6 +39,7 @@ function getNavHTML(activePage = '') {
     <div class="nav__mobile" id="nav-mobile">
       <a href="/" class="nav__link ${activePage === 'home' ? 'nav__link--active' : ''}">Home</a>
       <a href="/catalogue.html" class="nav__link ${activePage === 'catalogue' ? 'nav__link--active' : ''}">Catalogue</a>
+      <a href="/functional-stack-development.html" class="nav__link ${activePage === 'services' ? 'nav__link--active' : ''}">Services</a>
       <a href="/about.html" class="nav__link ${activePage === 'about' ? 'nav__link--active' : ''}">About</a>
       <a href="${authHref}" class="nav__cta" id="nav-auth-btn-mobile">${authLabel}</a>
       <a href="#" class="nav__link nav__logout${logoutClass}" id="nav-logout-btn-mobile">Sign Out</a>
@@ -64,6 +66,7 @@ function getFooterHTML() {
           <div>
             <h4 class="footer__col-heading">Products</h4>
             <a href="/how-to-order.html" class="footer__link">How to Order</a>
+            <a href="/functional-stack-development.html" class="footer__link">Functional Stack Development</a>
             <a href="/catalogue.html" class="footer__link">Browse Catalogue</a>
             <a href="/catalogue.html#tropical" class="footer__link">Tropical Botanicals</a>
             <a href="/catalogue.html#ethno" class="footer__link">Ethno-Pharma</a>
